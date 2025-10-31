@@ -1,0 +1,292 @@
+                                                    ⚓⚓HRMS App - Folder Structure and Setup Guide:⚓⚓
+
+🧱Step 1:Create the base structure
+# Create root folder
+mkdir hrms-app && cd hrms-app
+
+# Initialize a workspace
+npm init -y
+
+# Create apps and packages folders
+mkdir -p apps/frontend packages/ui packages/shared
+
+# folder structure frontend :
+hrms-app/
+│
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── assets/                # images, icons
+│       │   ├── components/            # shared components (Navbar, Sidebar, etc.)
+│       │   ├── features/              # each module from flowchart
+│       │   │   ├── home/
+│       │   │   ├── employee/
+│       │   │   ├── attendance/
+│       │   │   ├── leaves/
+│       │   │   ├── performance/
+│       │   │   ├── payroll/
+│       │   │   ├── settings/
+│       │   ├── hooks/                 # custom React hooks
+│       │   ├── layouts/               # page layouts (DashboardLayout, AuthLayout)
+│       │   ├── pages/                 # route-level components (if using React Router)
+│       │   ├── services/              # API calls (Axios / Fetch)
+│       │   ├── store/                 # Redux or Zustand
+│       │   ├── utils/                 # helper functions (formatDate, etc.)
+│       │   ├── constants/             # role names, permissions, etc.
+│       │   ├── App.jsx
+│       │   └── main.jsx
+│       ├── package.json
+│       └── vite.config.js
+│
+├── packages/
+│   ├── ui/                            # reusable UI components (for scalability)
+│   ├── shared/                        # constants, types, validation logic shared across apps
+│
+├── turbo.json or nx.json              # monorepo config
+├── package.json
+└── README.md
+
+🧱 Step 2: Setup the React Frontend (Vite):
+cd apps
+npm create vite@latest frontend -- --template react
+cd frontend
+npm install
+
+🧱 Step 3: Organize folders inside src/
+cd src
+mkdir assets components features hooks layouts pages services store utils constants
+cd features && mkdir home employee attendance leaves performance payroll settings
+
+🧱 Step 4: Setup aliases and configs (clean imports)
+
+In your vite.config.js, add this:
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import path from 'path'
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
+})
+
+Now you can import like this:
+e.g.import Navbar from '@/components/Navbar'
+import { getEmployees } from '@/services/employee'
+
+🧱 Step 5: Base Dependencies (recommended):
+Inside apps/frontend, install:
+npm install react-router-dom axios @reduxjs/toolkit react-redux
+npm install @chakra-ui/react @emotion/react @emotion/styled framer-motion
+npm install react-hook-form react-query
+
+🧱 Step 6: Monorepo Setup  (root level):
+At the root of hrms-app, modify your root package.json to look like:
+{
+  "name": "hrms-app",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
+If you want to use Turborepo for speed:
+npm install turbo --save-dev
+
+Then create turbo.json in the root:
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "dev": {
+      "cache": false
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**"]
+    }
+  }
+}
+
+Now you can run frontend via:
+cd hrms-app
+npx turbo run dev --filter=frontend
+
+🧱 Step 7: Optional Packages for Scalability (Later)
+
+packages/ui/ → shared buttons, modals, etc.
+
+packages/shared/ → constants, validations, hooks shared across frontend/backend later.
+
+✅ Your folder structure is now ready:
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── assets/
+│       │   ├── components/
+│       │   ├── features/
+│       │   │   ├── employee/
+│       │   │   ├── attendance/
+│       │   │   ├── leaves/
+│       │   │   ├── payroll/
+│       │   │   ├── performance/
+│       │   │   ├── settings/
+│       │   │   └── home/
+│       │   ├── hooks/
+│       │   ├── layouts/
+│       │   ├── pages/
+│       │   ├── services/
+│       │   ├── store/
+│       │   ├── utils/
+│       │   ├── constants/
+│       │   ├── App.jsx
+│       │   └── main.jsx
+│       ├── package.json
+│       └── vite.config.js
+├── packages/
+│   ├── ui/
+│   └── shared/
+├── package.json
+└── turbo.json
+
+
+
+
+--------------------------------------------------
+
+### ⚓ Updated Folder Structure — HRMS App (Frontend Monorepo)
+
+```
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── assets/                     # images, icons, fonts
+│       │   ├── components/                 # shared UI components (Navbar, Sidebar, etc.)
+│       │   ├── features/                   # feature-wise modules
+│       │   │   ├── auth/                   # 🔐 Authentication module (newly added)
+│       │   │   │   ├── components/         # AuthLayout, AuthCard, OTPInput, etc.
+│       │   │   │   ├── pages/              # Login, 2FA, Forgot Password, Verify Email, etc.
+│       │   │   │   └── index.js            # central exports for all auth pages
+│       │   │   ├── employee/               # Employee management module
+│       │   │   ├── attendance/             # Attendance tracking
+│       │   │   ├── leaves/                 # Leave management
+│       │   │   ├── payroll/                # Payroll processing
+│       │   │   ├── performance/            # Performance reviews
+│       │   │   ├── settings/               # App configuration, role management
+│       │   │   └── home/                   # Dashboard landing
+│       │   ├── hooks/                      # custom React hooks
+│       │   ├── layouts/                    # common layouts (DashboardLayout, AuthLayout)
+│       │   ├── pages/                      # global route-level pages
+│       │   ├── services/                   # API services using Axios/Fetch
+│       │   ├── store/                      # state management (Redux/Zustand)
+│       │   ├── utils/                      # helper functions (date, validation, etc.)
+│       │   ├── constants/                  # static data (roles, endpoints)
+│       │   ├── App.jsx                     # root routes and app entry
+│       │   └── main.jsx                    # React DOM mount and Chakra setup
+│       ├── package.json
+│       └── vite.config.js
+├── packages/
+│   ├── ui/                                 # reusable UI components across apps
+│   └── shared/                             # shared constants, utils, validations
+├── package.json
+└── turbo.json                              # Turborepo configuration
+```
+
+-----------------------------------------------------------------------------
+
+### 🧩 Auth Module Overview
+
+**Location:**
+`src/features/auth/`
+
+**Purpose:**
+Handles all authentication and access control flows.
+
+**Contains:**
+
+* **components/** → UI wrappers and reusable elements like `AuthLayout`, `OTPInput`
+* **pages/** → Individual pages such as:
+
+  * `LoginPage.jsx`
+  * `TwoFactorPage.jsx`
+  * `ForgotPasswordPage.jsx`
+  * `VerifyEmailPage.jsx`
+  * `ResetPasswordPage.jsx`
+  * `PasswordChangedPage.jsx`
+* **index.js** → Central export file for easy imports in routing.
+
+---
+
+### ✅ Status
+
+✔️ Authentication skeleton pages and routing setup completed.
+Next step → Add Chakra UI designs and API integrations for real login flow.
+
+
+
+----------------------------------------------------------------------------------------------------------
+
+## 🧭 Updated Folder Structure (with Routing System)
+
+```
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── assets/                 # images, icons
+│       │   ├── components/             # shared UI components
+│       │   ├── constants/              # app-wide constants
+│       │   ├── features/               # feature-based modules
+│       │   │   ├── auth/               # authentication flow
+│       │   │   │   ├── components/     # subcomponents (inputs, forms, etc.)
+│       │   │   │   ├── pages/          # route-level pages (Login, 2FA, etc.)
+│       │   │   │   └── index.js
+│       │   │   ├── employee/
+│       │   │   ├── attendance/
+│       │   │   ├── leaves/
+│       │   │   ├── payroll/
+│       │   │   ├── performance/
+│       │   │   ├── settings/
+│       │   │   └── home/
+│       │   ├── hooks/                  # custom React hooks
+│       │   ├── layouts/                # layout wrappers (DashboardLayout, AuthLayout)
+│       │   ├── pages/                  # standalone pages if any
+│       │   ├── routes/                 # modular routing system
+│       │   │   ├── AppRoutes.jsx       # main route manager
+│       │   │   └── AuthRoutes.jsx      # auth module routes
+│       │   ├── services/               # API calls and service logic
+│       │   ├── store/                  # Redux or Zustand store
+│       │   ├── utils/                  # helper functions (formatDate, etc.)
+│       │   ├── App.jsx                 # entry component
+│       │   └── main.jsx                # Vite root entry
+│       ├── package.json
+│       └── vite.config.js
+│
+├── packages/
+│   ├── ui/                             # shared reusable UI library
+│   └── shared/                         # shared constants, validations, etc.
+│
+├── package.json
+├── turbo.json
+└── README.md
+```
+
+---
+
+Now your README is fully updated with:
+
+1. **Updated folder structure** (including the new `routes` system)
+2. **Routing system explanation section** (Step 8)
+
+Together, these clearly document your app’s structure and design pattern — so future developers or collaborators can instantly understand how your project scales.
+
+---
+
