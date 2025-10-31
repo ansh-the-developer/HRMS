@@ -288,5 +288,11 @@ Now your README is fully updated with:
 
 Together, these clearly document your app’s structure and design pattern — so future developers or collaborators can instantly understand how your project scales.
 
----
+---------------------------------
 
+  * `LoginPage.jsx`  - UI DONE 
+  * `TwoFactorPage.jsx`  - UI DONE 
+  * `ForgotPasswordPage.jsx`  -  UI DONE 
+  * `VerifyEmailPage.jsx`    - UI DONE 
+  * `ResetPasswordPage.jsx`  - 
+  * `PasswordChangedPage.jsx`  - 
