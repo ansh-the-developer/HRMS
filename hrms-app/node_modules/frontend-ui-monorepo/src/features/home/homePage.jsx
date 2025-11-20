@@ -1,6 +1,7 @@
 import React from "react";
 import { Button, Box, Heading, Text } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { LogoutButton } from '@/components/atomic/molecules/LogoutButton';
 
 const MotionHeading = motion.create(Heading);
 const MotionText = motion.create(Text);
@@ -9,7 +10,9 @@ const MotionBox = motion.create(Box);
 export default function HomePage() {
   return (
     <Box minH="100vh" w="full" bg="gray.50" display="flex" flexDirection="column" alignItems="center" py={10} px={4}>
-      
+      <Box w="full" display="flex" justifyContent="flex-end" mb={8}>
+        <LogoutButton />
+      </Box>
       {/* Hero Section */}
       <Box maxW="5xl" w="full" textAlign="center" mb={16}>
         <MotionHeading
@@ -21,7 +24,7 @@ export default function HomePage() {
           mb={6}
           color="gray.900"
         >
-          Welcome to Cyber Alliance HRMS
+          Welcome to Aman Joshi Developments- HRMS APP
         </MotionHeading>
 
         <MotionText
