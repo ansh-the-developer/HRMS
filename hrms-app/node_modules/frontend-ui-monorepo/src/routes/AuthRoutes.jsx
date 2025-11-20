@@ -9,7 +9,7 @@ import PasswordChangedPage from "@/features/auth/pages/PasswordChangedPage";
 
 const AuthRoutes = () => (
   <>
-    <Route path="/" element={<LoginPage />} />
+    <Route path="/login" element={<LoginPage />} />
     <Route path="/2fa" element={<TwoFactorPage />} />
     <Route path="/forgot-password" element={<ForgotPasswordPage />} />
     <Route path="/verify-email" element={<VerifyEmailPage />} />

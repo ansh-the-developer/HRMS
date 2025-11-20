@@ -294,5 +294,59 @@ Together, these clearly document your app’s structure and design pattern — s
   * `TwoFactorPage.jsx`  - UI DONE 
   * `ForgotPasswordPage.jsx`  -  UI DONE 
   * `VerifyEmailPage.jsx`    - UI DONE 
-  * `ResetPasswordPage.jsx`  - 
-  * `PasswordChangedPage.jsx`  - 
+  * `ResetPasswordPage.jsx`  - UI DONE 
+  * `PasswordChangedPage.jsx`  - UI DONE 
+
+  .............20-11-2025.................
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── assets/                 # images, icons
+│       │   ├── components/             # shared UI components
+│       │   │   ├── atomic/             # ⬅ Atomic Architecture root
+│       │   │   │   ├── atoms/          # Button, Input, Typography, Badge, Icon
+│       │   │   │   ├── molecules/      # SearchBar, UserCard, MenuItem
+│       │   │   │   ├── organisms/      # Navbar, Sidebar, DataTable, ProfileCard
+│       │   │   │   ├── templates/      # DashboardTemplate, AuthTemplate
+│       │   │   │   └── pages/          # Page-level structures (optional)
+│       │   │   └── ui/                 # shared UI wrappers (Chakra, custom components)
+│       │   │
+│       │   ├── constants/              # app-wide constants
+│       │   ├── features/               # feature-based modules
+│       │   │   ├── auth/               # authentication flow
+│       │   │   │   ├── components/     # subcomponents (inputs, forms, etc.)
+│       │   │   │   ├── pages/          # route-level pages
+│       │   │   │   └── index.js
+│       │   │   ├── employee/
+│       │   │   ├── attendance/
+│       │   │   ├── leaves/
+│       │   │   ├── payroll/
+│       │   │   ├── performance/
+│       │   │   ├── settings/
+│       │   │   └── home/
+│       │   │       ├── HomePage.jsx    # homepage component
+│       │   │
+│       │   ├── hooks/                  # custom hooks
+│       │   ├── layouts/                # layout wrappers (DashboardLayout, AuthLayout)
+│       │   ├── pages/                  # standalone pages if needed
+│       │   ├── routes/                 # modular routing
+│       │   │   ├── AppRoutes.jsx       # main route manager
+│       │   │   ├── AuthRoutes.jsx      # auth module routes
+│       │   │   └── HomeRoutes.jsx      # home routes
+│       │   ├── services/               # API helpers
+│       │   ├── store/                  # Redux / Zustand store
+│       │   ├── utils/                  # helper functions
+│       │   ├── App.jsx                 # root component
+│       │   └── main.jsx                # Vite entry
+│       ├── package.json
+│       └── vite.config.js
+│
+├── packages/
+│   ├── ui/                             # shared design system (optional later)
+│   └── shared/                         # shared utils, constants, schemas
+│
+├── package.json
+├── turbo.json
+└── README.md

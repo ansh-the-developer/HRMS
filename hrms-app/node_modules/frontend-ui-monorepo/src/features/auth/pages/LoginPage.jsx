@@ -3,21 +3,18 @@ import {
   Box,
   Button,
   Image,
-  Input,
   Text,
-  Link,
-  Checkbox,
   Grid,
   VStack,
-  HStack,
   Heading,
-  FormControl,
-  FormLabel,
 } from "@chakra-ui/react";
+import { useAuth0 } from "@auth0/auth0-react";
 import buildingImage from "../../../assets/loginPagePic.jpg";
-import companyLogo from "../../../assets/hankukLogo.png";
+import Logo from "../../../components/atomic/atoms/Logo";
 
 const LoginPage = () => {
+  const { loginWithRedirect, isLoading } = useAuth0();
+
   return (
     <Grid
       templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
@@ -35,9 +32,7 @@ const LoginPage = () => {
           mx="auto"
         >
           {/* Logo */}
-          <Box justifySelf="center">
-            <Image src={companyLogo} w="18.375em" h="6.5rem" />
-          </Box>
+          <Logo />
 
           {/* Form Content */}
           <VStack spacing={8} align="stretch">
@@ -58,39 +53,38 @@ const LoginPage = () => {
               </Heading>
             </Box>
 
-            {/* Form Fields */}
+            {/* Auth Buttons */}
             <VStack spacing={4} align="stretch">
-              <FormControl>
-                <FormLabel>Email Address</FormLabel>
-                <Input size="lg" type="email" />
-              </FormControl>
-
-              <FormControl>
-                <FormLabel>Password</FormLabel>
-                <Input size="lg" type="password" />
-              </FormControl>
-
-              {/* Remember Me and Forgot Password */}
-              <HStack justify="space-between" pt={2}>
-                <Checkbox>Remember Me</Checkbox>
-                <Link color="blue.500" href="#">
-                  I forgot my password
-                </Link>
-              </HStack>
-
               {/* Sign In Button */}
               <Button
                 size="lg"
                 w="100%"
-                mt={4}
                 bgGradient="linear(to-r, #307DC5, #BDBBB9)"
                 color="white"
                 _hover={{
                   bgGradient: "linear(to-r, #276AAB, #A9A7A5)",
                   opacity: 0.9,
                 }}
+                onClick={() => loginWithRedirect()}
+                isLoading={isLoading}
               >
                 Sign In
+              </Button>
+
+              {/* Sign Up Button */}
+              <Button
+                size="lg"
+                w="100%"
+                variant="outline"
+                colorScheme="blue"
+                onClick={() => 
+                  loginWithRedirect({ 
+                    authorizationParams: { screen_hint: 'signup' } 
+                  })
+                }
+                isLoading={isLoading}
+              >
+                Sign Up
               </Button>
             </VStack>
           </VStack>

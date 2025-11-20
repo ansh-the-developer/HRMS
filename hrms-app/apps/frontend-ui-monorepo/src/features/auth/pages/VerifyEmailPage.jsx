@@ -17,7 +17,7 @@ import {
   PinInputField,
 } from "@chakra-ui/react";
 import passwordForgotImage from "../../../assets/forgetPassword.png";
-import companyLogo from "../../../assets/hankukLogo.png";
+import Logo from "../../../components/atomic/atoms/Logo";
 
 const VerifyEmailPage = () => {
   return (
@@ -37,9 +37,7 @@ const VerifyEmailPage = () => {
           mx="auto"
         >
           {/* Logo */}
-          <Box justifySelf="center">
-            <Image src={companyLogo} w="18.375em" h="6.5rem" />
-          </Box>
+          <Logo />
 
           {/* Form Content */}
           <VStack spacing={8} align="stretch">

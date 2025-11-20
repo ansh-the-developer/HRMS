@@ -15,7 +15,7 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 import passSucImg from "../../../assets/passSucImg.png";
-import companyLogo from "../../../assets/hankukLogo.png";
+import Logo from "../../../components/atomic/atoms/Logo";
 import successIcon from "../../../assets/successIcon.png";
 
 const PasswordChangedPage = () => {
@@ -36,48 +36,49 @@ const PasswordChangedPage = () => {
           mx="auto"
         >
           {/* Logo */}
-          <Box justifySelf="center">
-            <Image src={companyLogo} w="18.375em" h="6.5rem" />
-          </Box>
+          <Logo />
 
           {/* Form Content */}
           <VStack mt={10} spacing={8} align="stretch">
             {/* Form Fields */}
-              <Box >
-                <Image justifySelf="center" src={successIcon} h="35vh" fit='cover' />
-              </Box>
+            <Box>
+              <Image
+                justifySelf="center"
+                src={successIcon}
+                h="35vh"
+                fit="cover"
+              />
+            </Box>
 
-              <Heading
-                bgGradient="linear(to-r, #307DC5, #BDBBB9)"
-                bgClip="text"
-                as="h1"
-                size="lg"
-                mb={2}
-      
-                textAlign='center'
-              >
-                Congratulations
-              </Heading>
+            <Heading
+              bgGradient="linear(to-r, #307DC5, #BDBBB9)"
+              bgClip="text"
+              as="h1"
+              size="lg"
+              mb={2}
+              textAlign="center"
+            >
+              Congratulations
+            </Heading>
 
-              <Text                 textAlign='center'
->
-                You have successfully changed your password.
-              </Text>
+            <Text textAlign="center">
+              You have successfully changed your password.
+            </Text>
 
-              {/* Sign In Button */}
-              <Button
-                size="lg"
-                w="100%"
-                mt={4}
-                bgGradient="linear(to-r, #307DC5, #BDBBB9)"
-                color="white"
-                _hover={{
-                  bgGradient: "linear(to-r, #276AAB, #A9A7A5)",
-                  opacity: 0.9,
-                }}
-              >
-                Back To Login
-              </Button>
+            {/* Sign In Button */}
+            <Button
+              size="lg"
+              w="100%"
+              mt={4}
+              bgGradient="linear(to-r, #307DC5, #BDBBB9)"
+              color="white"
+              _hover={{
+                bgGradient: "linear(to-r, #276AAB, #A9A7A5)",
+                opacity: 0.9,
+              }}
+            >
+              Back To Login
+            </Button>
           </VStack>
         </Grid>
       </Box>

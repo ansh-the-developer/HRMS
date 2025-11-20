@@ -15,7 +15,7 @@ import {
   FormLabel,
 } from "@chakra-ui/react";
 import passwordForgotImage from "../../../assets/forgetPassword.png";
-import companyLogo from "../../../assets/hankukLogo.png";
+import Logo from "../../../components/atomic/atoms/Logo";
 
 const ForgotPasswordPage = () => {
   return (
@@ -28,42 +28,43 @@ const ForgotPasswordPage = () => {
           alignContent="center"
           maxW="400px"
           mx="auto"
-        
         >
-          <Box justifySelf="center">
-            <Image src={companyLogo} />
-          </Box>
+          <Logo />
 
-          <VStack  spacing={4} align="stretch">
+          <VStack spacing={4} align="stretch">
             <Box>
               <Text>Password Recovery</Text>
               <Heading
-               bgGradient="linear(to-r, #307DC5, #BDBBB9)"
-               bgClip='text'
-               >
-                Forgot your password?</Heading>
+                bgGradient="linear(to-r, #307DC5, #BDBBB9)"
+                bgClip="text"
+              >
+                Forgot your password?
+              </Heading>
               <Text pt={4}>
                 Kindly enter the email address address linked to this account
                 and we will send you a code to enable you change your password .
               </Text>
             </Box>
 
-            <FormControl pt={10} >
+            <FormControl pt={10}>
               <FormLabel>Email address</FormLabel>
-              <Input placeholder='Enter email address' size="lg" type="password" />
+              <Input
+                placeholder="Enter email address"
+                size="lg"
+                type="password"
+              />
             </FormControl>
 
-            <Button 
-                size="lg"
-                w="100%"
-                mt={7}
-                bgGradient="linear(to-r, #307DC5, #BDBBB9)"
-                color="white"
-                _hover={{
-                  bgGradient: "linear(to-r, #276AAB, #A9A7A5)",
-                  opacity: 0.9,
-                }}
-
+            <Button
+              size="lg"
+              w="100%"
+              mt={7}
+              bgGradient="linear(to-r, #307DC5, #BDBBB9)"
+              color="white"
+              _hover={{
+                bgGradient: "linear(to-r, #276AAB, #A9A7A5)",
+                opacity: 0.9,
+              }}
             >
               send
             </Button>
