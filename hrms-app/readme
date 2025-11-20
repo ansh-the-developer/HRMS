@@ -303,50 +303,93 @@ hrms-app/
 │   └── frontend-ui-monorepo/
 │       ├── public/
 │       ├── src/
-│       │   ├── assets/                 # images, icons
-│       │   ├── components/             # shared UI components
-│       │   │   ├── atomic/             # ⬅ Atomic Architecture root
-│       │   │   │   ├── atoms/          # Button, Input, Typography, Badge, Icon
-│       │   │   │   ├── molecules/      # SearchBar, UserCard, MenuItem
-│       │   │   │   ├── organisms/      # Navbar, Sidebar, DataTable, ProfileCard
-│       │   │   │   ├── templates/      # DashboardTemplate, AuthTemplate
-│       │   │   │   └── pages/          # Page-level structures (optional)
-│       │   │   └── ui/                 # shared UI wrappers (Chakra, custom components)
+│       │   ├── assets/
+│       │   │   └── loginPagePic.jpg
 │       │   │
-│       │   ├── constants/              # app-wide constants
-│       │   ├── features/               # feature-based modules
-│       │   │   ├── auth/               # authentication flow
-│       │   │   │   ├── components/     # subcomponents (inputs, forms, etc.)
-│       │   │   │   ├── pages/          # route-level pages
+│       │   ├── components/
+│       │   │   ├── atomic/
+│       │   │   │   ├── atoms/
+│       │   │   │   │   └── Logo.jsx
+│       │   │   │   ├── molecules/
+│       │   │   │   │   └── LogoutButton.jsx          # ⭐ NEW
+│       │   │   │   ├── organisms/
+│       │   │   │   ├── templates/
+│       │   │   │   └── pages/
+│       │   │   └── ui/
+│       │   │   └── ProtectedRoute.jsx                # ⭐ NEW
+│       │   │
+│       │   ├── constants/
+│       │   │
+│       │   ├── features/
+│       │   │   ├── auth/
+│       │   │   │   ├── components/
+│       │   │   │   ├── pages/
+│       │   │   │   │   ├── LoginPage.jsx             # ✅ Updated with Auth0
+│       │   │   │   │   ├── TwoFactorPage.jsx
+│       │   │   │   │   ├── ForgotPasswordPage.jsx
+│       │   │   │   │   ├── VerifyEmailPage.jsx
+│       │   │   │   │   ├── ResetPasswordPage.jsx
+│       │   │   │   │   └── PasswordChangedPage.jsx
 │       │   │   │   └── index.js
+│       │   │   │
+│       │   │   ├── home/
+│       │   │   │   └── HomePage.jsx
+│       │   │   │
 │       │   │   ├── employee/
 │       │   │   ├── attendance/
 │       │   │   ├── leaves/
 │       │   │   ├── payroll/
 │       │   │   ├── performance/
-│       │   │   ├── settings/
-│       │   │   └── home/
-│       │   │       ├── HomePage.jsx    # homepage component
+│       │   │   └── settings/
 │       │   │
-│       │   ├── hooks/                  # custom hooks
-│       │   ├── layouts/                # layout wrappers (DashboardLayout, AuthLayout)
-│       │   ├── pages/                  # standalone pages if needed
-│       │   ├── routes/                 # modular routing
-│       │   │   ├── AppRoutes.jsx       # main route manager
-│       │   │   ├── AuthRoutes.jsx      # auth module routes
-│       │   │   └── HomeRoutes.jsx      # home routes
-│       │   ├── services/               # API helpers
-│       │   ├── store/                  # Redux / Zustand store
-│       │   ├── utils/                  # helper functions
-│       │   ├── App.jsx                 # root component
-│       │   └── main.jsx                # Vite entry
+│       │   ├── hooks/
+│       │   ├── layouts/
+│       │   ├── pages/
+│       │   │
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx                     # ✅ Updated with auth logic
+│       │   │   ├── AuthRoutes.jsx
+│       │   │   └── HomeRoutes.jsx                    # ✅ Updated with ProtectedRoute
+│       │   │
+│       │   ├── services/
+│       │   ├── store/
+│       │   ├── utils/
+│       │   ├── App.jsx
+│       │   └── main.jsx                              # ✅ Updated with Auth0Provider
+│       │
+│       ├── .env                                       # ⭐ NEW (Auth0 credentials)
+│       ├── .gitignore                                 # ✅ Updated (.env added)
 │       ├── package.json
 │       └── vite.config.js
 │
 ├── packages/
-│   ├── ui/                             # shared design system (optional later)
-│   └── shared/                         # shared utils, constants, schemas
+│   ├── ui/
+│   └── shared/
 │
 ├── package.json
 ├── turbo.json
 └── README.md
+
+
+## ✅ Completed - Auth0 Integration (November 20, 2025)
+
+### Frontend Setup & Auth0 Integration
+- Designed and completed UI for 6 authentication pages (Login, 2FA, Forgot Password, Verify Email, Reset Password, Password Changed)
+- Integrated Auth0 authentication service with React
+- Configured Auth0 Single Page Application (SPA) with domain and client ID
+- Set up environment variables for secure credential management
+- Wrapped application with Auth0Provider in main.jsx
+- Updated LoginPage to use Auth0 Universal Login via `loginWithRedirect()`
+- Created reusable `LogoutButton` component in atomic design structure
+- Built `ProtectedRoute` wrapper component for route security
+- Configured routing system with proper redirects:
+  - Root `/` → redirects to `/login` (unauthenticated) or `/home` (authenticated)
+  - `/home` → protected route requiring authentication
+  - Logout → redirects back to `/login`
+- Successfully tested complete authentication flow
+
+### Tech Stack
+- React + Vite
+- Auth0 React SDK (@auth0/auth0-react)
+- Chakra UI
+- React Router v6
