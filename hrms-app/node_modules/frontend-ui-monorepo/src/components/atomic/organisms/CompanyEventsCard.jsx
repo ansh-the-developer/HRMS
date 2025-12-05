@@ -6,9 +6,17 @@ import LegendItem from "@/components/atomic/molecules/LegendItem";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 
 const events = [
-  { date: "November 02, 2025", name: "Company Incorporation" },
-  { date: "August 14, 2025", name: "Independence Day Decoration" },
-  { date: "September 19, 2025", name: "Sample Event" },
+  {
+    date: "November 02, 2025",
+    name: "Company Incorporation",
+    status: "upcoming",
+  },
+  {
+    date: "August 14, 2025",
+    name: "Independence Day Decoration",
+    status: "past",
+  },
+  { date: "September 19, 2025", name: "Sample Event", status: "past" },
 ];
 
 const CompanyEventsCard = () => {
@@ -21,7 +29,12 @@ const CompanyEventsCard = () => {
 
       <Box mb={4}>
         {events.map((e) => (
-          <InfoRow key={e.date} left={e.date} right={e.name} />
+          <InfoRow
+            key={e.date}
+            left={e.date}
+            right={e.name}
+            status={e.status}
+          />
         ))}
       </Box>
 

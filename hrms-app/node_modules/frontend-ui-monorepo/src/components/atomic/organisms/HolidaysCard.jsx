@@ -6,11 +6,10 @@ import LegendItem from "@/components/atomic/molecules/LegendItem";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 
 const holidays = [
-  { date: "April 10, 2025", name: "Mahavir Jayanti" },
-  { date: "August 15, 2025", name: "Independence Day" },
-  { date: "October 02, 2025", name: "Dussehra" },
+  { date: "April 10, 2025", name: "Mahavir Jayanti", status: "past" },
+  { date: "August 15, 2025", name: "Independence Day", status: "upcoming" },
+  { date: "October 02, 2025", name: "Dussehra", status: "upcoming" },
 ];
-
 const HolidaysCard = () => {
   return (
     <HRMSCard>
@@ -21,10 +20,14 @@ const HolidaysCard = () => {
 
       <Box mb={4}>
         {holidays.map((h) => (
-          <InfoRow key={h.date} left={h.date} right={h.name} />
+          <InfoRow
+            key={h.date}
+            left={h.date}
+            right={h.name}
+            status={h.status}
+          />
         ))}
       </Box>
-
       <HStack spacing={4}>
         <LegendItem label="Upcoming" color="purple.500" />
         <LegendItem label="Past Holidays" color="gray.400" />
