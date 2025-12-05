@@ -1,4 +1,11 @@
-import { Box, Flex, IconButton, Text, SimpleGrid, Button } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  IconButton,
+  Text,
+  SimpleGrid,
+  Button,
+} from "@chakra-ui/react";
 import { FiChevronLeft, FiChevronRight, FiCalendar } from "react-icons/fi";
 import HRMSCard from "@/components/atomic/molecules/HRMSCard";
 import SectionTitle from "@/components/atomic/atoms/SectionTitle";
@@ -15,14 +22,30 @@ const CalendarCard = ({ minH }) => {
           icon={<FiCalendar />}
           size="sm"
           variant="ghost"
+          bg="#7152F31A" // light purple background
+          borderRadius="full" // fully rounded
+          color="#7152F3" // brighter purple icon
+          _hover={{
+            bg: "#7152F333", // slightly stronger on hover
+          }}
         />
       </Flex>
 
       <Flex justify="space-between" align="center" mb={3}>
         <Text fontWeight="semibold">July, 2025</Text>
         <Flex gap={2}>
-          <IconButton aria-label="Previous month" icon={<FiChevronLeft />} size="sm" variant="outline" />
-          <IconButton aria-label="Next month" icon={<FiChevronRight />} size="sm" variant="outline" />
+          <IconButton
+            aria-label="Previous month"
+            icon={<FiChevronLeft />}
+            size="sm"
+            variant="outline"
+          />
+          <IconButton
+            aria-label="Next month"
+            icon={<FiChevronRight />}
+            size="sm"
+            variant="outline"
+          />
         </Flex>
       </Flex>
 
