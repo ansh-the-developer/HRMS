@@ -5,8 +5,9 @@ import { LogoutButton } from "@/components/atomic/molecules/LogoutButton";
 import SidebarToggleButton from "@/components/atomic/atoms/SidebarToggleButton";
 import { IconButton } from "@chakra-ui/react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import UserProfileMenu from "../organisms/UserProfileMenu";
 
-const TopBar = ({ onOpenSidebarMobile, onToggleSidebarDesktop, isCollapsed }) => {
+const TopBar = ({ onOpenSidebarMobile }) => {
   const { user } = useAuth0();
 
   return (
@@ -27,7 +28,6 @@ const TopBar = ({ onOpenSidebarMobile, onToggleSidebarDesktop, isCollapsed }) =>
         {/* Mobile hamburger */}
         <SidebarToggleButton onClick={onOpenSidebarMobile} />
 
-
         <VStack align="start" spacing={0}>
           <Heading size="md">Hello {user?.name || user?.email}</Heading>
           <Text fontSize="sm" color="gray.500">
@@ -36,9 +36,25 @@ const TopBar = ({ onOpenSidebarMobile, onToggleSidebarDesktop, isCollapsed }) =>
         </VStack>
       </Flex>
 
-      <Box>
-        <LogoutButton />
-      </Box>
+{/* // Right side of TopBar */}
+<Flex ml="auto" align="center" gap={3}>
+  {/* mobile: simple avatar icon */}
+  <Box display={{ base: "block", md: "none" }}>
+    <UserProfileMenu
+      role="HR Executive"
+      variant="icon"   // new prop
+    />
+  </Box>
+
+  {/* desktop: full pill */}
+  <Box display={{ base: "none", md: "block" }}>
+    <UserProfileMenu
+      role="HR Executive"
+      variant="pill"
+    />
+  </Box>
+</Flex>
+
     </Flex>
   );
 };

@@ -182,3 +182,156 @@ hrms-app/
 - Protected routing in place via `ProtectedRoute`.
 - Ready to continue building Home dashboard UI and core HRMS modules (employee, attendance, leaves, payroll, performance, settings).
 ```
+------------------------
+# HRMS App – 20-11-2025 Progress Log
+
+## 1. Sidebar + Dashboard Layout
+
+### New / Updated Components
+
+- `src/components/atomic/organisms/HRMSSidebar.jsx`
+  - Sidebar with:
+    - Company `Logo` atom
+    - Navigation items (Home, Employee, Attendance, Leaves, Performance, Payroll, Settings)
+    - Active state styling
+  - Supports props:
+    - `isCollapsed` – icon-only rail when `true`
+    - `onItemClick` – closes mobile drawer on nav click
+    - `onToggleCollapse` – toggles collapsed state from inside sidebar
+  - Internal UI:
+    - Collapse/expand toggle button in the sidebar header
+    - When collapsed (md+):
+      - Sidebar width shrinks
+      - Nav labels hidden, only icons shown
+      - Toggle button stacked above logo with rounded soft background
+
+- `src/components/atomic/templates/DashboardLayout.jsx`
+  - App shell for all authenticated pages:
+    - Desktop: `Flex` layout with collapsible sidebar on the left and main content on the right
+    - Mobile: sidebar shown as a `Drawer`
+  - Uses:
+    - `SIDEBAR_EXPANDED = 260`
+    - `SIDEBAR_COLLAPSED = 72`
+  - Behavior:
+    - Desktop:
+      - `<Box as="aside" w={sidebarWidth}>` renders `HRMSSidebar`
+      - Content has `ml={0}` (no extra gap)
+    - Mobile:
+      - Sidebar hidden in main layout
+      - Drawer with full sidebar opens from left
+
+- `src/components/atomic/organisms/TopBar.jsx`
+  - Sticky header on top of content
+  - Shows:
+    - Mobile hamburger (`SidebarToggleButton`) to open the sidebar drawer
+    - Greeting text with Auth0 user name/email
+    - `LogoutButton` on the right
+  - Desktop collapse toggle moved into `HRMSSidebar` (TopBar now only handles mobile open)
+
+- `src/components/atomic/atoms/SidebarToggleButton.jsx`
+  - Small `IconButton` (hamburger) shown on mobile only
+  - Triggers `onOpenSidebarMobile` in `DashboardLayout` via `TopBar`
+
+## 2. Dashboard Content Enhancements
+
+- `BirthdayTrackerCard`
+  - Uses `Flex` + `flex="1"` to grow vertically and align with `CalendarCard`
+  - Layout: avatar + name + date (below) + role on the right
+  - Tweaked so Birthday Tracker and Calendar cards align better in height
+
+- `CalendarCard`
+  - Calendar header icon styled:
+    - Background: `#7152F31A`
+    - Fully rounded
+    - Icon color: `#7152F3` (brighter than background)
+
+- `InfoRow` + vertical status bar
+  - `InfoRow` updated with a small vertical bar on the left:
+    - `status="upcoming"` → purple bar (`#7152F3`)
+    - `status="past"` → gray bar
+  - Used in `HolidaysCard` and `CompanyEventsCard` to visually denote upcoming vs past entries
+
+- `HRMSButton`
+  - Gradient button atom:
+    - `bgGradient="linear(to-r, #307DC7, #C1B9B8)"`
+    - Rounded (`borderRadius="full"`)
+  - Optional `withPlusIcon` prop:
+    - Renders a small white circular `+` icon on the left (FiPlus)
+  - Used for “Add New Holiday” and “Add an Event” buttons
+
+## 3. Sidebar Behavior Summary
+
+- **Mobile (`base`):**
+  - Sidebar hidden in main layout
+  - `TopBar` shows hamburger (`SidebarToggleButton`)
+  - Clicking opens `Drawer` with `HRMSSidebar`
+  - `onItemClick` closes drawer on navigation
+
+- **Desktop (`md+`):**
+  - Sidebar always visible on the left
+  - Can be toggled between:
+    - Expanded (full width, logo + labels)
+    - Collapsed (narrow, icons only)
+  - Collapse/expand button lives inside `HRMSSidebar` header (above/beside the logo)
+
+---
+
+## Updated Folder Structure (Relevant Parts)
+
+```
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── assets/
+│       │   ├── components/
+│       │   │   ├── atomic/
+│       │   │   │   ├── atoms/
+│       │   │   │   │   ├── Logo.jsx
+│       │   │   │   │   ├── HRMSButton.jsx
+│       │   │   │   │   ├── StatusDot.jsx
+│       │   │   │   │   └── SidebarToggleButton.jsx
+│       │   │   │   ├── molecules/
+│       │   │   │   │   ├── LogoutButton.jsx
+│       │   │   │   │   ├── HRMSCard.jsx
+│       │   │   │   │   ├── InfoRow.jsx
+│       │   │   │   │   ├── LegendItem.jsx
+│       │   │   │   │   └── BirthdayListItem.jsx
+│       │   │   │   ├── organisms/
+│       │   │   │   │   ├── HRMSSidebar.jsx
+│       │   │   │   │   ├── TopBar.jsx
+│       │   │   │   │   ├── NoticeBoardCard.jsx
+│       │   │   │   │   ├── HolidaysCard.jsx
+│       │   │   │   │   ├── CompanyEventsCard.jsx
+│       │   │   │   │   ├── BirthdayTrackerCard.jsx
+│       │   │   │   │   └── CalendarCard.jsx
+│       │   │   │   └── templates/
+│       │   │   │       └── DashboardLayout.jsx
+│       │   │   └── ui/
+│       │   ├── features/
+│       │   │   ├── auth/
+│       │   │   ├── home/
+│       │   │   │   └── HomePage.jsx
+│       │   │   ├── employee/
+│       │   │   ├── attendance/
+│       │   │   ├── leaves/
+│       │   │   ├── payroll/
+│       │   │   ├── performance/
+│       │   │   └── settings/
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx
+│       │   │   ├── AuthRoutes.jsx
+│       │   │   └── HomeRoutes.jsx
+│       │   ├── App.jsx
+│       │   └── main.jsx
+│       ├── package.json
+│       └── vite.config.js
+├── packages/
+│   ├── ui/
+│   └── shared/
+├── package.json
+├── turbo.json
+└── README.md
+```
+

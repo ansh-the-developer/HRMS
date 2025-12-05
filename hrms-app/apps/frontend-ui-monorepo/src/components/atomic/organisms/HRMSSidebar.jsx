@@ -36,8 +36,11 @@ const HRMSSidebar = ({
   onToggleCollapse,
 }) => {
   const location = useLocation();
+  
+  // New color constants
+  const SIDEBAR_BG = "#307DC717";
+  const SIDEBAR_BORDER = "#307DC730";
   const bgActive = useColorModeValue("white", "gray.700");
-  const bgSidebar = useColorModeValue("#F5F7FF", "gray.900");
   const iconColor = useColorModeValue("gray.600", "gray.300");
 
   return (
@@ -45,9 +48,11 @@ const HRMSSidebar = ({
       as="aside"
       w="100%"
       h="100vh"
-      bg={bgSidebar}
-      borderRightWidth="1px"
-      borderColor="gray.200"
+      bg={SIDEBAR_BG}
+      borderTopRightRadius={isCollapsed ? "none" : "24px"}
+      borderBottomRightRadius={isCollapsed ? "none" : "24px"}
+      borderRightWidth={isCollapsed ? "0" : "1px"}
+      borderRightColor={SIDEBAR_BORDER}
       px={isCollapsed ? 3 : 6}
       py={8}
     >
@@ -103,6 +108,7 @@ const HRMSSidebar = ({
           alt="Company sidebar logo"
         />
       </Box>
+      
       {/* Nav items */}
       <VStack align="stretch" spacing={3}>
         {navItems.map((item) => {
@@ -115,11 +121,13 @@ const HRMSSidebar = ({
                 justify={isCollapsed ? "center" : "flex-start"}
                 px={isCollapsed ? 0 : 4}
                 py={3}
-                borderRadius="xl"
+                borderRadius={isCollapsed ? "xl" : "0 12px 12px 0"}
                 bg={isActive ? bgActive : "transparent"}
                 color={isActive ? "purple.600" : "gray.700"}
                 fontWeight={isActive ? "semibold" : "medium"}
-                _hover={{ bg: bgActive }}
+                _hover={{ 
+                  bg: "#307DC72E" // Slightly darker hover matching theme
+                }}
               >
                 <Icon as={item.icon} boxSize={5} color={iconColor} />
                 {!isCollapsed && <Text fontSize="md">{item.label}</Text>}
