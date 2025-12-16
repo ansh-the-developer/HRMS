@@ -1,7 +1,10 @@
+// src/components/atomic/organisms/EmployeeTable.jsx
+import { useMemo } from "react";
 import { Thead, Tbody, Tr, Th } from "@chakra-ui/react";
 import HRMSTable from "../molecules/HRMSTable";
 import EmployeeTableRow from "../molecules/EmployeeTableRow";
 
+// Static list of employees shown in the table
 const mockEmployees = [
   {
     name: "Jaydeep",
@@ -59,40 +62,61 @@ const mockEmployees = [
   },
 ];
 
-const EmployeeTable = () => (
-  <HRMSTable>
-    <Thead>
-      <Tr borderBottomWidth="1px" borderColor="gray.100">
-        {[
-          "Employee Name",
-          "Employee ID",
-          "Department",
-          "Designation",
-          "Location",
-          "Status",
-          "Action",
-        ].map((col) => (
-          <Th
-            key={col}
-            fontFamily="'Lexend', system-ui, -apple-system, BlinkMacSystemFont"
-            fontWeight="300"
-            fontSize="15.09px"
-            lineHeight="22.64px"
-            letterSpacing="0"
-            color="#A2A1A8"
-            borderBottom="none"
-            textTransform="none" // keep exact casing
-          >
-            {col}
-          </Th>
+// Accept filter props from EmployeeListPage
+const EmployeeTable = ({ filterType, filterValue }) => {
+  // Decide which employees to show based on incoming filter
+  const visibleEmployees = useMemo(() => {
+    if (!filterType || !filterValue) return mockEmployees;
+
+    // Filter by department name when coming from Departments page
+    if (filterType === "department") {
+      return mockEmployees.filter(
+        (emp) => emp.department === filterValue
+      );
+    }
+
+    // If later you support team-based filtering, you can add:
+    // if (filterType === "team") { ... }
+
+    return mockEmployees;
+  }, [filterType, filterValue]); // standard React pattern: derive filtered list with Array.filter [web:283][web:291]
+
+  return (
+    <HRMSTable>
+      <Thead>
+        <Tr borderBottomWidth="1px" borderColor="gray.100">
+          {[
+            "Employee Name",
+            "Employee ID",
+            "Department",
+            "Designation",
+            "Location",
+            "Status",
+            "Action",
+          ].map((col) => (
+            <Th
+              key={col}
+              fontFamily="'Lexend', system-ui, -apple-system, BlinkMacSystemFont"
+              fontWeight="300"
+              fontSize="15.09px"
+              lineHeight="22.64px"
+              letterSpacing="0"
+              color="#A2A1A8"
+              borderBottom="none"
+              textTransform="none"
+            >
+              {col}
+            </Th>
+          ))}
+        </Tr>
+      </Thead>
+      <Tbody>
+        {visibleEmployees.map((emp) => (
+          <EmployeeTableRow key={emp.id} employee={emp} />
         ))}
-      </Tr>
-    </Thead>
-    <Tbody>
-      {mockEmployees.map((emp) => (
-        <EmployeeTableRow key={emp.id} employee={emp} />
-      ))}
-    </Tbody>
-  </HRMSTable>
-);
+      </Tbody>
+    </HRMSTable>
+  );
+};
+
 export default EmployeeTable;

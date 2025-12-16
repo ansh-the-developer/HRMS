@@ -335,3 +335,92 @@ hrms-app/
 └── README.md
 ```
 
+
+------------------------------
+16-12-2025 
+------------------------------
+
+
+
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── assets/
+│       │   ├── components/
+│       │   │   ├── atomic/
+│       │   │   │   ├── atoms/
+│       │   │   │   │   ├── Logo.jsx
+│       │   │   │   │   ├── HRMSButton.jsx
+│       │   │   │   │   ├── StatusDot.jsx
+│       │   │   │   │   └── SidebarToggleButton.jsx
+│       │   │   │   ├── molecules/
+│       │   │   │   │   ├── LogoutButton.jsx
+│       │   │   │   │   ├── HRMSCard.jsx
+│       │   │   │   │   ├── InfoRow.jsx
+│       │   │   │   │   ├── LegendItem.jsx
+│       │   │   │   │   ├── BirthdayListItem.jsx
+│       │   │   │   │   └── DepartmentListItem.jsx   # NEW: reusable row with view/edit/delete
+│       │   │   │   ├── organisms/
+│       │   │   │   │   ├── HRMSSidebar.jsx
+│       │   │   │   │   ├── TopBar.jsx
+│       │   │   │   │   ├── NoticeBoardCard.jsx
+│       │   │   │   │   ├── HolidaysCard.jsx
+│       │   │   │   │   ├── CompanyEventsCard.jsx
+│       │   │   │   │   ├── BirthdayTrackerCard.jsx
+│       │   │   │   │   ├── CalendarCard.jsx
+│       │   │   │   │   └── EmployeeTable.jsx        # UPDATED: now accepts filterType/filterValue
+│       │   │   │   └── templates/
+│       │   │   │       └── DashboardLayout.jsx
+│       │   │   └── ui/
+│       │   ├── features/
+│       │   │   ├── auth/
+│       │   │   ├── home/
+│       │   │   │   └── HomePage.jsx
+│       │   │   ├── employee/
+│       │   │   │   ├── pages/
+│       │   │   │   │   ├── EmployeeListPage.jsx        # UPDATED: reads filter from location.state and passes to table
+│       │   │   │   │   └── EmployeeDepartmentsPage.jsx # NEW: Departments & Teams management
+│       │   │   ├── attendance/
+│       │   │   ├── leaves/
+│       │   │   ├── payroll/
+│       │   │   ├── performance/
+│       │   │   └── settings/
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx
+│       │   │   ├── AuthRoutes.jsx
+│       │   │   └── HomeRoutes.jsx
+│       │   ├── App.jsx
+│       │   └── main.jsx
+│       ├── package.json
+│       └── vite.config.js
+├── packages/
+│   ├── ui/
+│   └── shared/
+├── package.json
+├── turbo.json
+└── README.md
+
+You are helping build the Employee module of an HRMS (React + Chakra UI, atomic design).
+
+**Done today**
+
+- Added `EmployeeDepartmentsPage.jsx` with:
+  - Local state for departments and teams.
+  - Add (append), Edit (inline rename), and Delete (with confirm) using `map`/`filter` on arrays.
+- Enhanced `DepartmentListItem.jsx` to accept `onView`, `onEdit`, `onDelete` and show eye/edit/trash icons.
+- Wired navigation + filtering:
+  - Eye on a department navigates to `/employees` with `{ filterType: "department", filterValue: "<name>" }`.
+  - `EmployeeListPage.jsx` reads this via location state and passes `filterType`/`filterValue` to `EmployeeTable`.
+  - `EmployeeTable.jsx` filters `mockEmployees` by department before rendering rows.
+
+**Next steps**
+
+- Create similar pages under `features/employee/pages`:
+  - `EmployeeBranchesPage.jsx` (Branches + Sites).
+  - `EmployeeDesignationsPage.jsx` (Job titles).
+  - `EmployeeStatusesPage.jsx` (Employment statuses).
+  - `EmployeeExportPage.jsx` (export button).
+- Reuse `DepartmentListItem` and the same add/edit/delete pattern.
+- On eye click from those pages, navigate to `/employees` with appropriate `filterType` (`"branch"`, `"site"`, `"designation"`, `"status"`) and extend `EmployeeTable` to filter on the corresponding employee fields.

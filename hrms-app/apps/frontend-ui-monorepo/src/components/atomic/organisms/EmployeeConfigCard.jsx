@@ -1,6 +1,6 @@
 // src/components/atomic/organisms/EmployeeConfigCard.jsx
 import { Box } from "@chakra-ui/react";
-import EmployeeConfigItem from "../molecules/EmployeeConfigItem";
+import EmployeeConfigItem from "@/components/atomic/molecules/EmployeeConfigItem";
 
 const EmployeeConfigCard = () => (
   <Box
@@ -15,6 +15,7 @@ const EmployeeConfigCard = () => (
     <EmployeeConfigItem
       title="Departments / Teams"
       description="Add, edit, delete departments/teams."
+      to="/employees/departments"
     />
     <EmployeeConfigItem
       title="Locations/Branches"

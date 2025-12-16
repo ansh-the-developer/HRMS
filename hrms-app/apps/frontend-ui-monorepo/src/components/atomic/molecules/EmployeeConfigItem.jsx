@@ -1,31 +1,37 @@
 // src/components/atomic/molecules/EmployeeConfigItem.jsx
 import { Flex, Box, Text } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 
-const EmployeeConfigItem = ({ title, description, buttonLabel = "Edit" }) => (
-  <Flex
-    align="center"
-    justify="space-between"
-    py={3}
-    _notLast={{ borderBottomWidth: "1px", borderColor: "gray.100" }}
-  >
-    <Box>
-      <Text fontSize="sm" fontWeight="semibold">
-        {title}
-      </Text>
-      <Text fontSize="xs" color="gray.500">
-        {description}
-      </Text>
-    </Box>
-    <HRMSButton
-      minW="80px"
-      h="32px"
-      fontSize="sm"
-      borderRadius="md"
+const EmployeeConfigItem = ({ title, description, buttonLabel = "Edit", to }) => {
+  const navigate = useNavigate();
+
+  return (
+    <Flex
+      align="center"
+      justify="space-between"
+      py={3}
+      _notLast={{ borderBottomWidth: "1px", borderColor: "gray.100" }}
     >
-      {buttonLabel}
-    </HRMSButton>
-  </Flex>
-);
+      <Box>
+        <Text fontSize="sm" fontWeight="semibold">
+          {title}
+        </Text>
+        <Text fontSize="xs" color="gray.500">
+          {description}
+        </Text>
+      </Box>
+      <HRMSButton
+        minW="80px"
+        h="32px"
+        fontSize="sm"
+        borderRadius="md"
+        onClick={to ? () => navigate(to) : undefined}
+      >
+        {buttonLabel}
+      </HRMSButton>
+    </Flex>
+  );
+};
 
 export default EmployeeConfigItem;
