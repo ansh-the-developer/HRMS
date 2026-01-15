@@ -46,7 +46,7 @@ const DashboardLayout = ({ children }) => {
 
       {/* Right side */}
       <Box
-        ml={{ base: 0, md: 0 }} // no shift on md+
+        ml={{ base: 0, md: 0 }} // no shift on md+ 
         w="100%"
         minH="100vh"
         bg="white"

@@ -17,26 +17,36 @@ const EmployeeConfigCard = () => (
       description="Add, edit, delete departments/teams."
       to="/employees/departments"
     />
+
     <EmployeeConfigItem
       title="Locations/Branches"
       description="Manage physical office locations."
+      to="/employees/branches"
     />
+
     <EmployeeConfigItem
-      title="Job Titles/Positions"
+      title="Job Titles / Positions"
       description="Define standard job titles."
+      to="/employees/designations"
     />
+
     <EmployeeConfigItem
       title="Employment Statuses"
       description="Full-time, Part-time, Contract, Intern, etc."
+      to="/employees/statuses"
     />
+
     <EmployeeConfigItem
       title="Employee Types"
       description="e.g., Salaried, Hourly."
+      to="/employees/types"
     />
+
     <EmployeeConfigItem
       title="Export"
       description="Export list of employees."
       buttonLabel="Go"
+      to="/employees/export"
     />
   </Box>
 );

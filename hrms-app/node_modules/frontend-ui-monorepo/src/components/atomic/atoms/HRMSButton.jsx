@@ -12,7 +12,7 @@ const HRMSButton = ({
     <Button
       variant={variant}
       size={size}
-      borderRadius="full"
+      borderRadius="10px"
       bgGradient="linear(to-r, #307DC7, #C1B9B8)"
       color="white"
       _hover={{

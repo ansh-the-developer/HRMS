@@ -3,7 +3,12 @@ import { Flex, Box, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 
-const EmployeeConfigItem = ({ title, description, buttonLabel = "Edit", to }) => {
+const EmployeeConfigItem = ({
+  title,
+  description,
+  buttonLabel = "Edit",
+  to,
+}) => {
   const navigate = useNavigate();
 
   return (
@@ -22,6 +27,7 @@ const EmployeeConfigItem = ({ title, description, buttonLabel = "Edit", to }) =>
         </Text>
       </Box>
       <HRMSButton
+        isDisabled={!to}
         minW="80px"
         h="32px"
         fontSize="sm"

@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom"; // for navigation with filter st
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 import DepartmentListItem from "@/components/atomic/molecules/DepartmentListItem";
+import { EMPLOYEE_FILTER_TYPES } from "@shared/employeeFilters";
+import HRMSInput from './../../../components/atomic/atoms/HRMSInput';
 
 const EmployeeDepartmentsPage = () => {
   // Local input state for controlled fields
@@ -103,14 +105,14 @@ const EmployeeDepartmentsPage = () => {
   };
 
   // Navigate back to employee list with a filter in location.state
-  const handleViewDepartment = (name) => {
-    navigate("/employees", {
-      state: {
-        filterType: "department",
-        filterValue: name,
-      },
-    });
-  };
+const handleViewDepartment = (name) => {
+  navigate("/employees", {
+    state: {
+      filterType: EMPLOYEE_FILTER_TYPES.DEPARTMENT,
+      filterValue: name,
+    },
+  });
+};
 
   const handleViewTeam = (name) => {
     navigate("/employees", {
@@ -140,7 +142,7 @@ const EmployeeDepartmentsPage = () => {
 
             {/* Input + right-aligned Add button */}
             <Box mb={4} maxW="420px" w="100%">
-              <Input
+              <HRMSInput
                 placeholder="New Department"
                 h="56px"
                 borderRadius="md"
@@ -192,7 +194,7 @@ const EmployeeDepartmentsPage = () => {
 
             {/* Input + right-aligned Add button */}
             <Box mb={4} maxW="420px" w="100%">
-              <Input
+              <HRMSInput
                 placeholder="Team Name"
                 h="56px"
                 borderRadius="md"
@@ -244,7 +246,7 @@ const EmployeeDepartmentsPage = () => {
               Rename {editingItem.type === "department" ? "Department" : "Team"}
             </Text>
             <Box maxW="420px" w="100%">
-              <Input
+              <HRMSInput
                 value={editingName}
                 onChange={(e) => setEditingName(e.target.value)}
                 h="56px"

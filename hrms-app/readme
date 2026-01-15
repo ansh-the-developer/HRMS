@@ -423,4 +423,6 @@ You are helping build the Employee module of an HRMS (React + Chakra UI, atomic 
   - `EmployeeStatusesPage.jsx` (Employment statuses).
   - `EmployeeExportPage.jsx` (export button).
 - Reuse `DepartmentListItem` and the same add/edit/delete pattern.
-- On eye click from those pages, navigate to `/employees` with appropriate `filterType` (`"branch"`, `"site"`, `"designation"`, `"status"`) and extend `EmployeeTable` to filter on the corresponding employee fields.
+- On eye click from those pages, navigate to `/employees` with appropriate `filterType` 
+(`"branch"`, `"site"`, `"designation"`, `"status"`) 
+and extend `EmployeeTable` to filter on the corresponding employee fields.

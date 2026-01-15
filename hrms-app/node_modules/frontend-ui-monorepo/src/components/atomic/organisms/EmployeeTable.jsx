@@ -10,6 +10,7 @@ const mockEmployees = [
     name: "Jaydeep",
     id: "009918765",
     department: "Human Resources",
+    team: "Aman’s Team",                 // ✅
     designation: "HR Manager",
     location: "Gurugram",
     status: "Permanent",
@@ -19,6 +20,7 @@ const mockEmployees = [
     name: "Yudhvir",
     id: "124355111",
     department: "Design",
+    team: "Rahul’s Team",               // ✅
     designation: "Graphic Designer",
     location: "Office",
     status: "Contract",
@@ -28,6 +30,7 @@ const mockEmployees = [
     name: "Vaishali",
     id: "435540099",
     department: "Management",
+    team: "Yashoda’s Team",             // ✅
     designation: "Project Manager",
     location: "Office",
     status: "Intern",
@@ -37,6 +40,7 @@ const mockEmployees = [
     name: "Debjoyti",
     id: "009812890",
     department: "Accounts",
+    team: "Ravi’s Team",                // ✅
     designation: "Accountant",
     location: "Office",
     status: "Permanent",
@@ -46,6 +50,7 @@ const mockEmployees = [
     name: "Deepak",
     id: "671190345",
     department: "Procurement",
+    team: "Mohit’s Team",               // ✅
     designation: "Procurement Officer",
     location: "Office",
     status: "Permanent",
@@ -55,6 +60,7 @@ const mockEmployees = [
     name: "Prince",
     id: "091233412",
     department: "Marketing",
+    team: "Rahul’s Team",               // ✅
     designation: "Brand Manager",
     location: "Remote",
     status: "Permanent",
@@ -62,25 +68,19 @@ const mockEmployees = [
   },
 ];
 
+
 // Accept filter props from EmployeeListPage
 const EmployeeTable = ({ filterType, filterValue }) => {
   // Decide which employees to show based on incoming filter
-  const visibleEmployees = useMemo(() => {
+   const visibleEmployees = useMemo(() => {
     if (!filterType || !filterValue) return mockEmployees;
 
-    // Filter by department name when coming from Departments page
-    if (filterType === "department") {
-      return mockEmployees.filter(
-        (emp) => emp.department === filterValue
-      );
-    }
-
-    // If later you support team-based filtering, you can add:
-    // if (filterType === "team") { ... }
-
-    return mockEmployees;
-  }, [filterType, filterValue]); // standard React pattern: derive filtered list with Array.filter [web:283][web:291]
-
+    // ✅ generic filtering for department, team, status, etc.
+    return mockEmployees.filter(
+      (emp) =>
+        emp[filterType]?.toLowerCase() === filterValue.toLowerCase()
+    );
+  }, [filterType, filterValue]);
   return (
     <HRMSTable>
       <Thead>
