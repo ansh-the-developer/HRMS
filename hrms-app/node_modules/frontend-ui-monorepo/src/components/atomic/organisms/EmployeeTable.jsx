@@ -3,7 +3,7 @@ import { Thead, Tbody, Tr, Th } from "@chakra-ui/react";
 import HRMSTable from "@/components/atomic/molecules/HRMSTable";
 import EmployeeTableRow from "@/components/atomic/molecules/EmployeeTableRow";
 
-/* ✅ UNIQUE MOCK DATA (NO DUPLICATE KEYS) */
+/*  UNIQUE MOCK DATA (NO DUPLICATE KEYS) */
 const mockEmployees = [
   { id: "EMP001", name: "Jaydeep", department: "HR", designation: "HR Manager", location: "Gurugram", status: "Permanent", avatar: "" },
   { id: "EMP002", name: "Yudhvir", department: "Design", designation: "Graphic Designer", location: "Office", status: "Contract", avatar: "" },
