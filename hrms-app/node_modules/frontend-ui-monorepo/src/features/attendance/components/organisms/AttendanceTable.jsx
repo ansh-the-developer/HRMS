@@ -1,3 +1,10 @@
+import {
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+} from "@chakra-ui/react";
+
 import HRMSTable from "@/components/atomic/molecules/HRMSTable";
 import AttendanceTableRow from "./AttendanceTableRow";
 
@@ -9,12 +16,31 @@ const columns = [
   "Status",
 ];
 
-const AttendanceTable = ({ data }) => {
+const AttendanceTable = ({ data = [] }) => {
   return (
-    <HRMSTable columns={columns}>
-      {data.map((row) => (
-        <AttendanceTableRow key={row.id} row={row} />
-      ))}
+    <HRMSTable>
+      {/* TABLE HEADER */}
+      <Thead>
+        <Tr borderBottomWidth="1px" borderColor="gray.200">
+          {columns.map((col) => (
+            <Th
+              key={col}
+              fontSize="xs"
+              color="gray.500"
+              whiteSpace="nowrap"
+            >
+              {col}
+            </Th>
+          ))}
+        </Tr>
+      </Thead>
+
+      {/* TABLE BODY */}
+      <Tbody>
+        {data.map((row) => (
+          <AttendanceTableRow key={row.id} row={row} />
+        ))}
+      </Tbody>
     </HRMSTable>
   );
 };

@@ -554,3 +554,91 @@ hrms-app/
 8. Add permission-based UI (RBAC)
 
 
+------------------------------------------------------------------------------------------------------------
+17-01-2026
+-------------------------------------------------------------------------------------------------------------
+apps/frontend-ui-monorepo/
+└── src/
+    ├── components/
+    │   └── atomic/
+    │       ├── atoms/
+    │       │   ├── HRMSButton.jsx
+    │       │   ├── HRMSInput.jsx
+    │       │   ├── Logo.jsx
+    │       │   ├── SectionTitle.jsx
+    │       │   ├── SidebarToggleButton.jsx
+    │       │   ├── StatusDot.jsx
+    │       │   └── index.js
+    │       │
+    │       ├── molecules/
+    │       │   ├── HRMSCard.jsx
+    │       │   ├── HRMSTable.jsx
+    │       │   ├── EmployeeConfigItem.jsx
+    │       │   ├── DepartmentListItem.jsx
+    │       │   ├── EmployeeTableRow.jsx
+    │       │   └── index.js
+    │       │
+    │       ├── organisms/
+    │       │   ├── EmployeeTable.jsx
+    │       │   ├── EmployeeConfigCard.jsx
+    │       │   ├── HRMSSidebar.jsx
+    │       │   ├── TopBar.jsx
+    │       │   └── index.js
+    │       │
+    │       └── templates/
+    │           ├── DashboardLayout.jsx
+    │           └── index.js
+    │
+    ├── features/
+    │   ├── employee/
+    │   │   └── pages/
+    │   │       ├── EmployeeListPage.jsx
+    │   │       ├── EmployeeDepartmentsPage.jsx
+    │   │       ├── EmployeeBranchesPage.jsx
+    │   │       ├── EmployeeDesignationsPage.jsx
+    │   │       ├── EmployeeStatusesPage.jsx
+    │   │       ├── EmployeeTypesPage.jsx
+    │   │       └── EmployeeExportPage.jsx
+    │   │
+    │   └── attendance/
+    │       ├── pages/
+    │       │   ├── AttendanceDashboardPage.jsx
+    │       │   ├── WorkingDaysPage.jsx
+    │       │   ├── WorkingHoursPage.jsx
+    │       │   ├── WorkingRulesPage.jsx
+    │       │   ├── EditWorkingRulePage.jsx
+    │       │   ├── EditAttendancePage.jsx
+    │       │   └── AttendanceExportPage.jsx
+    │       │
+    │       ├── components/
+    │       │   ├── molecules/
+    │       │   │   ├── AttendanceSearchInput.jsx
+    │       │   │   ├── AttendanceStatusBadge.jsx
+    │       │   │   ├── EmployeeAvatarName.jsx
+    │       │   │   ├── WeekdaySelector.jsx
+    │       │   │   ├── WorkingDayItem.jsx
+    │       │   │   ├── WorkingHourItem.jsx
+    │       │   │   ├── RuleListItem.jsx
+    │       │   │   └── RuleField.jsx
+    │       │   │
+    │       │   └── organisms/
+    │       │       ├── AttendanceTable.jsx
+    │       │       ├── AttendanceTableRow.jsx
+    │       │       ├── AttendanceConfigCard.jsx
+    │       │       ├── WorkingDaysForm.jsx
+    │       │       ├── WorkingDaysList.jsx
+    │       │       ├── WorkingHoursCard.jsx
+    │       │       ├── WorkingRulesList.jsx
+    │       │       ├── RuleEditCard.jsx
+    │       │       └── ExportAttendanceCard.jsx
+    │       │
+    │       └── constants/
+    │           └── attendanceMockData.js
+    │
+    ├── routes/
+    │   ├── AppRoutes.jsx
+    │   ├── HomeRoutes.jsx
+    │   └── AuthRoutes.jsx
+    │
+    ├── App.jsx
+    └── main.jsx

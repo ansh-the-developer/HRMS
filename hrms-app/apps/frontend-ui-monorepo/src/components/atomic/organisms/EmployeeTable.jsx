@@ -1,91 +1,87 @@
-import {
-  Tr,
-  Td,
-  HStack,
-  Avatar,
-  Text,
-  IconButton,
-  Badge,
-} from "@chakra-ui/react";
-import { FiEye, FiEdit2, FiTrash2 } from "react-icons/fi";
+// src/components/atomic/organisms/EmployeeTable.jsx
+import { Thead, Tbody, Tr, Th } from "@chakra-ui/react";
+import HRMSTable from "@/components/atomic/molecules/HRMSTable";
+import EmployeeTableRow from "@/components/atomic/molecules/EmployeeTableRow";
 
-const statusColor = {
-  Permanent: "purple",
-  Contract: "orange",
-  Intern: "blue",
-};
+/* ✅ TEMP MOCK DATA (safe & explicit) */
+const mockEmployees = [
+  {
+    id: "EMP001",
+    name: "Jaydeep",
+    department: "Human Resources",
+    designation: "HR Manager",
+    location: "Gurugram",
+    status: "Permanent",
+    avatar: "",
+  },
+  {
+    id: "EMP002",
+    name: "Yudhvir",
+    department: "Design",
+    designation: "Graphic Designer",
+    location: "Office",
+    status: "Contract",
+    avatar: "",
+  },
+  {
+    id: "EMP003",
+    name: "Vaishali",
+    department: "Management",
+    designation: "Project Manager",
+    location: "Office",
+    status: "Intern",
+    avatar: "",
+  },
+  {
+    id: "EMP004",
+    name: "Debjoyti",
+    department: "Accounts",
+    designation: "Accountant",
+    location: "Office",
+    status: "Permanent",
+    avatar: "",
+  },
+];
 
-const EmployeeTableRow = ({ employee }) => {
+const EmployeeTable = () => {
   return (
-    <Tr
-      borderBottomWidth="1px"
-      borderColor="gray.100"
-      _last={{ borderBottomWidth: 0 }}
-        maxH="440px"
-        overflowY="auto"
-    >
-      {/* ✅ Sticky first column */}
-      <Td
-        position="sticky"
-        left={0}
-        bg="white"
-        zIndex={1}
-        whiteSpace="nowrap"
-      >
-        <HStack spacing={3}>
-          <Avatar size="sm" name={employee.name} src={employee.avatar} />
-          <Text fontSize="sm" fontWeight="medium">
-            {employee.name}
-          </Text>
-        </HStack>
-      </Td>
+    <HRMSTable>
+      {/* HEADER */}
+      <Thead>
+        <Tr borderBottomWidth="1px" borderColor="gray.200">
+          {[
+            "Employee Name",
+            "Employee ID",
+            "Department",
+            "Designation",
+            "Location",
+            "Status",
+            "Action",
+          ].map((col) => (
+            <Th
+              key={col}
+              fontSize="xs"
+              color="gray.500"
+              whiteSpace="nowrap"
+              textTransform="none"
+            >
+              {col}
+            </Th>
+          ))}
+        </Tr>
+      </Thead>
 
-      <Td whiteSpace="nowrap">{employee.id}</Td>
-      <Td whiteSpace="nowrap">{employee.department}</Td>
-      <Td whiteSpace="nowrap">{employee.designation}</Td>
-      <Td whiteSpace="nowrap">{employee.location}</Td>
-
-      <Td whiteSpace="nowrap">
-        <Badge
-          variant="subtle"
-          colorScheme={statusColor[employee.status] || "gray"}
-          borderRadius="full"
-          px={3}
-          py={1}
-          fontSize="xs"
-        >
-          {employee.status}
-        </Badge>
-      </Td>
-
-      {/* ✅ Hide actions on mobile */}
-      <Td
-        whiteSpace="nowrap"
-        display={{ base: "none", md: "table-cell" }}
-      >
-        <HStack spacing={1} justify="flex-end">
-          <IconButton
-            aria-label="View"
-            icon={<FiEye />}
-            size="xs"
-            variant="ghost"
+      {/* BODY */}
+      <Tbody>
+        {mockEmployees.map((employee) => (
+          <EmployeeTableRow
+            key={employee.id}
+            employee={employee}
           />
-          <IconButton
-            aria-label="Edit"
-            icon={<FiEdit2 />}
-            size="xs"
-            variant="ghost"
-          />
-          <IconButton
-            aria-label="Delete"
-            icon={<FiTrash2 />}
-            size="xs"
-            variant="ghost"
-          />
-        </HStack>
-      </Td>
-    </Tr>
+        ))}
+      </Tbody>
+    </HRMSTable>
   );
 };
 
-export default EmployeeTableRow;
+export default EmployeeTable;

@@ -17,6 +17,8 @@ const statusColor = {
 };
 
 const EmployeeTableRow = ({ employee }) => {
+  if (!employee) return null; // 🔒 prevents runtime crash
+
   return (
     <Tr borderBottomWidth="1px" borderColor="gray.100">
       {/* Sticky Employee Name */}
@@ -53,27 +55,12 @@ const EmployeeTableRow = ({ employee }) => {
         </Badge>
       </Td>
 
-      {/* ✅ Action column – SAME on mobile & desktop */}
+      {/* Action column */}
       <Td whiteSpace="nowrap">
         <HStack spacing={2}>
-          <IconButton
-            aria-label="View"
-            icon={<FiEye />}
-            size="xs"
-            variant="ghost"
-          />
-          <IconButton
-            aria-label="Edit"
-            icon={<FiEdit2 />}
-            size="xs"
-            variant="ghost"
-          />
-          <IconButton
-            aria-label="Delete"
-            icon={<FiTrash2 />}
-            size="xs"
-            variant="ghost"
-          />
+          <IconButton aria-label="View" icon={<FiEye />} size="xs" variant="ghost" />
+          <IconButton aria-label="Edit" icon={<FiEdit2 />} size="xs" variant="ghost" />
+          <IconButton aria-label="Delete" icon={<FiTrash2 />} size="xs" variant="ghost" />
         </HStack>
       </Td>
     </Tr>
