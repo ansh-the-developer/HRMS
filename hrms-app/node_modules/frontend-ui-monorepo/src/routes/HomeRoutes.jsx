@@ -11,6 +11,14 @@ import EmployeeStatusesPage from "@/features/employee/pages/EmployeeStatusesPage
 import EmployeeTypesPage from "@/features/employee/pages/EmployeeTypesPage";
 import EmployeeExportPage from "@/features/employee/pages/EmployeeExportPage";
 
+import AttendanceDashboardPage from "@/features/attendance/pages/AttendanceDashboardPage";
+import WorkingDaysPage from "@/features/attendance/pages/WorkingDaysPage";
+import WorkingHoursPage from "@/features/attendance/pages/WorkingHoursPage";
+import WorkingRulesPage from "@/features/attendance/pages/WorkingRulesPage";
+import EditWorkingRulePage from "@/features/attendance/pages/EditWorkingRulePage";
+import EditAttendancePage from "@/features/attendance/pages/EditAttendancePage";
+import AttendanceExportPage from "@/features/attendance/pages/AttendanceExportPage";
+
 const HomeRoutes = () => (
   <>
     <Route
@@ -85,6 +93,70 @@ const HomeRoutes = () => (
       element={
         <ProtectedRoute>
           <EmployeeExportPage />
+        </ProtectedRoute>
+      }
+    />
+    {/* ================= Attendance ================= */}
+
+    <Route
+      path="/attendance"
+      element={
+        <ProtectedRoute>
+          <AttendanceDashboardPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/attendance/working-days"
+      element={
+        <ProtectedRoute>
+          <WorkingDaysPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/attendance/working-hours"
+      element={
+        <ProtectedRoute>
+          <WorkingHoursPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/attendance/working-rules"
+      element={
+        <ProtectedRoute>
+          <WorkingRulesPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/attendance/working-rules/edit"
+      element={
+        <ProtectedRoute>
+          <EditWorkingRulePage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/attendance/edit"
+      element={
+        <ProtectedRoute>
+          <EditAttendancePage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/attendance/export"
+      element={
+        <ProtectedRoute>
+          <AttendanceExportPage />
         </ProtectedRoute>
       }
     />

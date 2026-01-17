@@ -1,122 +1,91 @@
-// src/components/atomic/organisms/EmployeeTable.jsx
-import { useMemo } from "react";
-import { Thead, Tbody, Tr, Th } from "@chakra-ui/react";
-import HRMSTable from "../molecules/HRMSTable";
-import EmployeeTableRow from "../molecules/EmployeeTableRow";
+import {
+  Tr,
+  Td,
+  HStack,
+  Avatar,
+  Text,
+  IconButton,
+  Badge,
+} from "@chakra-ui/react";
+import { FiEye, FiEdit2, FiTrash2 } from "react-icons/fi";
 
-// Static list of employees shown in the table
-const mockEmployees = [
-  {
-    name: "Jaydeep",
-    id: "009918765",
-    department: "Human Resources",
-    team: "Aman’s Team",                 // ✅
-    designation: "HR Manager",
-    location: "Gurugram",
-    status: "Permanent",
-    avatar: "",
-  },
-  {
-    name: "Yudhvir",
-    id: "124355111",
-    department: "Design",
-    team: "Rahul’s Team",               // ✅
-    designation: "Graphic Designer",
-    location: "Office",
-    status: "Contract",
-    avatar: "",
-  },
-  {
-    name: "Vaishali",
-    id: "435540099",
-    department: "Management",
-    team: "Yashoda’s Team",             // ✅
-    designation: "Project Manager",
-    location: "Office",
-    status: "Intern",
-    avatar: "",
-  },
-  {
-    name: "Debjoyti",
-    id: "009812890",
-    department: "Accounts",
-    team: "Ravi’s Team",                // ✅
-    designation: "Accountant",
-    location: "Office",
-    status: "Permanent",
-    avatar: "",
-  },
-  {
-    name: "Deepak",
-    id: "671190345",
-    department: "Procurement",
-    team: "Mohit’s Team",               // ✅
-    designation: "Procurement Officer",
-    location: "Office",
-    status: "Permanent",
-    avatar: "",
-  },
-  {
-    name: "Prince",
-    id: "091233412",
-    department: "Marketing",
-    team: "Rahul’s Team",               // ✅
-    designation: "Brand Manager",
-    location: "Remote",
-    status: "Permanent",
-    avatar: "",
-  },
-];
+const statusColor = {
+  Permanent: "purple",
+  Contract: "orange",
+  Intern: "blue",
+};
 
-
-// Accept filter props from EmployeeListPage
-const EmployeeTable = ({ filterType, filterValue }) => {
-  // Decide which employees to show based on incoming filter
-   const visibleEmployees = useMemo(() => {
-    if (!filterType || !filterValue) return mockEmployees;
-
-    // ✅ generic filtering for department, team, status, etc.
-    return mockEmployees.filter(
-      (emp) =>
-        emp[filterType]?.toLowerCase() === filterValue.toLowerCase()
-    );
-  }, [filterType, filterValue]);
+const EmployeeTableRow = ({ employee }) => {
   return (
-    <HRMSTable>
-      <Thead>
-        <Tr borderBottomWidth="1px" borderColor="gray.100">
-          {[
-            "Employee Name",
-            "Employee ID",
-            "Department",
-            "Designation",
-            "Location",
-            "Status",
-            "Action",
-          ].map((col) => (
-            <Th
-              key={col}
-              fontFamily="'Lexend', system-ui, -apple-system, BlinkMacSystemFont"
-              fontWeight="300"
-              fontSize="15.09px"
-              lineHeight="22.64px"
-              letterSpacing="0"
-              color="#A2A1A8"
-              borderBottom="none"
-              textTransform="none"
-            >
-              {col}
-            </Th>
-          ))}
-        </Tr>
-      </Thead>
-      <Tbody>
-        {visibleEmployees.map((emp) => (
-          <EmployeeTableRow key={emp.id} employee={emp} />
-        ))}
-      </Tbody>
-    </HRMSTable>
+    <Tr
+      borderBottomWidth="1px"
+      borderColor="gray.100"
+      _last={{ borderBottomWidth: 0 }}
+        maxH="440px"
+        overflowY="auto"
+    >
+      {/* ✅ Sticky first column */}
+      <Td
+        position="sticky"
+        left={0}
+        bg="white"
+        zIndex={1}
+        whiteSpace="nowrap"
+      >
+        <HStack spacing={3}>
+          <Avatar size="sm" name={employee.name} src={employee.avatar} />
+          <Text fontSize="sm" fontWeight="medium">
+            {employee.name}
+          </Text>
+        </HStack>
+      </Td>
+
+      <Td whiteSpace="nowrap">{employee.id}</Td>
+      <Td whiteSpace="nowrap">{employee.department}</Td>
+      <Td whiteSpace="nowrap">{employee.designation}</Td>
+      <Td whiteSpace="nowrap">{employee.location}</Td>
+
+      <Td whiteSpace="nowrap">
+        <Badge
+          variant="subtle"
+          colorScheme={statusColor[employee.status] || "gray"}
+          borderRadius="full"
+          px={3}
+          py={1}
+          fontSize="xs"
+        >
+          {employee.status}
+        </Badge>
+      </Td>
+
+      {/* ✅ Hide actions on mobile */}
+      <Td
+        whiteSpace="nowrap"
+        display={{ base: "none", md: "table-cell" }}
+      >
+        <HStack spacing={1} justify="flex-end">
+          <IconButton
+            aria-label="View"
+            icon={<FiEye />}
+            size="xs"
+            variant="ghost"
+          />
+          <IconButton
+            aria-label="Edit"
+            icon={<FiEdit2 />}
+            size="xs"
+            variant="ghost"
+          />
+          <IconButton
+            aria-label="Delete"
+            icon={<FiTrash2 />}
+            size="xs"
+            variant="ghost"
+          />
+        </HStack>
+      </Td>
+    </Tr>
   );
 };
 
-export default EmployeeTable;
+export default EmployeeTableRow;

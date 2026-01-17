@@ -18,24 +18,29 @@ const statusColor = {
 
 const EmployeeTableRow = ({ employee }) => {
   return (
-   <Tr
-    borderBottomWidth="1px"
-    borderColor="gray.100"
-    _last={{ borderBottomWidth: 0 }}
-  >
-      <Td>
+    <Tr borderBottomWidth="1px" borderColor="gray.100">
+      {/* Sticky Employee Name */}
+      <Td
+        position="sticky"
+        left={0}
+        bg="white"
+        zIndex={1}
+        minW="200px"
+      >
         <HStack spacing={3}>
           <Avatar size="sm" name={employee.name} src={employee.avatar} />
-          <Text fontSize="sm" fontWeight="medium">
+          <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
             {employee.name}
           </Text>
         </HStack>
       </Td>
-      <Td>{employee.id}</Td>
-      <Td>{employee.department}</Td>
-      <Td>{employee.designation}</Td>
-      <Td>{employee.location}</Td>
-      <Td>
+
+      <Td whiteSpace="nowrap">{employee.id}</Td>
+      <Td whiteSpace="nowrap">{employee.department}</Td>
+      <Td whiteSpace="nowrap">{employee.designation}</Td>
+      <Td whiteSpace="nowrap">{employee.location}</Td>
+
+      <Td whiteSpace="nowrap">
         <Badge
           variant="subtle"
           colorScheme={statusColor[employee.status] || "gray"}
@@ -47,8 +52,10 @@ const EmployeeTableRow = ({ employee }) => {
           {employee.status}
         </Badge>
       </Td>
-      <Td>
-        <HStack spacing={1} justify="flex-end">
+
+      {/* ✅ Action column – SAME on mobile & desktop */}
+      <Td whiteSpace="nowrap">
+        <HStack spacing={2}>
           <IconButton
             aria-label="View"
             icon={<FiEye />}
