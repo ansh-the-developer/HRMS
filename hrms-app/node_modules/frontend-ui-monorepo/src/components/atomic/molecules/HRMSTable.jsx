@@ -3,12 +3,19 @@ import { Box, Table } from "@chakra-ui/react";
 
 const HRMSTable = ({ children }) => {
   return (
-    <Box width="100%" overflowX="auto">
+    <Box
+      width="100%"
+      maxH="440px"          //  vertical scroll here
+      overflowY="auto"      //  MUST be here
+      overflowX="auto"
+    >
       <Table
         size="sm"
         variant="unstyled"
         minW="900px"
-      >{children}</Table>
+      >
+        {children}
+      </Table>
     </Box>
   );
 };

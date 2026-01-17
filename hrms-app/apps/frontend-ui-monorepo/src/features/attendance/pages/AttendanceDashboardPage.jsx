@@ -11,12 +11,10 @@ const AttendanceDashboardPage = () => {
   return (
     <DashboardLayout>
       <Box
-        mt={4}
-        maxH="440px"
-        overflowY="auto"
-        borderRadius="lg"
-        borderWidth="1px"
-        borderColor="gray.100"
+       mt={4}
+  maxH="440px"
+  overflowY="auto"
+  borderRadius="lg"
       >
         {/* Attendance Table */}
         <AttendanceTable data={attendanceMockData} />
