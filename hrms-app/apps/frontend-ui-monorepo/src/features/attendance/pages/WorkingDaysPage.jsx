@@ -1,98 +1,204 @@
-// src/features/attendance/pages/WorkingDaysPage.jsx
-import { useState } from "react";
-import { Box, SimpleGrid } from "@chakra-ui/react";
+import React, { useState } from 'react';
+import {
+  Flex,
+  VStack,
+  HStack,
+  Box,
+  Heading,
+  Text,
+  Grid,
+  useToast,
+  Input,
+} from '@chakra-ui/react';
+import { Checkbox } from '@chakra-ui/react';
+import { FiEdit3, FiTrash2, FiPlus } from 'react-icons/fi';
 
-import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
-import HRMSCard from "@/components/atomic/molecules/HRMSCard";
+import DashboardLayout from './../../../components/atomic/templates/DashboardLayout';
+import HRMSButton from './../../../components/atomic/atoms/HRMSButton';
+import SectionTitle from './../../../components/atomic/atoms/SectionTitle';
 
-import WorkingDaysForm from "../components/organisms/WorkingDaysForm";
-import WorkingDaysList from "../components/organisms/WorkingDaysList";
-
-/* Mock data – will be replaced by API later */
-const INITIAL_WORKING_DAYS = [
-  {
-    id: "wd-1",
-    name: "Monday To Saturday",
-    days: ["Mo", "Tu", "We", "Th", "Fr", "Sa"],
-  },
-  {
-    id: "wd-2",
-    name: "Monday To Friday",
-    days: ["Mo", "Tu", "We", "Th", "Fr"],
-  },
-  {
-    id: "wd-3",
-    name: "Monday, Tuesday, Wednesday",
-    days: ["Mo", "Tu", "We"],
-  },
-  {
-    id: "wd-4",
-    name: "Saturday Only",
-    days: ["Sa"],
-  },
-  {
-    id: "wd-5",
-    name: "Thursday, Friday, Saturday",
-    days: ["Th", "Fr", "Sa"],
-  },
+const weekdays = [
+  { id: 1, short: 'Su' }, { id: 2, short: 'Mo' }, { id: 3, short: 'Tu' },
+  { id: 4, short: 'We' }, { id: 5, short: 'Th' }, { id: 6, short: 'Fr' },
+  { id: 7, short: 'Sa' },
 ];
 
+const mockWorkingDays = [
+  { id: 1, name: 'Monday to Saturday', days: [2,3,4,5,6,7] },
+  { id: 2, name: 'Monday to Friday', days: [2,3,4,5,6] },
+  { id: 3, name: 'Saturday Only', days: [7] },
+  { id: 4, name: 'Thursday, Friday, Saturday', days: [5,6,7] },
+];
+
+// PatternItem - Edit + Delete ONLY
+const PatternItem = ({ pattern, onDelete }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [localName, setLocalName] = useState(pattern.name);
+
+  const handleEdit = () => setIsEditing(true);
+
+  const handleSave = () => {
+    if (localName.trim()) {
+      console.log('Update:', pattern.id, localName.trim());
+      // TODO: parent onUpdate(pattern.id, localName)
+    }
+    setIsEditing(false);
+  };
+
+  return (
+    <Flex 
+      p={3} 
+      bg="white" 
+      border="1px solid"
+      borderColor="gray.200"
+      borderRadius="md" 
+      align="center" 
+      justify="space-between"
+      mb={2}
+      _hover={{ borderColor: 'blue.300', boxShadow: 'sm' }}
+    >
+      <Flex flex={1} align="center">
+        {isEditing ? (
+          <Input
+            value={localName}
+            onChange={(e) => setLocalName(e.target.value)}
+            onBlur={handleSave}
+            onKeyDown={(e) => e.key === 'Enter' && handleSave()}
+            autoFocus
+            size="sm"
+          />
+        ) : (
+          <Text fontWeight="500" fontSize="md">
+            {pattern.name}
+          </Text>
+        )}
+      </Flex>
+      <HStack spacing={1} ml={4}>
+        <HRMSButton 
+          size="xs" 
+          leftIcon={<FiEdit3 size={12} />}
+          fontSize="10px"
+          h={6}
+          onClick={handleEdit}
+        >
+          Edit
+        </HRMSButton>
+        <HRMSButton 
+          size="xs" 
+          leftIcon={<FiTrash2 size={12} />}
+          variant="ghost"
+          colorScheme="red"
+          fontSize="10px"
+          h={6}
+          onClick={() => onDelete(pattern.id)}
+        >
+          Delete
+        </HRMSButton>
+      </HStack>
+    </Flex>
+  );
+};
+
 const WorkingDaysPage = () => {
-  const [workingDays, setWorkingDays] = useState(INITIAL_WORKING_DAYS);
-  const [editingId, setEditingId] = useState(null);
+  const toast = useToast();
+  const [selectedDays, setSelectedDays] = useState([]);
+  const [workingPatterns, setWorkingPatterns] = useState(mockWorkingDays);
+  const [patternName, setPatternName] = useState('');
 
-  const editingItem = workingDays.find((w) => w.id === editingId);
+  const toggleDay = (dayId) => {
+    setSelectedDays(prev => 
+      prev.includes(dayId) 
+        ? prev.filter(id => id !== dayId)
+        : [...prev, dayId]
+    );
+  };
 
-  const handleAddOrUpdate = (payload) => {
-    if (editingId) {
-      setWorkingDays((prev) =>
-        prev.map((item) =>
-          item.id === editingId ? { ...item, ...payload } : item
-        )
-      );
-      setEditingId(null);
+  const handleAddPattern = () => {
+    if (!patternName.trim() || selectedDays.length === 0) {
+      toast({ title: 'Enter name and select days', status: 'warning' });
       return;
     }
-
-    setWorkingDays((prev) => [
-      ...prev,
-      {
-        id: `wd-${Date.now()}`,
-        ...payload,
-      },
-    ]);
+    const newPattern = {
+      id: Date.now(),
+      name: patternName.trim(),
+      days: selectedDays.sort((a,b) => a - b),
+    };
+    setWorkingPatterns(prev => [...prev, newPattern]);
+    setPatternName('');
+    setSelectedDays([]);
+    toast({ title: 'Working day added!', status: 'success' });
   };
 
   const handleDelete = (id) => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this working day rule?"
-    );
-    if (!confirmed) return;
-
-    setWorkingDays((prev) => prev.filter((item) => item.id !== id));
+    setWorkingPatterns(prev => prev.filter(p => p.id !== id));
+    toast({ title: 'Working day deleted', status: 'success' });
   };
 
   return (
     <DashboardLayout>
-      <SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-        {/* Left: Working Days Form */}
-        <HRMSCard>
-          <WorkingDaysForm
-            value={editingItem}
-            onSubmit={handleAddOrUpdate}
-            onCancelEdit={() => setEditingId(null)}
-          />
-        </HRMSCard>
+      <VStack spacing={6} align="stretch" p={{ base: 4, md: 6 }}>
+        <SectionTitle>Working Days</SectionTitle>
 
-        {/* Right: Existing Rules */}
-        <HRMSCard>
-          <WorkingDaysList
-            items={workingDays}
-            onEdit={(id) => setEditingId(id)}
-            onDelete={handleDelete}
-          />
-        </HRMSCard>
-      </SimpleGrid>
+        {/* TWO COLUMNS */}
+        <Flex direction={{ base: 'column', lg: 'row' }} gap={6}>
+          
+          {/* LEFT: Input + Weekdays + Add */}
+          <Box flex={1} bg="white" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="gray.100">
+            <Heading size="md" mb={4} color="gray.800">Create Working Days</Heading>
+            
+            <Input
+              placeholder="Working days name (e.g. Monday to Friday)"
+              value={patternName}
+              onChange={(e) => setPatternName(e.target.value)}
+              mb={6}
+              size="lg"
+            />
+            
+            <Text mb={3} fontWeight="500" color="gray.700">Select weekdays:</Text>
+            <Grid templateColumns="repeat(4, 1fr)" gap={2} mb={6}>
+              {weekdays.map(day => (
+                <Checkbox
+                  key={day.id}
+                  isChecked={selectedDays.includes(day.id)}
+                  onChange={() => toggleDay(day.id)}
+                  size="lg"
+                  colorScheme="blue"
+                  borderRadius="md"
+                >
+                  {day.short}
+                </Checkbox>
+              ))}
+            </Grid>
+
+            <HRMSButton
+              onClick={handleAddPattern}
+              w="full"
+              h={12}
+              bgGradient="linear(to-r, #307DC7, #C1B9B8)"
+              color="white"
+              borderRadius="full"
+              leftIcon={<FiPlus />}
+              fontSize="lg"
+            >
+              Add
+            </HRMSButton>
+          </Box>
+
+          {/* RIGHT: List (Edit + Delete only) */}
+          <Box flex={1} bg="white" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="gray.100">
+            <Heading size="md" mb={4} color="gray.800">Working Days List</Heading>
+            <VStack spacing={0} align="stretch">
+              {workingPatterns.map(pattern => (
+                <PatternItem
+                  key={pattern.id}
+                  pattern={pattern}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </VStack>
+          </Box>
+        </Flex>
+      </VStack>
     </DashboardLayout>
   );
 };

@@ -642,3 +642,9 @@ apps/frontend-ui-monorepo/
     │
     ├── App.jsx
     └── main.jsx
+
+
+/////////////////////////////////////////////////////////
+
+26-01-2026
+1.implement attendance config navigation + fix UI rendering issues"
