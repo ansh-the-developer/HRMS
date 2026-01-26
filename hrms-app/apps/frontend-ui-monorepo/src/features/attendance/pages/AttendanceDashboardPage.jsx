@@ -5,23 +5,18 @@ import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 import AttendanceSearchInput from "../components/molecules/AttendanceSearchInput";
 import AttendanceTable from "../components/organisms/AttendanceTable";
 import { attendanceMockData } from "../constants/attendanceMockData";
-import AttendanceConfigCard from './AttendanceConfigCard';
+import AttendanceConfigCard from './../../../components/atomic/organisms/AttendanceConfigCard';
 
 const AttendanceDashboardPage = () => {
   return (
     <DashboardLayout>
-      <Box
-       mt={4}
-  maxH="440px"
-  overflowY="auto"
-  borderRadius="lg"
-      >
+      <Box mt={4} maxH="440px" overflowY="auto" borderRadius="lg">
         {/* Attendance Table */}
         <AttendanceTable data={attendanceMockData} />
       </Box>
       <Box mt={6}>
-  <AttendanceConfigCard />
-</Box>
+        <AttendanceConfigCard />
+      </Box>
     </DashboardLayout>
   );
 };

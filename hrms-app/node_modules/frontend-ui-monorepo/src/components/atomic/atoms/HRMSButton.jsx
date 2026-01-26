@@ -1,4 +1,4 @@
-import { Button, HStack, Icon, Circle } from "@chakra-ui/react";
+import { Button, Icon, Circle } from "@chakra-ui/react";
 import { FiPlus } from "react-icons/fi";
 
 const HRMSButton = ({
@@ -6,32 +6,37 @@ const HRMSButton = ({
   variant = "solid",
   size = "sm",
   children,
+  onClick,
   ...props
 }) => {
   return (
     <Button
+      type="button"
       variant={variant}
       size={size}
-      borderRadius="10px"
+      onClick={onClick}
+      pointerEvents="auto"
+      zIndex={1}
       bgGradient="linear(to-r, #307DC7, #C1B9B8)"
       color="white"
-      _hover={{
-        bgGradient: "linear(to-r, #276BAA, #AAA09E)",
-        opacity: 0.95,
-      }}
-      _active={{
-        bgGradient: "linear(to-r, #225886, #8E8483)",
-      }}
+      _hover={{ opacity: 0.95 }}
+      fontWeight="500"     // ← ensure readable text weight
+      lineHeight="1.2"     // ← fix line height for gradient
       {...props}
     >
-      <HStack spacing={2}>
-        {withPlusIcon && (
-          <Circle size="20px" bg="white" color="#307DC7">
-            <Icon as={FiPlus} boxSize={3} />
-          </Circle>
-        )}
-        <span>{children}</span>
-      </HStack>
+      {withPlusIcon && (
+        <Circle 
+          size="20px" 
+          bg="white" 
+          color="#307DC7" 
+          mr={2} 
+          display="inline-flex" 
+          alignItems="center"
+        >
+          <Icon as={FiPlus} boxSize={3} />
+        </Circle>
+      )}
+      {children}
     </Button>
   );
 };

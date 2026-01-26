@@ -1,12 +1,26 @@
-import { Box, Text } from "@chakra-ui/react";
+import { VStack, Text } from "@chakra-ui/react";
+import HRMSCard from "@/components/atomic/molecules/HRMSCard";
+import WorkingDayItem from "../molecules/WorkingDayItem";
 
-const WorkingDaysList = () => {
+const WorkingDaysList = ({ days = [] }) => {
   return (
-    <Box>
-      <Text fontSize="sm" color="gray.500">
-        WorkingDaysList (UI scaffold)
-      </Text>
-    </Box>
+    <HRMSCard>
+      <VStack align="stretch" spacing={3}>
+        <Text fontSize="lg" fontWeight="semibold">
+          Selected Working Days
+        </Text>
+
+        {days.length === 0 ? (
+          <Text fontSize="sm" color="gray.500">
+            No working days selected
+          </Text>
+        ) : (
+          days.map((day) => (
+            <WorkingDayItem key={day} day={day} />
+          ))
+        )}
+      </VStack>
+    </HRMSCard>
   );
 };
 

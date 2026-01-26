@@ -1,12 +1,16 @@
-import { Box, Text } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 
-const WorkingDayItem = () => {
+const WorkingDayItem = ({ day }) => {
   return (
-    <Box>
-      <Text fontSize="sm" color="gray.500">
-        WorkingDayItem (UI scaffold)
-      </Text>
-    </Box>
+    <Flex
+      px={4}
+      py={2}
+      borderRadius="md"
+      borderWidth="1px"
+      borderColor="gray.200"
+    >
+      <Text fontSize="sm">{day}</Text>
+    </Flex>
   );
 };
 

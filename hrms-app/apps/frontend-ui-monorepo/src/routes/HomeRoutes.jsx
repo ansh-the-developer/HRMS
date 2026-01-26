@@ -18,6 +18,7 @@ import WorkingRulesPage from "@/features/attendance/pages/WorkingRulesPage";
 import EditWorkingRulePage from "@/features/attendance/pages/EditWorkingRulePage";
 import EditAttendancePage from "@/features/attendance/pages/EditAttendancePage";
 import AttendanceExportPage from "@/features/attendance/pages/AttendanceExportPage";
+import EditWorkingDaysPage from "@/features/attendance/pages/EditWorkingDaysPage";
 
 const HomeRoutes = () => (
   <>
@@ -112,6 +113,15 @@ const HomeRoutes = () => (
       element={
         <ProtectedRoute>
           <WorkingDaysPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/attendance/working-days/edit"
+      element={
+        <ProtectedRoute>
+          <EditWorkingDaysPage />
         </ProtectedRoute>
       }
     />
