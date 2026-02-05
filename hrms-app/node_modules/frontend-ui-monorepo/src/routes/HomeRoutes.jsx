@@ -1,8 +1,8 @@
 import React from "react";
 import { Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-
-import HomePage from "../features/home/HomePage";
+// import HomePage from "../features/home/HomePage";
+import HomePage from "@/features/home/HomePage";  // ← FIXED
 import EmployeeListPage from "@/features/employee/pages/EmployeeListPage";
 import EmployeeDepartmentsPage from "@/features/employee/pages/EmployeeDepartmentsPage";
 import EmployeeBranchesPage from "@/features/employee/pages/EmployeeBranchesPage";
