@@ -1,4 +1,0 @@
-[build]
-  base = "hrms-app"
-  command = "npx turbo run build --filter=frontend-ui-monorepo"
-  publish = "apps/frontend-ui-monorepo/dist"
