@@ -735,3 +735,125 @@ hrms-app/
 ├── turbo.json
 └── README.md
 ```
+////////////////////////////////////////////////////////////
+
+05-02-2026
+..........
+
+
+## 🚀 **Auth0 Production Deployment (Feb 2026)**
+
+### ✅ **Netlify Environment Variables**
+```
+VITE_AUTH0_DOMAIN=staging-tenant01.jp.auth0.com
+VITE_AUTH0_CLIENT_ID=mBVtD10a9CzgiGqcy7jZeApU1XTpf828
+```
+**Site Settings → Environment variables → Deploy** [web:39]
+
+### 🔐 **Auth0 Application Settings**
+```
+✅ Allowed Callback URLs:
+  http://localhost:5173
+  https://happyhrsystems.netlify.app
+  https://happyhrsystems.netlify.app/*
+
+✅ Allowed Logout URLs: 
+  https://happyhrsystems.netlify.app  ← Prod FIRST
+  https://happyhrsystems.netlify.app/*
+  http://localhost:5173              ← Local LAST
+
+✅ Allowed Web Origins:
+  http://localhost:5173
+  https://happyhrsystems.netlify.app
+```
+
+### 💻 **Logout Code** (Production Ready)
+```jsx
+logout({
+  logoutParams: { returnTo: window.location.origin }
+});
+```
+
+**Live**: https://happyhrsystems.netlify.app ✅
+```
+
+## **📁 Complete Folder Structure**
+
+```
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── components/
+│       │   │   └── atomic/
+│       │   │       ├── atoms/
+│       │   │       │   ├── HRMSButton.jsx
+│       │   │       │   ├── HRMSInput.jsx
+│       │   │       │   ├── Logo.jsx
+│       │   │       │   ├── SectionTitle.jsx ⭐
+│       │   │       │   ├── SidebarToggleButton.jsx
+│       │   │       │   └── StatusDot.jsx
+│       │   │       │
+│       │   │       ├── molecules/
+│       │   │       │   ├── HRMSCard.jsx
+│       │   │       │   ├── EmployeeConfigItem.jsx
+│       │   │       │   ├── DepartmentListItem.jsx
+│       │   │       │   └── EmployeeTableRow.jsx
+│       │   │       │
+│       │   │       ├── organisms/
+│       │   │       │   ├── EmployeeTable.jsx (filter ✅)
+│       │   │       │   ├── EmployeeConfigCard.jsx
+│       │   │       │   ├── HRMSSidebar.jsx
+│       │   │       │   ├── TopBar.jsx
+│       │   │       │   └── AttendanceConfigCard.jsx ⭐
+│       │   │       │
+│       │   │       └── templates/
+│       │   │           └── DashboardLayout.jsx
+│       │   │
+│       │   ├── features/
+│       │   │   ├── employee/
+│       │   │   │   └── pages/ (✅ 7 COMPLETE)
+│       │   │   │       ├── EmployeeListPage.jsx
+│       │   │   │       ├── EmployeeDepartmentsPage.jsx
+│       │   │   │       ├── EmployeeBranchesPage.jsx
+│       │   │   │       ├── EmployeeDesignationsPage.jsx
+│       │   │   │       ├── EmployeeStatusesPage.jsx
+│       │   │   │       ├── EmployeeTypesPage.jsx
+│       │   │   │       └── EmployeeExportPage.jsx
+│       │   │   │
+│       │   │   └── attendance/ ⭐ **PROD ✅**
+│       │   │       ├── pages/
+│       │   │       │   ├── AttendanceDashboardPage.jsx
+│       │   │       │   ├── WorkingDaysPage.jsx ⭐
+│       │   │       │   ├── WorkingHoursPage.jsx ⭐
+│       │   │       │   ├── WorkingRulesPage.jsx ⭐
+│       │   │       │   ├── EditWorkingRulePage.jsx ⭐
+│       │   │       │   ├── EditAttendancePage.jsx ⭐ (date table)
+│       │   │       │   ├── AttendanceExportPage.jsx ⭐
+│       │   │       │   └── EditWorkingDaysPage.jsx (TBD)
+│       │   │       │
+│       │   │       └── constants/
+│       │   │           └── attendanceMockData.js ⭐NEXT
+│       │   │
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx
+│       │   │   ├── HomeRoutes.jsx ⭐ALL ✅
+│       │   │   └── AuthRoutes.jsx ⭐PROD ✅
+│       │   │
+│       │   ├── App.jsx
+│       │   ├── Auth0Provider.jsx ⭐
+│       │   └── main.jsx
+│       │
+│       ├── .env (gitignored) ⭐REMOVED
+│       ├── package.json
+│       └── vite.config.js
+│
+├── packages/
+│   ├── ui/
+│   └── shared/
+├── package.json
+├── turbo.json
+└── README.md ⭐UPDATED
+```
+

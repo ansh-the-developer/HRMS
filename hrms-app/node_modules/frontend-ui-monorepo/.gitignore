@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 
 # auth0 creds:
-.env
+.envnode_modules/
