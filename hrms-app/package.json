@@ -7,7 +7,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx turbo@latest run build --filter=frontend-ui-monorepo"
+    "build": "cd apps/frontend-ui-monorepo && npm run build",
+    "dev": "cd apps/frontend-ui-monorepo && npm run dev"
   },
   "keywords": [],
   "author": "",
