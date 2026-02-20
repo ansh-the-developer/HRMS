@@ -48,6 +48,11 @@ import PayrollSlipsPage from "@/features/payroll/pages/PayrollSlipsPage";
 import RecordPaymentPage from "@/features/payroll/pages/RecordPaymentPage";
 import PendingPaymentsPage from "@/features/payroll/pages/PendingPaymentsPage";
 import PayrollOverviewPage from "@/features/payroll/pages/PayrollOverviewPage";
+// ── Settings ──
+import SettingsDashboardPage from "@/features/settings/pages/SettingsDashboardPage";
+import UserManagementPage from "@/features/settings/pages/UserManagementPage";
+import CompanyDetailsPage from "@/features/settings/pages/CompanyDetailsPage";
+import PermissionsManagerPage from "@/features/settings/pages/PermissionsManagerPage";
 
 const HomeRoutes = () => (
   <>
@@ -59,7 +64,7 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-    
+
     {/* ================= Employee ================= */}
     <Route
       path="/employees"
@@ -121,7 +126,7 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-    
+
     {/* ================= Attendance ================= */}
     <Route
       path="/attendance"
@@ -187,7 +192,7 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-    
+
     {/* ================= Leaves ================= */}
     <Route
       path="/leaves"
@@ -253,7 +258,7 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-    
+
     {/* ================= Performance ================= */}
     <Route
       path="/performance"
@@ -287,7 +292,7 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-    
+
     {/* ================= Payroll ⭐ NEW ================= */}
     <Route
       path="/payroll"
@@ -342,6 +347,40 @@ const HomeRoutes = () => (
       element={
         <ProtectedRoute>
           <PayrollOverviewPage />
+        </ProtectedRoute>
+      }
+    />
+    {/* ================= Settings ================= */}
+    {/* ── Settings ── */}
+    <Route
+      path="/settings"
+      element={
+        <ProtectedRoute>
+          <SettingsDashboardPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/settings/users/new"
+      element={
+        <ProtectedRoute>
+          <UserManagementPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/settings/company"
+      element={
+        <ProtectedRoute>
+          <CompanyDetailsPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/settings/permissions"
+      element={
+        <ProtectedRoute>
+          <PermissionsManagerPage />
         </ProtectedRoute>
       }
     />
