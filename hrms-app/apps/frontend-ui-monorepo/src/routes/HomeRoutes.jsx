@@ -1,8 +1,11 @@
 import React from "react";
 import { Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-// import HomePage from "../features/home/HomePage";
-import HomePage from "@/features/home/homePage";  // ← FIXED
+
+// Home
+import HomePage from "@/features/home/homePage";
+
+// Employee
 import EmployeeListPage from "@/features/employee/pages/EmployeeListPage";
 import EmployeeDepartmentsPage from "@/features/employee/pages/EmployeeDepartmentsPage";
 import EmployeeBranchesPage from "@/features/employee/pages/EmployeeBranchesPage";
@@ -11,6 +14,7 @@ import EmployeeStatusesPage from "@/features/employee/pages/EmployeeStatusesPage
 import EmployeeTypesPage from "@/features/employee/pages/EmployeeTypesPage";
 import EmployeeExportPage from "@/features/employee/pages/EmployeeExportPage";
 
+// Attendance
 import AttendanceDashboardPage from "@/features/attendance/pages/AttendanceDashboardPage";
 import WorkingDaysPage from "@/features/attendance/pages/WorkingDaysPage";
 import WorkingHoursPage from "@/features/attendance/pages/WorkingHoursPage";
@@ -19,6 +23,16 @@ import EditWorkingRulePage from "@/features/attendance/pages/EditWorkingRulePage
 import EditAttendancePage from "@/features/attendance/pages/EditAttendancePage";
 import AttendanceExportPage from "@/features/attendance/pages/AttendanceExportPage";
 import EditWorkingDaysPage from "@/features/attendance/pages/EditWorkingDaysPage";
+
+// Leaves
+import LeavesDashboardPage from "@/features/leaves/pages/LeavesDashboardPage";
+import LeaveRequiredFormPage from "@/features/leaves/pages/LeaveRequiredFormPage";
+import LeaveRequestUploadPage from "@/features/leaves/pages/LeaveRequestUploadPage";
+import LeaveSubmitStatusPage from "@/features/leaves/pages/LeaveSubmitStatusPage";
+import LeaveRequestListPage from "@/features/leaves/pages/LeaveRequestListPage";
+import LeaveRequestActionPage from "@/features/leaves/pages/LeaveRequestActionPage";
+import LeaveRulesPage from "@/features/leaves/pages/LeaveRulesPage";
+import LeaveRulesApprovalFlowPage from "@/features/leaves/pages/LeaveRulesApprovalFlowPage";
 
 const HomeRoutes = () => (
   <>
@@ -31,6 +45,7 @@ const HomeRoutes = () => (
       }
     />
 
+    {/* ================= Employee ================= */}
     <Route
       path="/employees"
       element={
@@ -97,8 +112,8 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-    {/* ================= Attendance ================= */}
 
+    {/* ================= Attendance ================= */}
     <Route
       path="/attendance"
       element={
@@ -167,6 +182,79 @@ const HomeRoutes = () => (
       element={
         <ProtectedRoute>
           <AttendanceExportPage />
+        </ProtectedRoute>
+      }
+    />
+
+    {/* ================= Leaves ================= */}
+    <Route
+      path="/leaves"
+      element={
+        <ProtectedRoute>
+          <LeavesDashboardPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/leaves/required-form"
+      element={
+        <ProtectedRoute>
+          <LeaveRequiredFormPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/leaves/request-upload"
+      element={
+        <ProtectedRoute>
+          <LeaveRequestUploadPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/leaves/submit-status"
+      element={
+        <ProtectedRoute>
+          <LeaveSubmitStatusPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/leaves/requests"
+      element={
+        <ProtectedRoute>
+          <LeaveRequestListPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/leaves/requests/:id"
+      element={
+        <ProtectedRoute>
+          <LeaveRequestActionPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/leaves/rules"
+      element={
+        <ProtectedRoute>
+          <LeaveRulesPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/leaves/rules/approval-flow"
+      element={
+        <ProtectedRoute>
+          <LeaveRulesApprovalFlowPage />
         </ProtectedRoute>
       }
     />
