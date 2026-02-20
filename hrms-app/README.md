@@ -985,3 +985,107 @@ To run only the frontend app from the monorepo, we use Turborepo filtering (e.g.
 
 ///////////////////////////////////////////////////////////////////
 
+Here is the updated folder structure and a clean, PR-friendly summary of the work we completed for the Payroll module today. 
+
+### 📁 Updated Folder Structure (README.md)
+
+```text
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── components/
+│       │   │   └── atomic/
+│       │   │       ├── atoms/
+│       │   │       │   ├── index.js ⭐ (Barrel export added)
+│       │   │       │   ├── HRMSButton.jsx
+│       │   │       │   ├── HRMSInput.jsx
+│       │   │       │   ├── Logo.jsx
+│       │   │       │   ├── SectionTitle.jsx
+│       │   │       │   ├── SidebarToggleButton.jsx
+│       │   │       │   └── StatusDot.jsx
+│       │   │       ├── molecules/
+│       │   │       │   ├── index.js ⭐ (Barrel export added)
+│       │   │       │   ├── HRMSCard.jsx
+│       │   │       │   ├── EmployeeConfigItem.jsx
+│       │   │       │   ├── DepartmentListItem.jsx
+│       │   │       │   └── EmployeeTableRow.jsx
+│       │   │       ├── organisms/
+│       │   │       │   ├── EmployeeTable.jsx
+│       │   │       │   ├── EmployeeConfigCard.jsx
+│       │   │       │   ├── HRMSSidebar.jsx
+│       │   │       │   ├── TopBar.jsx
+│       │   │       │   └── AttendanceConfigCard.jsx
+│       │   │       └── templates/
+│       │   │           └── DashboardLayout.jsx
+│       │   │
+│       │   ├── features/
+│       │   │   ├── employee/ (✅ 7 COMPLETE)
+│       │   │   ├── attendance/ (✅ PROD)
+│       │   │   ├── leaves/ (✅ UI COMPLETE)
+│       │   │   ├── performance/ (✅ UI COMPLETE)
+│       │   │   │
+│       │   │   └── payroll/ ⭐ NEW MODULE (UI + Logic)
+│       │   │       ├── constants/
+│       │   │       │   └── payrollMockData.js
+│       │   │       └── pages/
+│       │   │           ├── PayrollDashboardPage.jsx      ⭐ (/payroll)
+│       │   │           ├── PendingPaymentsPage.jsx       ⭐ (/payroll/pending)
+│       │   │           ├── RecordPaymentPage.jsx         ⭐ (/payroll/record)
+│       │   │           ├── SalaryStructurePage.jsx       ⭐ (/payroll/structure)
+│       │   │           ├── ReimbursementStatusPage.jsx   ⭐ (/payroll/reimbursement)
+│       │   │           ├── PayrollSlipsPage.jsx          ⭐ (/payroll/payslips)
+│       │   │           └── PayrollOverviewPage.jsx       ⭐ (/payroll/overview)
+│       │   │
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx
+│       │   │   ├── HomeRoutes.jsx ⭐ updated with Leaves, Performance, & Payroll routes
+│       │   │   └── AuthRoutes.jsx
+│       │   │
+│       │   ├── App.jsx
+│       │   ├── Auth0Provider.jsx
+│       │   └── main.jsx
+│       │
+│       ├── package.json
+│       └── vite.config.js ⭐ (Updated for Chakra icon externalization)
+│
+├── packages/
+│   ├── ui/
+│   └── shared/
+├── package.json
+├── turbo.json
+└── README.md ⭐ UPDATED
+```
+
+***
+
+### 🧾 Work Summary for README / PR
+
+#### 🚀 **New Feature: Payroll Module**
+Built out the complete Payroll module UI matching Figma design screens, including interactive functionality and local state persistence.
+
+*   **Routing & Architecture:**
+    *   Configured 7 new protected paths in `HomeRoutes.jsx` under the `/payroll/*` path.
+    *   Standardized import/export architecture across the app (created `atoms/index.js` and `molecules/index.js` barrel exports) to eliminate build errors.
+    *   Centralized mock state and formatting helpers in `payrollMockData.js`.
+
+*   **Pages Implemented:**
+    *   **Dashboard (`PayrollDashboardPage`):** Responsive grid mapping out all employees with their CTC, salary, deductions, and accurate payment status badges. Includes quick-action navigation rows at the bottom.
+    *   **Payment Processing (`PendingPaymentsPage` & `RecordPaymentPage`):** 
+        *   Interactive tables allowing HR to move employee salaries from "Pending" to "Paid" via actions.
+        *   Added live search filtering by employee name.
+        *   Added "Undo" functionality to revert payments. 
+        *   State is cached locally via `localStorage` to persist across navigations.
+    *   **Salary Structure (`SalaryStructurePage`):** 
+        *   Two-column panel UI for Earnings and Deductions.
+        *   Full CRUD functionality: Add new items, inline-edit existing items, and delete items.
+        *   Replaced external `@chakra-ui/icons` with optimized inline SVGs to fix Vite optimization issues.
+    *   **Reimbursement (`ReimbursementStatusPage`):** 
+        *   Interactive pill-based selection for claim types (Food, Travel, Other).
+        *   Native date picker integration.
+        *   Custom stylized file upload mechanism that securely captures documents visually matching the design system.
+
+#### 🔧 **Technical Fixes**
+*   **Vite Optimization:** Updated `vite.config.js` to handle Chakra UI v3 breaking changes, polyfilling node globals and bypassing strict dependency tracking for broken Chakra external exports.
+*   **Import Resolution:** Refactored default vs. named exports comprehensively across the repository to ensure strict Vite compliance during Hot Module Replacement (HMR).
