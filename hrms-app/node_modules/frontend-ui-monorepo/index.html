@@ -2,11 +2,30 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    
+    <!-- 📱 Viewport (Accessibility & Performance) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>HRMS</title>
+    
+    <!-- 🔍 SEO (Search Engine Optimization) -->
+    <title>Happy HR - Human Resource Management</title>
+    <meta name="description" content="Happy HR Management System. Manage employee attendance, leaves, performance, payroll, and company settings securely." />
+    
+    <!-- ✨ Best Practices / PWA -->
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="icon" type="image/png" href="/hr.png" />
+    <link rel="apple-touch-icon" href="/hr.png" />
+
+    <!-- 🚀 Performance (Optional but recommended) -->
+    <!-- Preconnect to Google Fonts if you are fetching fonts externally -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   </head>
   <body>
+    <!-- ♿ Accessibility: Fallback for users/bots with JS disabled -->
+    <noscript>
+      You need to enable JavaScript to run the Happy HR application.
+    </noscript>
+    
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
