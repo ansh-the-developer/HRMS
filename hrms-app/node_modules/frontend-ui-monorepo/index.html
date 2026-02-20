@@ -2,14 +2,25 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    
+
     <!-- 📱 Viewport (Accessibility & Performance) -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
+
     <!-- 🔍 SEO (Search Engine Optimization) -->
     <title>Happy HR - Human Resource Management</title>
-    <meta name="description" content="Happy HR Management System. Manage employee attendance, leaves, performance, payroll, and company settings securely." />
-    
+    <meta
+      name="description"
+      content="Happy HR Management System. Manage employee attendance, leaves, performance, payroll, and company settings securely."
+    />
+    <!-- Add this under your description meta tag -->
+    <meta name="robots" content="index, follow" />
+    <meta property="og:title" content="Happy HR - Human Resource Management" />
+    <meta
+      property="og:description"
+      content="Manage employee attendance, leaves, performance, and payroll securely."
+    />
+    <meta property="og:type" content="website" />
+
     <!-- ✨ Best Practices / PWA -->
     <meta name="theme-color" content="#ffffff" />
     <link rel="icon" type="image/png" href="/hr.png" />
@@ -25,7 +36,7 @@
     <noscript>
       You need to enable JavaScript to run the Happy HR application.
     </noscript>
-    
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
