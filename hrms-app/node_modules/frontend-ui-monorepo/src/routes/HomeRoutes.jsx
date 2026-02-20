@@ -34,11 +34,20 @@ import LeaveRequestActionPage from "@/features/leaves/pages/LeaveRequestActionPa
 import LeaveRulesPage from "@/features/leaves/pages/LeaveRulesPage";
 import LeaveRulesApprovalFlowPage from "@/features/leaves/pages/LeaveRulesApprovalFlowPage";
 
-// Performance// Performance
+// Performance
 import PerformanceDashboardPage from "@/features/performance/pages/PerformanceDashboardPage";
 import PerformanceHistoryPage from "@/features/performance/pages/PerformanceHistoryPage";
 import PerformanceReviewDetailPage from "@/features/performance/pages/PerformanceReviewDetailPage";
 import PerformanceNewReviewPage from "@/features/performance/pages/PerformanceNewReviewPage";
+
+// Payroll ⭐ NEW MODULE
+import PayrollDashboardPage from "@/features/payroll/pages/PayrollDashboardPage";
+import ReimbursementStatusPage from "@/features/payroll/pages/ReimbursementStatusPage";
+import SalaryStructurePage from "@/features/payroll/pages/SalaryStructurePage";
+import PayrollSlipsPage from "@/features/payroll/pages/PayrollSlipsPage";
+import RecordPaymentPage from "@/features/payroll/pages/RecordPaymentPage";
+import PendingPaymentsPage from "@/features/payroll/pages/PendingPaymentsPage";
+import PayrollOverviewPage from "@/features/payroll/pages/PayrollOverviewPage";
 
 const HomeRoutes = () => (
   <>
@@ -50,7 +59,7 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
+    
     {/* ================= Employee ================= */}
     <Route
       path="/employees"
@@ -60,7 +69,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/employees/departments"
       element={
@@ -69,7 +77,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/employees/branches"
       element={
@@ -78,7 +85,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     {/* Job Titles / Positions */}
     <Route
       path="/employees/designations"
@@ -88,7 +94,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     {/* Employment Statuses */}
     <Route
       path="/employees/statuses"
@@ -98,7 +103,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     {/* Employee Types */}
     <Route
       path="/employees/types"
@@ -108,7 +112,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     {/* Export */}
     <Route
       path="/employees/export"
@@ -118,7 +121,7 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
+    
     {/* ================= Attendance ================= */}
     <Route
       path="/attendance"
@@ -128,7 +131,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/attendance/working-days"
       element={
@@ -137,7 +139,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/attendance/working-days/edit"
       element={
@@ -146,7 +147,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/attendance/working-hours"
       element={
@@ -155,7 +155,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/attendance/working-rules"
       element={
@@ -164,7 +163,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/attendance/working-rules/edit"
       element={
@@ -173,7 +171,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/attendance/edit"
       element={
@@ -182,7 +179,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/attendance/export"
       element={
@@ -191,7 +187,7 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
+    
     {/* ================= Leaves ================= */}
     <Route
       path="/leaves"
@@ -201,7 +197,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/leaves/required-form"
       element={
@@ -210,7 +205,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/leaves/request-upload"
       element={
@@ -219,7 +213,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/leaves/submit-status"
       element={
@@ -228,7 +221,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/leaves/requests"
       element={
@@ -237,7 +229,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/leaves/requests/:id"
       element={
@@ -246,7 +237,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/leaves/rules"
       element={
@@ -255,7 +245,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/leaves/rules/approval-flow"
       element={
@@ -264,7 +253,7 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
+    
     {/* ================= Performance ================= */}
     <Route
       path="/performance"
@@ -274,7 +263,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/performance/history"
       element={
@@ -283,7 +271,6 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/performance/review/:id"
       element={
@@ -292,12 +279,69 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
-
     <Route
       path="/performance/new"
       element={
         <ProtectedRoute>
           <PerformanceNewReviewPage />
+        </ProtectedRoute>
+      }
+    />
+    
+    {/* ================= Payroll ⭐ NEW ================= */}
+    <Route
+      path="/payroll"
+      element={
+        <ProtectedRoute>
+          <PayrollDashboardPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/payroll/reimbursement"
+      element={
+        <ProtectedRoute>
+          <ReimbursementStatusPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/payroll/structure"
+      element={
+        <ProtectedRoute>
+          <SalaryStructurePage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/payroll/payslips"
+      element={
+        <ProtectedRoute>
+          <PayrollSlipsPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/payroll/record"
+      element={
+        <ProtectedRoute>
+          <RecordPaymentPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/payroll/pending"
+      element={
+        <ProtectedRoute>
+          <PendingPaymentsPage />
+        </ProtectedRoute>
+      }
+    />
+    <Route
+      path="/payroll/overview"
+      element={
+        <ProtectedRoute>
+          <PayrollOverviewPage />
         </ProtectedRoute>
       }
     />

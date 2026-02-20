@@ -857,3 +857,131 @@ hrms-app/
 └── README.md ⭐UPDATED
 ```
 
+
+
+////////////////////////////////////////////////////////////
+
+
+## 📁 Updated folder structure (Feb 21, 2026)
+
+```txt
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── components/
+│       │   │   └── atomic/
+│       │   │       ├── atoms/
+│       │   │       │   ├── HRMSButton.jsx
+│       │   │       │   ├── HRMSInput.jsx
+│       │   │       │   ├── Logo.jsx
+│       │   │       │   ├── SectionTitle.jsx
+│       │   │       │   ├── SidebarToggleButton.jsx
+│       │   │       │   └── StatusDot.jsx
+│       │   │       ├── molecules/
+│       │   │       │   ├── HRMSCard.jsx
+│       │   │       │   ├── EmployeeConfigItem.jsx
+│       │   │       │   ├── DepartmentListItem.jsx
+│       │   │       │   └── EmployeeTableRow.jsx
+│       │   │       ├── organisms/
+│       │   │       │   ├── EmployeeTable.jsx (filter ✅)
+│       │   │       │   ├── EmployeeConfigCard.jsx
+│       │   │       │   ├── HRMSSidebar.jsx
+│       │   │       │   ├── TopBar.jsx
+│       │   │       │   └── AttendanceConfigCard.jsx
+│       │   │       └── templates/
+│       │   │           └── DashboardLayout.jsx
+│       │   │
+│       │   ├── features/
+│       │   │   ├── employee/
+│       │   │   │   └── pages/ (✅ 7 COMPLETE)
+│       │   │   ├── attendance/ (✅ PROD)
+│       │   │   │   ├── pages/
+│       │   │   │   └── constants/
+│       │   │   │       └── attendanceMockData.js
+│       │   │   │
+│       │   │   ├── leaves/ ⭐ NEW MODULE (UI)
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── LeaveRequestForm.jsx
+│       │   │   │   │   └── LeaveUploadOverlay.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── LeavesDashboardPage.jsx
+│       │   │   │       ├── LeaveSubmitStatusPage.jsx
+│       │   │   │       ├── LeaveRequestListPage.jsx
+│       │   │   │       ├── LeaveRequestActionPage.jsx
+│       │   │   │       ├── LeaveRulesPage.jsx
+│       │   │   │       └── LeaveRulesApprovalFlowPage.jsx
+│       │   │   │
+│       │   │   └── performance/ ⭐ NEW MODULE (UI)
+│       │   │       └── pages/
+│       │   │           ├── PerformanceDashboardPage.jsx  ⭐ (/performance)
+│       │   │           ├── PerformanceHistoryPage.jsx    ⭐ (/performance/history)
+│       │   │           ├── PerformanceReviewDetailPage.jsx ⭐ (/performance/review/:id)
+│       │   │           └── PerformanceNewReviewPage.jsx  ⭐ (/performance/new)
+│       │   │
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx
+│       │   │   ├── HomeRoutes.jsx ⭐ updated with Leaves + Performance routes
+│       │   │   └── AuthRoutes.jsx
+│       │   │
+│       │   ├── App.jsx
+│       │   ├── Auth0Provider.jsx
+│       │   └── main.jsx
+│       │
+│       ├── package.json
+│       └── vite.config.js
+│
+├── packages/
+│   ├── ui/
+│   └── shared/
+├── package.json
+├── turbo.json
+└── README.md
+```
+
+To run only the frontend app from the monorepo, we use Turborepo filtering (e.g., `turbo run dev --filter=frontend-ui-monorepo`). [turborepo](https://turborepo.com/docs/crafting-your-repository/running-tasks)
+
+***
+
+## 🧾 Today’s work summary (README / PR friendly)
+
+### ✅ Leaves module (UI + state)
+- Built **LeavesDashboardPage** with 3 cards (calendar, leave summary ↔ inline form toggle, team members) and bottom action rows.
+- Built inline **LeaveRequestForm** with leave type pills, date inputs, reason, cancel/submit, and backend-ready **FormData** submit shape.
+- Built **LeaveUploadOverlay** (drag & drop + file picker, validates pdf/jpg/jpeg, returns selected file).
+- Built Leave approval flow pages:
+  - **LeaveSubmitStatusPage** (horizontal stepper timeline)
+  - **LeaveRequestListPage** (approve leaves list)
+  - **LeaveRequestActionPage** (approve/decline + notes)
+  - **LeaveRulesPage** and **LeaveRulesApprovalFlowPage** (add/remove approvers)
+
+### ✅ Performance module (UI + navigation)
+- Implemented **PerformanceDashboardPage** as the **homepage** for Performance (`/performance`):
+  - Shows the latest review (knowledge, quality, comments)
+  - Added action cards + Proceed buttons:
+    - **Check previous reviews** → `/performance/history`
+    - **Initiate Performance Review** → `/performance/new`
+- Implemented:
+  - **PerformanceHistoryPage** (review list)
+  - **PerformanceReviewDetailPage** (review detail)
+  - **PerformanceNewReviewPage** (new review form)
+
+### ✅ Routing & navigation consistency
+- Updated `HomeRoutes.jsx` to include **Leaves** + **Performance** routes under `ProtectedRoute`.
+- Ensured navigation follows SPA routing (React Router patterns) so we avoid full reload issues.
+
+***
+
+## ▶️ What to start next
+
+- Replace mock data in Leaves + Performance with real API calls (React Query/RTK Query), add loading/empty/error states.
+- Define shared data models (Review, ReviewItem, Rating scale, LeaveRequest) and centralize mock data in `constants/`.
+- Add persistence for:
+  - Performance new review submission (POST) + history fetch (GET)
+  - Leave request submission + approval actions + rules/approval flow storage
+- Optional UI polish: reuse shared table/row molecules for consistent “list + details” pages.
+
+
+///////////////////////////////////////////////////////////////////
+

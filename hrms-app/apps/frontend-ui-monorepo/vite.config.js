@@ -15,4 +15,17 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "../../packages/shared"),
     },
   },
+  // 🔧 Chakra UI Icons + Rollup Fix
+  optimizeDeps: {
+    exclude: ['@chakra-ui/icons'],
+  },
+  define: {
+    global: 'globalThis',
+  },
+  // 🔧 Additional Vite stability for Chakra v3
+  build: {
+    rollupOptions: {
+      external: ['@chakra-ui/icons'],
+    },
+  },
 });
