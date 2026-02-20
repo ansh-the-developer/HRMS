@@ -34,6 +34,12 @@ import LeaveRequestActionPage from "@/features/leaves/pages/LeaveRequestActionPa
 import LeaveRulesPage from "@/features/leaves/pages/LeaveRulesPage";
 import LeaveRulesApprovalFlowPage from "@/features/leaves/pages/LeaveRulesApprovalFlowPage";
 
+// Performance// Performance
+import PerformanceDashboardPage from "@/features/performance/pages/PerformanceDashboardPage";
+import PerformanceHistoryPage from "@/features/performance/pages/PerformanceHistoryPage";
+import PerformanceReviewDetailPage from "@/features/performance/pages/PerformanceReviewDetailPage";
+import PerformanceNewReviewPage from "@/features/performance/pages/PerformanceNewReviewPage";
+
 const HomeRoutes = () => (
   <>
     <Route
@@ -255,6 +261,43 @@ const HomeRoutes = () => (
       element={
         <ProtectedRoute>
           <LeaveRulesApprovalFlowPage />
+        </ProtectedRoute>
+      }
+    />
+
+    {/* ================= Performance ================= */}
+    <Route
+      path="/performance"
+      element={
+        <ProtectedRoute>
+          <PerformanceDashboardPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/performance/history"
+      element={
+        <ProtectedRoute>
+          <PerformanceHistoryPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/performance/review/:id"
+      element={
+        <ProtectedRoute>
+          <PerformanceReviewDetailPage />
+        </ProtectedRoute>
+      }
+    />
+
+    <Route
+      path="/performance/new"
+      element={
+        <ProtectedRoute>
+          <PerformanceNewReviewPage />
         </ProtectedRoute>
       }
     />
