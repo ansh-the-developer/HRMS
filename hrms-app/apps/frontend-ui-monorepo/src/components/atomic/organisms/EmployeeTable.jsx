@@ -1,31 +1,10 @@
 // src/components/atomic/organisms/EmployeeTable.jsx
-import { Thead, Tbody, Tr, Th } from "@chakra-ui/react";
+import { Box, Thead, Tbody, Tr, Th } from "@chakra-ui/react";
 import HRMSTable from "@/components/atomic/molecules/HRMSTable";
 import EmployeeTableRow from "@/components/atomic/molecules/EmployeeTableRow";
-
-/*  UNIQUE MOCK DATA (NO DUPLICATE KEYS) */
-const mockEmployees = [
-  { id: "EMP001", name: "Jaydeep", department: "HR", designation: "HR Manager", location: "Gurugram", status: "Permanent", avatar: "" },
-  { id: "EMP002", name: "Yudhvir", department: "Design", designation: "Graphic Designer", location: "Office", status: "Contract", avatar: "" },
-  { id: "EMP003", name: "Vaishali", department: "Management", designation: "Project Manager", location: "Office", status: "Intern", avatar: "" },
-  { id: "EMP004", name: "Debjoyti", department: "Accounts", designation: "Accountant", location: "Office", status: "Permanent", avatar: "" },
-  { id: "EMP005", name: "Aman", department: "Engineering", designation: "Frontend Developer", location: "Remote", status: "Permanent", avatar: "" },
-  { id: "EMP006", name: "Neha", department: "Engineering", designation: "Backend Developer", location: "Remote", status: "Permanent", avatar: "" },
-  { id: "EMP007", name: "Rohit", department: "Engineering", designation: "QA Engineer", location: "Office", status: "Contract", avatar: "" },
-  { id: "EMP008", name: "Pooja", department: "Marketing", designation: "SEO Specialist", location: "Office", status: "Permanent", avatar: "" },
-  { id: "EMP009", name: "Kunal", department: "Marketing", designation: "Content Writer", location: "Remote", status: "Intern", avatar: "" },
-  { id: "EMP010", name: "Sneha", department: "Sales", designation: "Sales Executive", location: "Office", status: "Permanent", avatar: "" },
-  { id: "EMP011", name: "Arjun", department: "Sales", designation: "Sales Manager", location: "Office", status: "Permanent", avatar: "" },
-  { id: "EMP012", name: "Megha", department: "HR", designation: "HR Executive", location: "Office", status: "Contract", avatar: "" },
-  { id: "EMP013", name: "Sahil", department: "Engineering", designation: "DevOps Engineer", location: "Remote", status: "Permanent", avatar: "" },
-  { id: "EMP014", name: "Anjali", department: "Design", designation: "UI Designer", location: "Remote", status: "Permanent", avatar: "" },
-  { id: "EMP015", name: "Vikas", department: "Support", designation: "Support Engineer", location: "Office", status: "Permanent", avatar: "" },
-  { id: "EMP016", name: "Nitin", department: "Support", designation: "Customer Support", location: "Office", status: "Contract", avatar: "" },
-  { id: "EMP017", name: "Riya", department: "Product", designation: "Product Analyst", location: "Remote", status: "Permanent", avatar: "" },
-  { id: "EMP018", name: "Manish", department: "Product", designation: "Product Manager", location: "Office", status: "Permanent", avatar: "" },
-  { id: "EMP019", name: "Isha", department: "Finance", designation: "Finance Analyst", location: "Office", status: "Intern", avatar: "" },
-  { id: "EMP020", name: "Tarun", department: "Finance", designation: "Finance Manager", location: "Office", status: "Permanent", avatar: "" },
-];
+import { useToast } from "@chakra-ui/react";
+import { deleteEmployee } from "@/services/employeeApi";
+import { HiUserGroup } from "react-icons/hi";
 
 const columns = [
   "Employee Name",
@@ -37,41 +16,122 @@ const columns = [
   "Action",
 ];
 
-const EmployeeTable = () => {
-  return (
-    <HRMSTable>
-      {/* TABLE HEADER */}
-      <Thead>
-        <Tr borderBottomWidth="1px" borderColor="gray.200">
-          {columns.map((col, index) => (
-            <Th
-              key={col}
-              position="sticky"
-              top={0}
-              zIndex={index === 0 ? 4 : 3}
-              bg="white"
-              fontSize="xs"
-              color="gray.500"
-              whiteSpace="nowrap"
-              textTransform="none"
-              {...(index === 0 && { left: 0 })}
-            >
-              {col}
-            </Th>
-          ))}
-        </Tr>
-      </Thead>
+const EmployeeTable = ({
+  employees = [],
+  filterType,
+  filterValue,
+  refetchEmployees,
+}) => {
+  const toast = useToast();
 
-      {/* TABLE BODY */}
-      <Tbody>
-        {mockEmployees.map((employee) => (
-          <EmployeeTableRow
-            key={employee.id} //  UNIQUE
-            employee={employee}
-          />
-        ))}
-      </Tbody>
-    </HRMSTable>
+  const handleDelete = async (employeeId) => {
+    if (!confirm(`Delete employee ${employeeId}?`)) return;
+
+    try {
+      await deleteEmployee(employeeId);
+      await refetchEmployees();
+      toast({
+        title: "Employee deleted",
+        description: "Employee record removed successfully.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error) {
+      toast({
+        title: "Delete failed",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  // Filter locally if no server filter
+  const filteredEmployees =
+    filterType && !filterValue
+      ? employees
+      : employees.filter((emp) => {
+          if (filterType === "department" && filterValue) {
+            return emp.department
+              ?.toLowerCase()
+              .includes(filterValue.toLowerCase());
+          }
+          return true;
+        });
+
+  return (
+    <Box
+      bg="white"
+      borderRadius="xl"
+      shadow="sm"
+      borderWidth="1px"
+      overflow="hidden"
+    >
+      <HRMSTable>
+        {/* TABLE HEADER */}
+        <Thead>
+          <Tr borderBottomWidth="2px" borderColor="gray.200">
+            {columns.map((col, index) => (
+              <Th
+                key={col}
+                position="sticky"
+                top={0}
+                zIndex={index === 0 ? 4 : 3}
+                bg="white"
+                fontSize="xs"
+                color="gray.600"
+                fontWeight="medium"
+                whiteSpace="nowrap"
+                textTransform="none"
+                py={4}
+                {...(index === 0 && { left: 0 })}
+              >
+                {col}
+              </Th>
+            ))}
+          </Tr>
+        </Thead>
+
+        {/* TABLE BODY */}
+        <Tbody>
+          {filteredEmployees.length === 0 ? (
+            <Tr>
+              <Td colSpan={columns.length} py={12} textAlign="center">
+                <VStack spacing={2} color="gray.500">
+                  <Icon as={HiUserGroup} w={12} h={12} opacity={0.5} />
+                  <Text fontSize="sm">No employees found</Text>
+                  {filterValue && (
+                    <Text fontSize="xs">{filterValue} returned no results</Text>
+                  )}
+                </VStack>
+              </Td>
+            </Tr>
+          ) : (
+            filteredEmployees.map((employee) => (
+              <EmployeeTableRow
+                key={employee.id}
+                employee={{
+                  ...employee,
+                  // Map Supabase data to mock shape
+                  id: employee.id,
+                  name: employee.name,
+                  department: employee.department || "N/A",
+                  designation: employee.designation || "N/A",
+                  location: "Office", // Mock for now
+                  status: "Permanent", // Mock for now
+                  avatar: "",
+                }}
+                // Force action buttons
+                onEdit={() => console.log("Edit", employee.id)}
+                onDelete={() => handleDelete(employee.id)}
+              />
+            ))
+          )}
+        </Tbody>
+      </HRMSTable>
+    </Box>
   );
 };
 
