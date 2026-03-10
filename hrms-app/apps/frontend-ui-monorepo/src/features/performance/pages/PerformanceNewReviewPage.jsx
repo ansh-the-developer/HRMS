@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import {
   Box,
@@ -8,213 +9,280 @@ import {
   Grid,
   Input,
   Select,
+  Spinner,
+  useToast,
 } from "@chakra-ui/react";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getEmployees, createPerformanceReview } from "@/services/performanceApi";
 
 const PerformanceNewReviewPage = () => {
-  const [quarter] = useState("Q2 2025");
-  const [employee, setEmployee] = useState("");
-  const [ratings, setRatings] = useState({
-    knowledge1: "",
-    knowledge2: "",
-    quality1: "",
-    quality2: "",
-  });
+  const navigate = useNavigate();
+  const toast = useToast();
+  const queryClient = useQueryClient();
+
+  // Form state
+  const [period, setPeriod] = useState("Q1 2026");
+  const [employeeId, setEmployeeId] = useState("");
+  const [knowledgeScore, setKnowledgeScore] = useState("");
+  const [qualityScore, setQualityScore] = useState("");
   const [comments, setComments] = useState("");
 
-  const handleRatingChange = (key, value) => {
-    setRatings((prev) => ({ ...prev, [key]: value }));
+  // Fetch employees for dropdown
+  const {
+    data: employees,
+    isLoading: employeesLoading,
+  } = useQuery({
+    queryKey: ["employees"],
+    queryFn: getEmployees,
+  });
+
+  // Submit mutation
+  const createMutation = useMutation({
+    mutationFn: createPerformanceReview,
+    onSuccess: () => {
+      toast({
+        title: "Success!",
+        description: "Performance review created successfully.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["performance-reviews"] });
+      navigate("/performance");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
+    },
+  });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (!employeeId || !knowledgeScore || !qualityScore) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill all required fields.",
+        status: "warning",
+        duration: 3000,
+      });
+      return;
+    }
+
+    const payload = {
+      employee_id: employeeId,
+      period,
+      knowledge_score: parseInt(knowledgeScore),
+      quality_score: parseInt(qualityScore),
+      comments,
+      status: "Submitted",
+    };
+
+    createMutation.mutate(payload);
   };
 
-  const handleSubmit = () => {
-    const payload = { quarter, employee, ratings, comments };
-    console.log("Performance review submit:", payload);
-  };
+  if (employeesLoading) {
+    return (
+      <DashboardLayout pageTitle="Performance">
+        <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+          <Flex justify="center" py={16}>
+            <Spinner size="lg" />
+          </Flex>
+        </Box>
+      </DashboardLayout>
+    );
+  }
 
   return (
     <DashboardLayout pageTitle="Performance">
       <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
-        <VStack align="stretch" spacing={8}>
-          <VStack align="flex-start" spacing={4}>
-            <Flex align="center" gap={4}>
-              <Text fontSize="sm" fontWeight="semibold">
-                Quarter:
-              </Text>
-              <Box
-                px={4}
-                py={1}
-                borderRadius="full"
-                bg="gray.200"
-                fontSize="sm"
-              >
-                {quarter}
-              </Box>
-            </Flex>
+        <form onSubmit={handleSubmit}>
+          <VStack align="stretch" spacing={8}>
+            <VStack align="flex-start" spacing={4}>
+              <Flex align="center" gap={4}>
+                <Text fontSize="sm" fontWeight="semibold">
+                  Quarter:
+                </Text>
+                <Select
+                  value={period}
+                  onChange={(e) => setPeriod(e.target.value)}
+                  size="sm"
+                  maxW="220px"
+                  bg="gray.50"
+                  border="none"
+                >
+                  <option>Q1 2026</option>
+                  <option>Q2 2026</option>
+                  <option>Q3 2026</option>
+                  <option>Q4 2026</option>
+                  <option>Annual 2026</option>
+                </Select>
+              </Flex>
 
-            <Flex align="center" gap={4}>
-              <Text fontSize="sm" fontWeight="semibold">
-                Employee:
-              </Text>
-              <Select
-                placeholder="Choose"
-                size="sm"
-                maxW="220px"
-                bg="gray.50"
-                border="none"
-                value={employee}
-                onChange={(e) => setEmployee(e.target.value)}
+              <Flex align="center" gap={4}>
+                <Text fontSize="sm" fontWeight="semibold">
+                  Employee:
+                </Text>
+                <Select
+                  placeholder="Choose employee"
+                  size="sm"
+                  maxW="220px"
+                  bg="gray.50"
+                  border="none"
+                  value={employeeId}
+                  onChange={(e) => setEmployeeId(e.target.value)}
+                >
+                  {employees?.map((emp) => (
+                    <option key={emp.id} value={emp.id}>
+                      {emp.name} ({emp.email})
+                    </option>
+                  ))}
+                </Select>
+              </Flex>
+            </VStack>
+
+            {/* Knowledge Section */}
+            <Box borderRadius="md" overflow="hidden" shadow="sm">
+              <Grid templateColumns="2fr 1fr">
+                <Box
+                  bg="#4A90E2"
+                  color="white"
+                  px={4}
+                  py={2}
+                  fontWeight="semibold"
+                  borderRightWidth="1px"
+                  borderColor="whiteAlpha.400"
+                >
+                  Knowledge of job skills
+                </Box>
+                <Box
+                  bg="#4A90E2"
+                  color="white"
+                  px={4}
+                  py={2}
+                  fontWeight="semibold"
+                >
+                  Overall Score (1-5)
+                </Box>
+              </Grid>
+              <Grid templateColumns="2fr 1fr" bg="#E2E5EA">
+                <Box px={4} py={4} fontSize="sm">
+                  Overall knowledge rating for the period
+                </Box>
+                <Box px={4} py={4}>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={5}
+                    size="sm"
+                    bg="white"
+                    placeholder="1-5"
+                    value={knowledgeScore}
+                    onChange={(e) => setKnowledgeScore(e.target.value)}
+                    required
+                  />
+                </Box>
+              </Grid>
+            </Box>
+
+            {/* Quality Section */}
+            <Box borderRadius="md" overflow="hidden" shadow="sm">
+              <Grid templateColumns="2fr 1fr">
+                <Box
+                  bg="#4A90E2"
+                  color="white"
+                  px={4}
+                  py={2}
+                  fontWeight="semibold"
+                  borderRightWidth="1px"
+                  borderColor="whiteAlpha.400"
+                >
+                  Quality / quantity of work
+                </Box>
+                <Box
+                  bg="#4A90E2"
+                  color="white"
+                  px={4}
+                  py={2}
+                  fontWeight="semibold"
+                >
+                  Overall Score (1-5)
+                </Box>
+              </Grid>
+              <Grid templateColumns="2fr 1fr" bg="#E2E5EA">
+                <Box px={4} py={4} fontSize="sm">
+                  Overall quality rating for the period
+                </Box>
+                <Box px={4} py={4}>
+                  <Input
+                    type="number"
+                    min={1}
+                    max={5}
+                    size="sm"
+                    bg="white"
+                    placeholder="1-5"
+                    value={qualityScore}
+                    onChange={(e) => setQualityScore(e.target.value)}
+                    required
+                  />
+                </Box>
+              </Grid>
+            </Box>
+
+            {/* Comments */}
+            <Box borderRadius="md" overflow="hidden" shadow="sm">
+              <Grid templateColumns="2fr 1fr">
+                <Box
+                  bg="#4A90E2"
+                  color="white"
+                  px={4}
+                  py={2}
+                  fontWeight="semibold"
+                >
+                  Comments
+                </Box>
+                <Box bg="#4A90E2" />
+              </Grid>
+              <Box bg="#E2E5EA" px={4} py={3}>
+                <Input
+                  as="textarea"
+                  rows={4}
+                  size="sm"
+                  bg="white"
+                  placeholder="Write overall comments about performance..."
+                  value={comments}
+                  onChange={(e) => setComments(e.target.value)}
+                />
+              </Box>
+            </Box>
+
+            {/* Submit Button */}
+            <Flex justify="flex-end" gap={4}>
+              <HRMSButton
+                variant="outline"
+                onClick={() => navigate("/performance")}
               >
-                <option value="Jaydeep">Jaydeep</option>
-                <option value="Rahul">Rahul</option>
-                <option value="Aman">Aman</option>
-              </Select>
+                Cancel
+              </HRMSButton>
+              <HRMSButton
+                type="submit"
+                colorScheme="blue"
+                bgGradient="linear(to-r, #4A90E2, #B0B0B0)"
+                isLoading={createMutation.isPending}
+                isDisabled={!employeeId || !knowledgeScore || !qualityScore}
+              >
+                Submit Review
+              </HRMSButton>
             </Flex>
           </VStack>
-
-          <Box borderRadius="md" overflow="hidden">
-            <Grid templateColumns="2fr 1fr">
-              <Box
-                bg="#4A90E2"
-                color="white"
-                px={4}
-                py={2}
-                fontWeight="semibold"
-                borderRightWidth="1px"
-                borderColor="whiteAlpha.400"
-              >
-                Knowledge of job skills
-              </Box>
-              <Box
-                bg="#4A90E2"
-                color="white"
-                px={4}
-                py={2}
-                fontWeight="semibold"
-              >
-                Rating
-              </Box>
-            </Grid>
-
-            <Grid templateColumns="2fr 1fr" bg="#E2E5EA">
-              <Box px={4} py={2} borderBottomWidth="1px">
-                Understands role and scope of work
-              </Box>
-              <Box px={4} py={2} borderBottomWidth="1px">
-                <Input
-                  size="sm"
-                  bg="white"
-                  value={ratings.knowledge1}
-                  onChange={(e) =>
-                    handleRatingChange("knowledge1", e.target.value)
-                  }
-                />
-              </Box>
-
-              <Box px={4} py={2}>
-                Applies domain knowledge effectively
-              </Box>
-              <Box px={4} py={2}>
-                <Input
-                  size="sm"
-                  bg="white"
-                  value={ratings.knowledge2}
-                  onChange={(e) =>
-                    handleRatingChange("knowledge2", e.target.value)
-                  }
-                />
-              </Box>
-            </Grid>
-          </Box>
-
-          <Box borderRadius="md" overflow="hidden">
-            <Grid templateColumns="2fr 1fr">
-              <Box
-                bg="#4A90E2"
-                color="white"
-                px={4}
-                py={2}
-                fontWeight="semibold"
-                borderRightWidth="1px"
-                borderColor="whiteAlpha.400"
-              >
-                Quality / quantity of work
-              </Box>
-              <Box
-                bg="#4A90E2"
-                color="white"
-                px={4}
-                py={2}
-                fontWeight="semibold"
-              >
-                Rating
-              </Box>
-            </Grid>
-
-            <Grid templateColumns="2fr 1fr" bg="#E2E5EA">
-              <Box px={4} py={2} borderBottomWidth="1px">
-                Meets deadlines and output expectations
-              </Box>
-              <Box px={4} py={2} borderBottomWidth="1px">
-                <Input
-                  size="sm"
-                  bg="white"
-                  value={ratings.quality1}
-                  onChange={(e) =>
-                    handleRatingChange("quality1", e.target.value)
-                  }
-                />
-              </Box>
-
-              <Box px={4} py={2}>
-                Maintains accuracy and attention to detail
-              </Box>
-              <Box px={4} py={2}>
-                <Input
-                  size="sm"
-                  bg="white"
-                  value={ratings.quality2}
-                  onChange={(e) =>
-                    handleRatingChange("quality2", e.target.value)
-                  }
-                />
-              </Box>
-            </Grid>
-          </Box>
-
-          <Box borderRadius="md" overflow="hidden">
-            <Grid templateColumns="2fr 1fr">
-              <Box
-                bg="#4A90E2"
-                color="white"
-                px={4}
-                py={2}
-                fontWeight="semibold"
-              >
-                Comments
-              </Box>
-              <Box bg="#4A90E2" />
-            </Grid>
-            <Box bg="#E2E5EA" px={4} py={3}>
-              <Input
-                size="sm"
-                bg="white"
-                placeholder="Write overall comments"
-                value={comments}
-                onChange={(e) => setComments(e.target.value)}
-              />
-            </Box>
-          </Box>
-
-          <Box>
-            <HRMSButton
-              colorScheme="blue"
-              bgGradient="linear(to-r, #4A90E2, #B0B0B0)"
-              onClick={handleSubmit}
-            >
-              Submit
-            </HRMSButton>
-          </Box>
-        </VStack>
+        </form>
       </Box>
     </DashboardLayout>
   );

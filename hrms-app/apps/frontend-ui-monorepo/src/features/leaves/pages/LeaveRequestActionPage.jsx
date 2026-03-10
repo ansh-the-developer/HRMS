@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import {
   Box,
@@ -9,14 +9,118 @@ import {
   VStack,
   HStack,
   Input,
+  useToast,
 } from "@chakra-ui/react";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  getLeaveRequestById,
+  updateLeaveStatus,
+} from "@/services/leaveApi";
 
 const LeaveRequestActionPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const toast = useToast(); // ← ADD TOAST
+
   const [status, setStatus] = useState(null); // "approved" | "declined" | null
   const [notes, setNotes] = useState("");
 
+  // 1) Fetch this single leave request
+  const {
+    data: leaveRequest,
+    isLoading,
+    error,
+  } = useQuery({
+    queryKey: ["leave-request", id],
+    queryFn: () => getLeaveRequestById(id),
+  });
+
+  // 2) Mutations for approve / decline WITH TOASTS
+  const approveMutation = useMutation({
+    mutationFn: () => updateLeaveStatus(id, "Approved"),
+    onSuccess: () => {
+      toast({
+        title: "✅ Leave Approved",
+        description: `${leaveRequest?.employees?.name ?? "Employee"}'s leave approved.`,
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+      queryClient.invalidateQueries(["leave-requests"]);
+      navigate("/leaves/requests");
+    },
+    onError: (error) => {
+      toast({
+        title: "❌ Error",
+        description: error.message,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+        position: "top-right",
+      });
+    },
+  });
+
+  const declineMutation = useMutation({
+    mutationFn: () => updateLeaveStatus(id, "Rejected"),
+    onSuccess: () => {
+      toast({
+        title: "❌ Leave Rejected",
+        description: `${leaveRequest?.employees?.name ?? "Employee"}'s leave rejected.`,
+        status: "warning",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+      queryClient.invalidateQueries(["leave-requests"]);
+      navigate("/leaves/requests");
+    },
+    onError: (error) => {
+      toast({
+        title: "❌ Error",
+        description: error.message,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+        position: "top-right",
+      });
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <DashboardLayout pageTitle="Approve Leaves">
+        <Box p={8} textAlign="center">
+          <Text>Loading leave request...</Text>
+        </Box>
+      </DashboardLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <DashboardLayout pageTitle="Approve Leaves">
+        <Box p={8} textAlign="center">
+          <Text color="red.500">Error: {error.message}</Text>
+        </Box>
+      </DashboardLayout>
+    );
+  }
+
+  if (!leaveRequest) {
+    return (
+      <DashboardLayout pageTitle="Approve Leaves">
+        <Box p={8} textAlign="center">
+          <Text color="gray.500">Leave request not found.</Text>
+        </Box>
+      </DashboardLayout>
+    );
+  }
+
+  const employeeName = leaveRequest.employees?.name ?? "Unknown";
   const rowBg = status === "approved" ? "#B7FF7A" : "white";
 
   return (
@@ -25,16 +129,17 @@ const LeaveRequestActionPage = () => {
         {/* Header */}
         <VStack align="stretch" spacing={1} mb={6}>
           <Text fontSize="lg" fontWeight="bold">
-            Leave Request Action
+            {leaveRequest.type} Leave Request
           </Text>
           <Text fontSize="sm" color="gray.500">
-            Approve or decline the selected leave request
+            {leaveRequest.start_date} to {leaveRequest.end_date} •{" "}
+            {employeeName}
           </Text>
         </VStack>
 
-        {/* Table header (Approve / Decline / Notes) */}
+        {/* Table header */}
         <Flex px={4} py={2} fontSize="xs" color="gray.500">
-          <Box flex="2">Employee Name</Box>
+          <Box flex="2">Employee Details</Box>
           <Box flex="1" textAlign="center">
             Approve
           </Box>
@@ -56,8 +161,19 @@ const LeaveRequestActionPage = () => {
           {/* Employee cell */}
           <Box flex="2">
             <HStack spacing={3}>
-              <Avatar size="sm" name="Jaydeep" />
-              <Text>Jaydeep</Text>
+              <Avatar size="sm" name={employeeName} />
+              <VStack align="flex-start" spacing={0}>
+                <Text fontSize="sm" fontWeight="medium">
+                  {employeeName}
+                </Text>
+                <Text fontSize="xs" color="gray.500">
+                  {leaveRequest.type} — {leaveRequest.start_date} to{" "}
+                  {leaveRequest.end_date}
+                </Text>
+                <Text fontSize="xs" color="gray.400">
+                  {leaveRequest.reason || "No reason provided"}
+                </Text>
+              </VStack>
             </HStack>
           </Box>
 
@@ -67,7 +183,11 @@ const LeaveRequestActionPage = () => {
               size="sm"
               variant={status === "approved" ? "solid" : "outline"}
               colorScheme="green"
-              onClick={() => setStatus("approved")}
+              isLoading={approveMutation.isPending}
+              onClick={() => {
+                setStatus("approved");
+                approveMutation.mutate();
+              }}
             >
               Approve
             </HRMSButton>
@@ -79,7 +199,11 @@ const LeaveRequestActionPage = () => {
               size="sm"
               variant={status === "declined" ? "solid" : "outline"}
               colorScheme="red"
-              onClick={() => setStatus("declined")}
+              isLoading={declineMutation.isPending}
+              onClick={() => {
+                setStatus("declined");
+                declineMutation.mutate();
+              }}
             >
               Decline
             </HRMSButton>
@@ -89,7 +213,7 @@ const LeaveRequestActionPage = () => {
           <Box flex="2">
             <Input
               size="sm"
-              placeholder="Notes"
+              placeholder="Optional notes..."
               bg="white"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}

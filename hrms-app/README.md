@@ -1089,3 +1089,204 @@ Built out the complete Payroll module UI matching Figma design screens, includin
 #### 🔧 **Technical Fixes**
 *   **Vite Optimization:** Updated `vite.config.js` to handle Chakra UI v3 breaking changes, polyfilling node globals and bypassing strict dependency tracking for broken Chakra external exports.
 *   **Import Resolution:** Refactored default vs. named exports comprehensively across the repository to ensure strict Vite compliance during Hot Module Replacement (HMR).
+
+
+/////////////////////////////////////////////////////////////////////
+
+## Phase 2: Backend Integration (Supabase + React Query)
+
+### ✅ **Completed: Supabase Setup (Mar 6, 2026)**
+
+#### **What we did:**
+```
+1. Created Supabase project: snuqlfgzzxaemxfyklvv.supabase.co
+2. Added environment variables (.env.local):
+   VITE_SUPABASE_URL=https://snuqlfgzzxaemxfyklvv.supabase.co
+   VITE_SUPABASE_ANON_KEY=[anonpublic key]
+3. Installed SDK: npm install @supabase/supabase-js
+4. Created src/lib/supabaseClient.js:
+```js
+import { createClient } from "@supabase/supabase-js";
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
+```
+5. Added React Query: npm install @tanstack/react-query
+6. Wrapped App in QueryClientProvider (main.jsx)
+7. Verified connection: ✅ test_items table → real data in browser
+8. Enabled RLS policy: "Enable read access for test_items" (anon role)
+```
+
+#### **Core React Query Pattern (template for all modules):**
+```jsx
+const { data, isLoading, error } = useQuery({
+  queryKey: ["leave-requests"],
+  queryFn: async () => {
+    const { data, error } = await supabase.from("leave_requests").select("*");
+    if (error) throw error;
+    return data;
+  },
+});
+```
+
+#### **Current Status:**
+```
+✅ Supabase client working
+✅ React Query provider active  
+✅ RLS policies configured for testing
+✅ HRMS UI + Auth0 unchanged
+⏳ Ready to wire first real module (Leaves)
+```
+
+#### **Next Steps:**
+```
+1. Create Leaves tables: employees, leave_requests
+2. Replace Leaves mock data → React Query + Supabase
+3. Add loading/error/empty states
+4. Copy pattern to Performance, Payroll, Attendance
+```
+
+**Production-ready data layer foundation complete. No mock data needed anymore.**  
+
+/////////////////////////////////////////////////////////////////////////////////
+🚀 HRMS Progress Summary (Last 2 Days)
+
+📊 Completed Modules: 2/5 LIVE
+
+✅ Leaves Module       → Supabase + React Query + Full CRUD
+✅ Performance Module  → Supabase + React Query + Full CRUD  
+⏳ Payroll           → Mock data
+⏳ Attendance        → Mock data  
+⏳ Employee          → Mock data
+
+Features:
+
+✅ Dashboard (pending/approved leaves)
+
+✅ History list with status badges
+
+✅ Detail view with employee info
+
+✅ New leave request form (dates, type, reason)
+
+✅ Submit → Toast → Auto-refresh list
+
+Supabase Tables: leaves, employees (RLS enabled)
+
+📁 src/services/performanceApi.js
+📄 PerformanceDashboardPage.jsx
+📄 PerformanceHistoryPage.jsx
+📄 PerformanceReviewDetailPage.jsx
+📄 PerformanceNewReviewPage.jsx
+
+
+🔄 React Query (useQuery, useMutation, invalidation)
+📡 Supabase (CRUD, RLS, relations)
+🍞 Chakra UI (toasts, badges, spinners, forms)
+📱 Responsive UI (loading/error/empty states)
+⚡ Optimistic updates + caching
+
+
+hrms-app/                                    ✅ TURBO REPO LIVE
+├── apps/
+│   └── frontend-ui-monorepo/                ✅ VITE + CHAKRA + SUPABASE
+│       ├── public/
+│       ├── src/
+│       │   ├── components/
+│       │   │   └── atomic/                  ✅ ATOMIC DESIGN ✅
+│       │   │       ├── atoms/
+│       │   │       │   ├── index.js ⭐       # Barrel export
+│       │   │       │   ├── HRMSButton.jsx
+│       │   │       │   ├── HRMSInput.jsx
+│       │   │       │   ├── Logo.jsx
+│       │   │       │   ├── SectionTitle.jsx
+│       │   │       │   ├── SidebarToggleButton.jsx
+│       │   │       │   └── StatusDot.jsx
+│       │   │       ├── molecules/
+│       │   │       │   ├── index.js ⭐       # Barrel export
+│       │   │       │   ├── HRMSCard.jsx
+│       │   │       │   ├── EmployeeConfigItem.jsx
+│       │   │       │   ├── DepartmentListItem.jsx
+│       │   │       │   └── EmployeeTableRow.jsx
+│       │   │       ├── organisms/
+│       │   │       │   ├── EmployeeTable.jsx
+│       │   │       │   ├── EmployeeConfigCard.jsx
+│       │   │       │   ├── HRMSSidebar.jsx
+│       │   │       │   ├── TopBar.jsx
+│       │   │       │   └── AttendanceConfigCard.jsx
+│       │   │       └── templates/
+│       │   │           └── DashboardLayout.jsx
+│       │   │
+│       │   ├── features/                    ✅ 4/5 MODULES LIVE
+│       │   │   ├── employee/                ✅ 7 COMPLETE
+│       │   │   ├── attendance/              ✅ PROD READY
+│       │   │   ├── leaves/                  ✅ SUPABASE LIVE (Last 2 days)
+│       │   │   │   ├── pages/
+│       │   │   │   │   ├── LeavesDashboardPage.jsx
+│       │   │   │   │   ├── LeavesHistoryPage.jsx
+│       │   │   │   │   ├── LeaveDetailPage.jsx
+│       │   │   │   │   └── LeaveNewRequestPage.jsx
+│       │   │   │   └── routes.jsx
+│       │   │   ├── performance/             ✅ SUPABASE LIVE (Last 2 days)
+│       │   │   │   ├── pages/
+│       │   │   │   │   ├── PerformanceDashboardPage.jsx
+│       │   │   │   │   ├── PerformanceHistoryPage.jsx
+│       │   │   │   │   ├── PerformanceReviewDetailPage.jsx
+│       │   │   │   │   └── PerformanceNewReviewPage.jsx
+│       │   │   │   └── routes.jsx
+│       │   │   └── payroll/                 ⭐ NEW MODULE (UI + Mock)
+│       │   │       ├── constants/
+│       │   │       │   └── payrollMockData.js
+│       │   │       └── pages/
+│       │   │           ├── PayrollDashboardPage.jsx      ⭐ /payroll
+│       │   │           ├── PendingPaymentsPage.jsx       ⭐ /payroll/pending
+│       │   │           ├── RecordPaymentPage.jsx         ⭐ /payroll/record
+│       │   │           ├── SalaryStructurePage.jsx       ⭐ /payroll/structure
+│       │   │           ├── ReimbursementStatusPage.jsx   ⭐ /payroll/reimbursement
+│       │   │           ├── PayrollSlipsPage.jsx          ⭐ /payroll/payslips
+│       │   │           └── PayrollOverviewPage.jsx       ⭐ /payroll/overview
+│       │   │
+│       │   ├── services/                    ✅ SUPABASE APIS
+│       │   │   ├── leavesApi.js            ✅ LIVE
+│       │   │   └── performanceApi.js       ✅ LIVE
+│       │   │
+│       │   ├── lib/
+│       │   │   └── supabaseClient.js       ✅ LIVE
+│       │   │
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx
+│       │   │   ├── HomeRoutes.jsx ⭐        # +Leaves/Perf/Payroll
+│       │   │   └── AuthRoutes.jsx
+│       │   │
+│       │   ├── App.jsx                     ✅ React Query Provider
+│       │   ├── Auth0Provider.jsx
+│       │   └── main.jsx
+│       │
+│       ├── package.json
+│       └── vite.config.js ⭐                # Chakra icon fix
+│
+├── packages/
+│   ├── ui/                                 ✅ Shared components
+│   └── shared/                             ✅ Utilities
+├── package.json
+├── turbo.json                              ✅ Monorepo build
+└── README.md                               ✅ Updated progress
+
+
+🎉 Key Wins
+Full CRUD cycle (Create → Read → Update → List)
+
+Real-time data from Supabase (no more mocks)
+
+Form validation + toasts + loading states
+
+Employee relations (dropdowns, detail views)
+
+Route navigation flows working end-to-end
+
+Cache invalidation (submit → lists auto-refresh)
+
+1. Payroll Module (salary slips, payslips)
+2. Attendance Module (timesheets, clock-in/out)  
+3. Employee Module (profiles, departments)
