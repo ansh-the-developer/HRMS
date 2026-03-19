@@ -3,7 +3,6 @@ import {
   Text,
   VStack,
   Spinner,
-  IconButton,
   useDisclosure,
   useToast,
   Flex,
@@ -11,11 +10,6 @@ import {
   Badge,
   HStack,
   Button,
-} from "@chakra-ui/react";
-import { AddIcon, EditIcon, DeleteIcon, StarIcon } from "@chakra-ui/icons";
-import HRMSCard from "@/components/atomic/molecules/HRMSCard";
-import SectionTitle from "@/components/atomic/atoms/SectionTitle";
-import {
   Modal,
   ModalOverlay,
   ModalContent,
@@ -26,6 +20,9 @@ import {
   Textarea,
   Checkbox,
 } from "@chakra-ui/react";
+import HRMSCard from "@/components/atomic/molecules/HRMSCard";
+import SectionTitle from "@/components/atomic/atoms/SectionTitle";
+import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getNotices } from "@/services/homeApi";
 import { supabase } from "@/lib/supabaseClient";
@@ -33,22 +30,17 @@ import { supabase } from "@/lib/supabaseClient";
 const NoticeBoardCard = () => {
   const toast = useToast();
   const queryClient = useQueryClient();
-
-  // Modal state (used for both create + edit)
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [editingNotice, setEditingNotice] = React.useState(null);
 
-  // Fetch notices
   const { data: notices = [], isLoading } = useQuery({
     queryKey: ["notices"],
     queryFn: getNotices,
   });
 
-  // Create / update notice
   const saveMutation = useMutation({
     mutationFn: async (payload) => {
       if (payload.id) {
-        // update
         const { data, error } = await supabase
           .from("notices")
           .update({
@@ -62,7 +54,6 @@ const NoticeBoardCard = () => {
         if (error) throw error;
         return data;
       } else {
-        // create
         const { data, error } = await supabase
           .from("notices")
           .insert({
@@ -98,7 +89,6 @@ const NoticeBoardCard = () => {
     },
   });
 
-  // Delete notice
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       const { error } = await supabase.from("notices").delete().eq("id", id);
@@ -146,7 +136,7 @@ const NoticeBoardCard = () => {
     saveMutation.mutate(payload);
   };
 
-  const togglePin = async (notice) => {
+  const togglePin = (notice) => {
     saveMutation.mutate({
       id: notice.id,
       title: notice.title,
@@ -179,14 +169,15 @@ const NoticeBoardCard = () => {
       <HRMSCard>
         <Flex justify="space-between" align="center" mb={4}>
           <SectionTitle>Notice Board</SectionTitle>
-          <IconButton
-            icon={<AddIcon />}
+          <HRMSButton
             size="sm"
             colorScheme="blue"
             variant="outline"
-            aria-label="Add notice"
             onClick={openCreateModal}
-          />
+            withPlusIcon
+          >
+            Add Notice
+          </HRMSButton>
         </Flex>
 
         {notices.length === 0 ? (
@@ -195,7 +186,7 @@ const NoticeBoardCard = () => {
               No notices yet
             </Text>
             <Text fontSize="xs" color="gray.400">
-              Click + to add your first notice
+              Click Add Notice to create your first one
             </Text>
           </VStack>
         ) : (
@@ -209,7 +200,7 @@ const NoticeBoardCard = () => {
                 bg={notice.pinned ? "orange.50" : "gray.50"}
               >
                 <Flex justify="space-between" align="flex-start" gap={3}>
-                  <Box>
+                  <Box flex={1}>
                     <HStack spacing={2} mb={1}>
                       {notice.title && (
                         <Text
@@ -231,35 +222,34 @@ const NoticeBoardCard = () => {
                     </Text>
                   </Box>
 
-                  <HStack spacing={1}>
-                    {/* Pin toggle */}
-                    <IconButton
-                      aria-label="Pin to top"
-                      icon={<StarIcon />}
+                  <VStack spacing={1} align="flex-end" flexShrink={0}>
+                    <Button
                       size="xs"
                       variant={notice.pinned ? "solid" : "ghost"}
                       colorScheme={notice.pinned ? "orange" : "gray"}
                       onClick={() => togglePin(notice)}
-                    />
-
-                    {/* Edit */}
-                    <IconButton
-                      aria-label="Edit notice"
-                      icon={<EditIcon />}
+                      isLoading={saveMutation.isPending}
+                    >
+                      {notice.pinned ? "Unpin" : "Pin"}
+                    </Button>
+                    <Button
                       size="xs"
                       variant="ghost"
+                      colorScheme="blue"
                       onClick={() => openEditModal(notice)}
-                    />
-                    {/* Delete */}
-                    <IconButton
-                      aria-label="Delete notice"
-                      icon={<DeleteIcon />}
+                    >
+                      Edit
+                    </Button>
+                    <Button
                       size="xs"
                       variant="ghost"
                       colorScheme="red"
                       onClick={() => handleDelete(notice)}
-                    />
-                  </HStack>
+                      isLoading={deleteMutation.isPending}
+                    >
+                      Delete
+                    </Button>
+                  </VStack>
                 </Flex>
               </Box>
             ))}
@@ -267,7 +257,6 @@ const NoticeBoardCard = () => {
         )}
       </HRMSCard>
 
-      {/* Add / Edit Notice Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="md">
         <form onSubmit={handleSubmit}>
           <ModalOverlay />

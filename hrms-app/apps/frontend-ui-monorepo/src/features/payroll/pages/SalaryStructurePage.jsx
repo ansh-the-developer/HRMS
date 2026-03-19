@@ -24,7 +24,7 @@ const load = (key, fallback) => {
 
 const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
-// ─── Inline SVG Icons (no @chakra-ui/icons) ───────────────────────────────────
+// ─── Inline SVG Icons ───────────────────────────────────
 const EditIcon = () => (
   <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
     stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

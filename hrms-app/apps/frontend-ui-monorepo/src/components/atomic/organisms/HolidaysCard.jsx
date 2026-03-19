@@ -8,16 +8,7 @@ import {
   useDisclosure,
   useToast,
   VStack,
-  IconButton,
   Button,
-} from "@chakra-ui/react";
-import { AddIcon, EditIcon, DeleteIcon } from "@chakra-ui/icons";
-import HRMSCard from "@/components/atomic/molecules/HRMSCard";
-import SectionTitle from "@/components/atomic/atoms/SectionTitle";
-import InfoRow from "@/components/atomic/molecules/InfoRow";
-import LegendItem from "@/components/atomic/molecules/LegendItem";
-import HRMSButton from "@/components/atomic/atoms/HRMSButton";
-import {
   Modal,
   ModalOverlay,
   ModalContent,
@@ -27,6 +18,11 @@ import {
   Input,
   Select,
 } from "@chakra-ui/react";
+import HRMSCard from "@/components/atomic/molecules/HRMSCard";
+import SectionTitle from "@/components/atomic/atoms/SectionTitle";
+import InfoRow from "@/components/atomic/molecules/InfoRow";
+import LegendItem from "@/components/atomic/molecules/LegendItem";
+import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getHolidays, createHoliday } from "@/services/homeApi";
 import { supabase } from "@/lib/supabaseClient";
@@ -40,17 +36,14 @@ const HolidaysCard = () => {
   const [name, setName] = useState("");
   const [type, setType] = useState("Public");
 
-  // Fetch holidays
   const { data: holidays = [], isLoading } = useQuery({
     queryKey: ["holidays"],
     queryFn: getHolidays,
   });
 
-  // Create / update holiday (single mutation)
   const saveMutation = useMutation({
     mutationFn: async (payload) => {
       if (payload.id) {
-        // UPDATE
         const { data, error } = await supabase
           .from("holidays")
           .update({
@@ -64,7 +57,6 @@ const HolidaysCard = () => {
         if (error) throw error;
         return data;
       }
-      // INSERT
       return await createHoliday({
         name: payload.name,
         date: payload.date,
@@ -93,7 +85,6 @@ const HolidaysCard = () => {
     },
   });
 
-  // Delete holiday
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
       const { error } = await supabase
@@ -211,29 +202,33 @@ const HolidaysCard = () => {
                   justify="space-between"
                   align="center"
                   w="full"
+                  gap={3}
                 >
                   <InfoRow
                     left={holiday.date}
                     right={holiday.name}
                     status={holiday.type?.toLowerCase() || "upcoming"}
                   />
-                  <HStack spacing={1} ml={2}>
-                    <IconButton
-                      aria-label="Edit holiday"
-                      icon={<EditIcon />}
+                  {/* ✅ Text buttons instead of IconButtons */}
+                  <VStack spacing={1} align="flex-end" flexShrink={0}>
+                    <Button
                       size="xs"
                       variant="ghost"
+                      colorScheme="blue"
                       onClick={() => openEditModal(holiday)}
-                    />
-                    <IconButton
-                      aria-label="Delete holiday"
-                      icon={<DeleteIcon />}
+                    >
+                      Edit
+                    </Button>
+                    <Button
                       size="xs"
                       variant="ghost"
                       colorScheme="red"
                       onClick={() => handleDelete(holiday)}
-                    />
-                  </HStack>
+                      isLoading={deleteMutation.isPending}
+                    >
+                      Delete
+                    </Button>
+                  </VStack>
                 </Flex>
               ))}
             </VStack>
@@ -247,7 +242,6 @@ const HolidaysCard = () => {
         </HStack>
       </HRMSCard>
 
-      {/* Add / Edit Holiday Modal */}
       <Modal isOpen={isOpen} onClose={onClose} size="md">
         <form onSubmit={handleSubmit}>
           <ModalOverlay />
@@ -284,7 +278,15 @@ const HolidaysCard = () => {
               </VStack>
             </ModalBody>
             <ModalFooter>
-              <Button size="sm" mr={3} onClick={() => { onClose(); resetForm(); }} variant="ghost">
+              <Button
+                size="sm"
+                mr={3}
+                onClick={() => {
+                  onClose();
+                  resetForm();
+                }}
+                variant="ghost"
+              >
                 Cancel
               </Button>
               <Button
