@@ -1,6 +1,6 @@
 [build]
   base = "hrms-app"
-  command = "npm install && cd apps/frontend-ui-monorepo && npm install && npm run build"
+  command = "npm install && npx turbo run build --filter=frontend-ui-monorepo"
   publish = "apps/frontend-ui-monorepo/dist"
 
 [[redirects]]

@@ -3,12 +3,12 @@
   "version": "1.0.0",
   "packageManager": "npm@10.9.3",
   "private": true,
-  "description": "mkdir hrms-app && cd hrms-app",
+  "description": "HRMS Monorepo",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "cd apps/frontend-ui-monorepo && npm run build",
-    "dev": "cd apps/frontend-ui-monorepo && npm run dev"
+    "dev": "turbo run dev --filter=frontend-ui-monorepo",
+    "build": "turbo run build --filter=frontend-ui-monorepo",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
@@ -18,20 +18,19 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@rolldown/pluginutils": "1.0.0-beta.43",
-    "@vitejs/plugin-react": "^4.7.0",
     "turbo": "^2.8.3",
-    "vite": "^5.4.21"
+    "vite": "5.4.8",
+    "@vitejs/plugin-react": "4.3.1"
   },
   "dependencies": {
     "@auth0/auth0-react": "^2.15.1",
-    "@chakra-ui/icons": "^2.2.4",
-    "@chakra-ui/react": "^3.28.0",
-    "@chakra-ui/theme": "^3.4.6",
+    "@chakra-ui/react": "^2.10.9",
+    "@chakra-ui/icon": "^3.2.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@tanstack/react-query": "^5.90.3",
     "framer-motion": "^12.23.24",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^6.30.3"
+    "react-router-dom": "^7.9.4"
   }
 }
