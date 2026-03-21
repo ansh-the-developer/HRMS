@@ -12,9 +12,14 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "@shared": path.resolve(__dirname, "../../packages/shared"),
+      // ✅ Safe - empty object instead of false
+      "@chakra-ui/icons": path.resolve(__dirname, "./empty-icons.js"),
     },
   },
   define: {
     global: "globalThis",
+  },
+  optimizeDeps: {
+    exclude: ["@chakra-ui/icons"],
   },
 });
