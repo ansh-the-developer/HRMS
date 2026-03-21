@@ -12,14 +12,20 @@ export default defineConfig({
     alias: {
       "@": path.resolve(__dirname, "./src"),
       "@shared": path.resolve(__dirname, "../../packages/shared"),
-      // ✅ Safe - empty object instead of false
-      "@chakra-ui/icons": path.resolve(__dirname, "./empty-icons.js"),
     },
   },
   define: {
     global: "globalThis",
   },
+  // 🔥 Nuclear: Replace icons with empty module
   optimizeDeps: {
-    exclude: ["@chakra-ui/icons"],
+    include: ["@chakra-ui/icons > @chakra-ui/icon"],
+    exclude: []
+  },
+  build: {
+    rollupOptions: {
+      // Block icons completely
+      external: (id) => id.includes("@chakra-ui/icons"),
+    },
   },
 });

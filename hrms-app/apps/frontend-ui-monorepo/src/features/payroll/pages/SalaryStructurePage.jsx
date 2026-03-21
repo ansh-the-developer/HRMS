@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Box, Flex, Grid, GridItem, Input,
-  Text, IconButton, useToast,
+  Text, useToast,
 } from '@chakra-ui/react';
 import DashboardLayout from '@/components/atomic/templates/DashboardLayout';
 import HRMSButton from '@/components/atomic/atoms/HRMSButton';
@@ -23,25 +23,6 @@ const load = (key, fallback) => {
 };
 
 const save = (key, data) => localStorage.setItem(key, JSON.stringify(data));
-
-// ─── Inline SVG Icons ───────────────────────────────────
-const EditIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-  </svg>
-);
-
-const TrashIcon = () => (
-  <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-    stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <polyline points="3 6 5 6 21 6"/>
-    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-    <path d="M10 11v6M14 11v6"/>
-    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-  </svg>
-);
 
 // ─── Reusable Panel ───────────────────────────────────────────────────────────
 function StructurePanel({ title, placeholder, storageKey, initialItems }) {
@@ -76,7 +57,10 @@ function StructurePanel({ title, placeholder, storageKey, initialItems }) {
     toast({ title: `"${name}" deleted`, status: 'info', duration: 2000, isClosable: true, position: 'top-right' });
   };
 
-  const startEdit = (item) => { setEditingId(item.id); setEditVal(item.name); };
+  const startEdit = (item) => { 
+    setEditingId(item.id); 
+    setEditVal(item.name); 
+  };
 
   const saveEdit = (id) => {
     const trimmed = editVal.trim();
@@ -87,7 +71,10 @@ function StructurePanel({ title, placeholder, storageKey, initialItems }) {
     toast({ title: 'Updated', status: 'success', duration: 2000, isClosable: true, position: 'top-right' });
   };
 
-  const cancelEdit = () => { setEditingId(null); setEditVal(''); };
+  const cancelEdit = () => { 
+    setEditingId(null); 
+    setEditVal(''); 
+  };
 
   return (
     <Flex direction="column" gap={5}>
@@ -107,7 +94,7 @@ function StructurePanel({ title, placeholder, storageKey, initialItems }) {
           _placeholder={{ color: 'gray.400' }}
         />
         <HRMSButton w="full" onClick={handleAdd}>
-          Add
+          ➕ Add
         </HRMSButton>
       </Flex>
 
@@ -148,37 +135,37 @@ function StructurePanel({ title, placeholder, storageKey, initialItems }) {
               </Text>
             )}
 
-            {/* Actions */}
+            {/* Actions - ✅ Text + Emoji buttons */}
             <Flex gap={1} align="center">
               {editingId === item.id ? (
                 <>
                   <HRMSButton size="xs" onClick={() => saveEdit(item.id)}>
-                    Save
+                    ✅ Save
                   </HRMSButton>
                   <HRMSButton size="xs" variant="outline" onClick={cancelEdit}>
-                    Cancel
+                    ❌ Cancel
                   </HRMSButton>
                 </>
               ) : (
                 <>
-                  <IconButton
-                    icon={<EditIcon />}
-                    size="xs"
-                    variant="ghost"
-                    color="gray.400"
-                    _hover={{ color: 'blue.500' }}
-                    aria-label="Edit"
+                  <HRMSButton 
+                    size="xs" 
+                    variant="ghost" 
+                    colorScheme="blue"
+                    leftIcon="✏️"
                     onClick={() => startEdit(item)}
-                  />
-                  <IconButton
-                    icon={<TrashIcon />}
-                    size="xs"
-                    variant="ghost"
-                    color="gray.400"
-                    _hover={{ color: 'red.500' }}
-                    aria-label="Delete"
+                  >
+                    Edit
+                  </HRMSButton>
+                  <HRMSButton 
+                    size="xs" 
+                    variant="ghost" 
+                    colorScheme="red"
+                    leftIcon="🗑️"
                     onClick={() => handleDelete(item.id, item.name)}
-                  />
+                  >
+                    Delete
+                  </HRMSButton>
                 </>
               )}
             </Flex>
