@@ -1,38 +1,13 @@
+// BirthdayTrackerCard.jsx
 import React from "react";
 import {
-  VStack, Flex, Spinner, Text, Badge,  // ✅ BADGE ADDED
+  VStack, Flex, Spinner, Text, Badge,
 } from "@chakra-ui/react";
 import HRMSCard from "@/components/atomic/molecules/HRMSCard";
 import SectionTitle from "@/components/atomic/atoms/SectionTitle";
 import BirthdayListItem from "@/components/atomic/molecules/BirthdayListItem";
-import { useQuery } from "@tanstack/react-query";
-import { supabase } from "@/lib/supabaseClient";
-import { useCalendar } from "@/contexts/CalendarContext";
-
-const getBirthdaysForMonth = async (targetYear, targetMonth) => {
-  // Get ALL birthdays (ignore year)
-  const { data: employees } = await supabase
-    .from("employees")
-    .select("id, name, designation, department, birthdate")
-    .not("birthdate", "is", null);
-
-  // ✅ MONTH/DAY ONLY FILTER
-  const targetMonthNum = targetMonth + 1;
-  return employees
-    ?.filter(emp => {
-      const birthDate = new Date(emp.birthdate);
-      return birthDate.getMonth() + 1 === targetMonthNum;
-    })
-    ?.map(emp => {
-      const birthDate = new Date(emp.birthdate);
-      return {
-        name: emp.name,
-        role: emp.designation || emp.department || "Employee",
-        date: birthDate.getDate() + " " + birthDate.toLocaleDateString("en-GB", { month: "short" }),
-      };
-    })
-    ?.slice(0, 10) || [];
-};
+import { useEmployees } from "@/hooks";  // ✅ CORRECT
+import { useCalendar } from '@/contexts/CalendarContext';
 
 const BirthdayTrackerCard = ({ minH }) => {
   const { calendarMonth } = useCalendar();
@@ -43,11 +18,28 @@ const BirthdayTrackerCard = ({ minH }) => {
     year: "numeric",
   });
 
-  const { data: birthdays = [], isLoading } = useQuery({
-    queryKey: ["birthdays-month-day", year, month],
-    queryFn: () => getBirthdaysForMonth(year, month),
-    staleTime: 1000,
-  });
+  // ✅ USE CENTRALIZED EMPLOYEES + MONTH/DAY FILTER
+  const { data: allEmployees = [], isLoading } = useEmployees();
+
+  // Filter birthdays MONTH/DAY only (client-side)
+  const birthdays = React.useMemo(() => {
+    const targetMonthNum = month + 1;
+    return allEmployees
+      ?.filter(emp => {
+        if (!emp.birthdate) return false;
+        const birthDate = new Date(emp.birthdate);
+        return birthDate.getMonth() + 1 === targetMonthNum;
+      })
+      ?.map(emp => {
+        const birthDate = new Date(emp.birthdate);
+        return {
+          name: emp.name,
+          role: emp.designation || emp.department || "Employee",
+          date: `${birthDate.getDate()} ${birthDate.toLocaleDateString("en-GB", { month: "short" })}`,
+        };
+      })
+      ?.slice(0, 10) || [];
+  }, [allEmployees, month]);
 
   if (isLoading) {
     return (
@@ -67,7 +59,7 @@ const BirthdayTrackerCard = ({ minH }) => {
       <Flex direction="column" h="100%">
         <Flex justify="space-between" align="center" mb={2}>
           <SectionTitle>Birthday Tracker 🎂</SectionTitle>
-          <Badge colorScheme="green" fontSize="xs">Month/Day Sync</Badge>
+          <Badge colorScheme="green" fontSize="xs">Central Cache</Badge>
         </Flex>
         
         <Text fontSize="sm" color="gray.500" mb={3} fontWeight="medium">

@@ -1,12 +1,11 @@
+// src/main.jsx
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { Auth0Provider } from "@auth0/auth0-react";
-import { ChakraProvider, extendTheme } from "@chakra-ui/react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { queryClient } from "@/lib/queryClient";  // ✅ SINGLE SOURCE
 import App from "./App.jsx";
-
-const theme = extendTheme({});
-const queryClient = new QueryClient(); // ← Add this
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
@@ -17,11 +16,10 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         redirect_uri: window.location.origin,
       }}
     >
-      <ChakraProvider theme={theme}>
-        <QueryClientProvider client={queryClient}> {/* ← Wrap App here */}
-          <App />
-        </QueryClientProvider>
-      </ChakraProvider>
+      <QueryClientProvider client={queryClient}>
+        <App />
+        <ReactQueryDevtools initialIsOpen={false} />
+      </QueryClientProvider>
     </Auth0Provider>
   </React.StrictMode>
 );

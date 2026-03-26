@@ -1,22 +1,22 @@
+// src/App.jsx
 import React from 'react';
 import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { ChakraProvider } from "@chakra-ui/react";
-import { CalendarProvider } from "@/contexts/CalendarContext";  // ✅ ADD
+import { ChakraProvider, extendTheme } from "@chakra-ui/react";
+import { CalendarProvider } from "@/contexts/CalendarContext";
 import AppRoutes from '@/routes/AppRoutes';
 
-const queryClient = new QueryClient();
+const theme = extendTheme({
+  config: { initialColorMode: "light", useSystemColorMode: false }
+});
 
 function App() {
   return (
-    <ChakraProvider>
-      <QueryClientProvider client={queryClient}>
-        <CalendarProvider>        {/* ✅ WRAP */}
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </CalendarProvider>       {/* ✅ END */}
-      </QueryClientProvider>
+    <ChakraProvider theme={theme}>
+      <CalendarProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </CalendarProvider>
     </ChakraProvider>
   );
 }
