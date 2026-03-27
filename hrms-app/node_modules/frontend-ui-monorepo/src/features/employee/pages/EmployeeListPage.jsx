@@ -1,75 +1,78 @@
-// src/features/employee/pages/EmployeeListPage.jsx
-import { Box, Flex, Spinner, Text, VStack } from "@chakra-ui/react";
+import React, { useState } from "react";
+import { Box, Flex, Text, Spinner, VStack } from "@chakra-ui/react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import EmployeeTable from "@/components/atomic/organisms/EmployeeTable";
+import EmployeeMasterForm from "@/features/employee/components/EmployeeMasterForm";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
-import { useToast } from "@chakra-ui/react";
-import { useEmployees } from '../../../hooks/useEmployees';
+import { useEmployees } from "@/hooks";
 
 const EmployeeListPage = () => {
-  const toast = useToast();
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const [isFormOpen, setIsFormOpen] = useState(false);
+  const [editingEmployee, setEditingEmployee] = useState(null);
 
   const filterType = searchParams.get("filterType") || location.state?.filterType;
   const filterValue = searchParams.get("filterValue") || location.state?.filterValue;
 
-  const {
-    data: employees,
-    isLoading,
-    error,
-    refetch,
-  } = useEmployees({ filterType, filterValue });   // ✅ USES HOOK
+  const { data: employees = [], isLoading, error, refetch } = useEmployees({ filterType, filterValue });
 
-  if (isLoading) {
-    return (
-      <DashboardLayout>
-        <Box px={{ base: 4, md: 8 }} py={6}>
-          <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
-            <VStack spacing={4}>
-              <Spinner size="lg" thickness="4px" color="blue.500" />
-              <Text color="gray.500">Loading employees...</Text>
-            </VStack>
-          </Box>
-        </Box>
-      </DashboardLayout>
-    );
-  }
+  const handleAddNew = () => {
+    setEditingEmployee(null);
+    setIsFormOpen(true);
+  };
 
-  if (error) {
-    return (
-      <DashboardLayout>
-        <Box px={{ base: 4, md: 8 }} py={6}>
-          <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
-            <VStack spacing={4}>
-              <Text color="red.500" fontSize="lg">Error loading employees</Text>
-              <Text color="gray.500">{error.message}</Text>
-              <HRMSButton size="sm" onClick={() => refetch()}>
-                🔄 Retry
-              </HRMSButton>
-            </VStack>
-          </Box>
-        </Box>
-      </DashboardLayout>
-    );
-  }
+  const handleEdit = (employee) => {
+    setEditingEmployee(employee);
+    setIsFormOpen(true);
+  };
+
+  const handleClose = () => {
+    setIsFormOpen(false);
+    setEditingEmployee(null);
+  };
+
+  const handleSuccess = () => {
+    refetch();
+    handleClose();
+  };
 
   return (
     <DashboardLayout>
-      <Box px={{ base: 4, md: 8 }} py={6}>
-        <VStack spacing={6} w="full">
-          {/* ❌ REMOVED: EmployeeConfigCard (as per requirements) */}
-          <Box w="full">
-            <EmployeeTable
-              employees={employees || []}
-              filterType={filterType}
-              filterValue={filterValue}
-              refetchEmployees={refetch}
-            />
+      <Box px={{ base: 4, md: 8 }} py={6} minH="100vh" bg="gray.50">
+        {/* ── Page Header ── */}
+        <Flex justify="space-between" align="flex-start" mb={6}>
+          <Box>
+            <Text fontSize="2xl" fontWeight="bold" color="gray.900" lineHeight="1.2">
+              Employee Master
+            </Text>
+            <Text fontSize="sm" color="gray.400" mt={1}>
+              Compliance, Identity & Financial Directory
+            </Text>
           </Box>
-        </VStack>
+          <HRMSButton withPlusIcon onClick={handleAddNew} h="44px" px={6}>
+            Add New Record
+          </HRMSButton>
+        </Flex>
+
+        {/* ── Table ── */}
+        <EmployeeTable
+          employees={employees}
+          isLoading={isLoading}
+          error={error}
+          refetchEmployees={refetch}
+          onEdit={handleEdit}
+        />
       </Box>
+
+      {/* ── Create / Edit Modal ── */}
+      <EmployeeMasterForm
+        isOpen={isFormOpen}
+        onClose={handleClose}
+        employee={editingEmployee}
+        onSuccess={handleSuccess}
+      />
     </DashboardLayout>
   );
 };

@@ -1745,3 +1745,132 @@ Supabase → services/*.js → hooks/*.js → Components
 ```
 
 **Architecture 100% production-ready! 🎉**
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////
+
+hrms-app/                                           ✅ TURBO MONOREPO
+├── netlify.toml                                    ✅ Deploy config (ROOT)
+├── package.json                                    ✅ Turbo orchestrator
+├── turbo.json                                      ✅ Build pipeline
+│
+├── apps/
+│   └── frontend-ui-monorepo/                       ✅ VITE 5.4.8 + CHAKRA v2 + RQ v5
+│       ├── public/
+│       │   ├── favicon.ico
+│       │   └── vite.svg
+│       │
+│       ├── src/
+│       │   ├── components/
+│       │   │   └── atomic/                         ✅ Atomic Design System
+│       │   │       ├── atoms/                      ✅ 6 primitives
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSButton.jsx          ✅ Purple gradient CTA
+│       │   │       │   ├── HRMSInput.jsx           ✅ Focus states
+│       │   │       │   ├── Logo.jsx
+│       │   │       │   ├── SectionTitle.jsx
+│       │   │       │   ├── SidebarToggleButton.jsx
+│       │   │       │   └── StatusDot.jsx
+│       │   │       │
+│       │   │       ├── molecules/                  ✅ 7 composable items
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSCard.jsx
+│       │   │       │   ├── InfoRow.jsx
+│       │   │       │   ├── LegendItem.jsx
+│       │   │       │   ├── EmployeeConfigItem.jsx
+│       │   │       │   ├── DepartmentListItem.jsx  ✅ Icons fixed
+│       │   │       │   ├── EmployeeTableRow.jsx    ✅ Icons fixed
+│       │   │       │   └── BirthdayListItem.jsx    ✅ Month/Day display
+│       │   │       │
+│       │   │       ├── organisms/                  ✅ 10 cards + layouts
+│       │   │       │   ├── HRMSSidebar.jsx         ✅ Collapsible nav
+│       │   │       │   ├── TopBar.jsx              ✅ Profile + notifications
+│       │   │       │   ├── NoticeBoardCard.jsx     ✅ Icons removed
+│       │   │       │   ├── HolidaysCard.jsx        ✅ Icons removed
+│       │   │       │   ├── CompanyEventsCard.jsx
+│       │   │       │   ├── BirthdayTrackerCard.jsx ✅ 🎂 React Query LIVE
+│       │   │       │   ├── CalendarCard.jsx        ✅ 📅 React Query + badges
+│       │   │       │   ├── EmployeeTable.jsx       ✅ TOTP Delete Modal
+│       │   │       │   ├── EmployeeConfigCard.jsx  ✅ ⚠️ DEPRECATED
+│       │   │       │   └── AttendanceConfigCard.jsx
+│       │   │       │
+│       │   │       └── templates/
+│       │   │           └── DashboardLayout.jsx     ✅ Sidebar + Topbar wrapper
+│       │   │
+│       │   ├── contexts/                           ✅ Global state
+│       │   │   └── CalendarContext.jsx             ✅ Birthday ↔ Calendar sync
+│       │   │
+│       │   ├── hooks/                              ✅ ⭐ React Query v5 Hooks
+│       │   │   ├── index.js                        ✅ Barrel export
+│       │   │   ├── useEmployees.js                 ✅ List + CRUD ops
+│       │   │   ├── useHome.js                      ✅ Dashboard data
+│       │   │   ├── useLeaves.js                    ✅ Leave requests
+│       │   │   └── usePerformance.js               ✅ Reviews data
+│       │   │
+│       │   ├── features/                           ✅ Feature-sliced by domain
+│       │   │   ├── auth/
+│       │   │   │   └── pages/
+│       │   │   │       └── ResetPasswordPage.jsx   ✅ Icons fixed
+│       │   │   │
+│       │   │   ├── home/
+│       │   │   │   └── pages/
+│       │   │   │       └── HomePage.jsx            ✅ Dashboard (RQ ready)
+│       │   │   │
+│       │   │   ├── employee/                       ✅ ✅ FULL CRUD + TOTP DELETE
+│       │   │   │   └── pages/
+│       │   │   │       └── EmployeeListPage.jsx    ✅ Table + modals + RQ
+│       │   │   │
+│       │   │   ├── attendance/
+│       │   │   │   └── pages/
+│       │   │   │       └── WorkingHoursPage.jsx    ✅ Icons fixed
+│       │   │   │
+│       │   │   ├── leaves/
+│       │   │   │   └── components/
+│       │   │   │       └── LeaveRequestForm.jsx    ✅ Icons fixed
+│       │   │   │
+│       │   │   ├── performance/                    ✅ Supabase LIVE
+│       │   │   │   └── pages/
+│       │   │   │       └── PerformanceReviewsPage.jsx
+│       │   │   │
+│       │   │   └── payroll/
+│       │   │       └── pages/
+│       │   │           └── SalaryStructurePage.jsx ✅ Icons removed
+│       │   │
+│       │   ├── services/                           ✅ Supabase API layer
+│       │   │   ├── employeeApi.js                  ✅ ✅ CASCADE DELETE + TOTP ready
+│       │   │   ├── homeApi.js                      ✅ Notices + Birthdays
+│       │   │   ├── leaveApi.js                     ✅ Leave endpoints
+│       │   │   └── performanceApi.js               ✅ Review endpoints
+│       │   │
+│       │   ├── lib/                                ✅ Core utils
+│       │   │   ├── supabaseClient.js               ✅ LIVE connection
+│       │   │   ├── queryClient.js                  ✅ ⭐ React Query v5 + DevTools
+│       │   │   └── totpUtils.js                    ✅ Native Web Crypto TOTP
+│       │   │
+│       │   ├── routes/                             ✅ Client-side routing
+│       │   │   ├── AppRoutes.jsx
+│       │   │   ├── HomeRoutes.jsx
+│       │   │   └── AuthRoutes.jsx
+│       │   │
+│       │   ├── App.jsx                             ✅ Providers stack
+│       │   └── main.jsx                            ✅ Entry point + QueryClient
+│       │
+│       ├── package.json                            ✅ @tanstack/react-query v5
+│       ├── vite.config.js                          ✅ Chakra + aliases optimized
+│       └── tailwind.config.js                      ✅ Custom theme
+│
+├── packages/
+│   ├── ui/                                         ✅ Shared components (future)
+│   └── shared/                                     ✅ Types + utils (future)
+│
+└── README.md                                       ✅ Updated below
+
+**Today's Wins (March 27, 2026):**
+
+1. **✅ Employee CRUD LIVE** (Add/Edit/Delete/List via Supabase)
+2. **✅ Secure TOTP Delete** (Native Web Crypto + 6-digit auth)
+3. **✅ Cascade Deletes** (performance_reviews + child tables cleaned)
+4. **✅ 0 Broken FKs** (RLS Policy B + data integrity fixed)
+5. **✅ Production Ready** (React Query v5 + error handling)
+

@@ -1,137 +1,178 @@
-// src/components/atomic/organisms/EmployeeTable.jsx
-import { Box, Thead, Tbody, Tr, Th } from "@chakra-ui/react";
-import HRMSTable from "@/components/atomic/molecules/HRMSTable";
-import EmployeeTableRow from "@/components/atomic/molecules/EmployeeTableRow";
-import { useToast } from "@chakra-ui/react";
-import { deleteEmployee } from "@/services/employeeApi";
-import { HiUserGroup } from "react-icons/hi";
+import React, { useState } from "react";
+import {
+  Box, Table, Thead, Tbody, Tr, Th, Td,
+  Avatar, Text, HStack, Badge, IconButton,
+  VStack, Spinner, Button,
+} from "@chakra-ui/react";
+import { FiTrash2, FiEdit2 } from "react-icons/fi";
+import DeleteEmployeeModal from "@/features/employee/components/DeleteEmployeeModal";
 
-const columns = [
-  "Employee Name",
-  "Employee ID",
-  "Department",
-  "Designation",
-  "Location",
-  "Status",
-  "Action",
+const AVATAR_COLORS = [
+  ["purple.100", "purple.700"],
+  ["blue.100",   "blue.700"],
+  ["green.100",  "green.700"],
+  ["orange.100", "orange.700"],
+  ["pink.100",   "pink.700"],
+  ["teal.100",   "teal.700"],
+  ["cyan.100",   "cyan.700"],
+  ["red.100",    "red.700"],
+  ["yellow.100", "yellow.700"],
 ];
 
-const EmployeeTable = ({
-  employees = [],
-  filterType,
-  filterValue,
-  refetchEmployees,
-}) => {
-  const toast = useToast();
+const getAvatarColors = (name = "") => {
+  const idx = (name.charCodeAt(0) || 0) % AVATAR_COLORS.length;
+  return AVATAR_COLORS[idx];
+};
 
-  const handleDelete = async (employeeId) => {
-    if (!confirm(`Delete employee ${employeeId}?`)) return;
+const getEmpId = (id = "") => `#${id.slice(0, 8).toUpperCase()}`;
 
-    try {
-      await deleteEmployee(employeeId);
-      await refetchEmployees();
-      toast({
-        title: "Employee deleted",
-        description: "Employee record removed successfully.",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-      });
-    } catch (error) {
-      toast({
-        title: "Delete failed",
-        description: error.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
-    }
-  };
+const ColHeader = ({ children }) => (
+  <Th
+    fontSize="2xs" color="gray.400" fontWeight="semibold"
+    textTransform="uppercase" letterSpacing="wider"
+    py={4} borderColor="gray.100"
+  >
+    {children}
+  </Th>
+);
 
-  // Filter locally if no server filter
-  const filteredEmployees =
-    filterType && !filterValue
-      ? employees
-      : employees.filter((emp) => {
-          if (filterType === "department" && filterValue) {
-            return emp.department
-              ?.toLowerCase()
-              .includes(filterValue.toLowerCase());
-          }
-          return true;
-        });
+const EmployeeTable = ({ employees = [], isLoading, error, refetchEmployees, onEdit }) => {
+  const [deleteTarget, setDeleteTarget] = useState(null); // employee to delete
+
+  if (isLoading) {
+    return (
+      <Box bg="white" borderRadius="2xl" p={16} textAlign="center" boxShadow="sm">
+        <Spinner size="lg" color="purple.500" thickness="3px" />
+        <Text mt={3} color="gray.400" fontSize="sm">Loading employees...</Text>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box bg="white" borderRadius="2xl" p={12} textAlign="center" boxShadow="sm">
+        <Text color="red.500" fontSize="sm">Error: {error.message}</Text>
+      </Box>
+    );
+  }
 
   return (
-    <Box
-      bg="white"
-      borderRadius="xl"
-      shadow="sm"
-      borderWidth="1px"
-      overflow="hidden"
-    >
-      <HRMSTable>
-        {/* TABLE HEADER */}
-        <Thead>
-          <Tr borderBottomWidth="2px" borderColor="gray.200">
-            {columns.map((col, index) => (
-              <Th
-                key={col}
-                position="sticky"
-                top={0}
-                zIndex={index === 0 ? 4 : 3}
-                bg="white"
-                fontSize="xs"
-                color="gray.600"
-                fontWeight="medium"
-                whiteSpace="nowrap"
-                textTransform="none"
-                py={4}
-                {...(index === 0 && { left: 0 })}
-              >
-                {col}
-              </Th>
-            ))}
-          </Tr>
-        </Thead>
+    <>
+      <Box bg="white" borderRadius="2xl" boxShadow="sm" overflow="hidden">
+        <Box overflowX="auto">
+          <Table variant="simple" size="md">
+            <Thead>
+              <Tr borderBottom="1px solid" borderColor="gray.100">
+                <ColHeader>EMP ID</ColHeader>
+                <ColHeader>Official Identity</ColHeader>
+                <ColHeader>Department</ColHeader>
+                <ColHeader>Type</ColHeader>
+                <ColHeader>Modify</ColHeader>
+                <ColHeader>Delete</ColHeader>
+              </Tr>
+            </Thead>
 
-        {/* TABLE BODY */}
-        <Tbody>
-          {filteredEmployees.length === 0 ? (
-            <Tr>
-              <Td colSpan={columns.length} py={12} textAlign="center">
-                <VStack spacing={2} color="gray.500">
-                  <Icon as={HiUserGroup} w={12} h={12} opacity={0.5} />
-                  <Text fontSize="sm">No employees found</Text>
-                  {filterValue && (
-                    <Text fontSize="xs">{filterValue} returned no results</Text>
-                  )}
-                </VStack>
-              </Td>
-            </Tr>
-          ) : (
-            filteredEmployees.map((employee) => (
-              <EmployeeTableRow
-                key={employee.id}
-                employee={{
-                  ...employee,
-                  // Map Supabase data to mock shape
-                  id: employee.id,
-                  name: employee.name,
-                  department: employee.department || "N/A",
-                  designation: employee.designation || "N/A",
-                  location: "Office", // Mock for now
-                  status: "Permanent", // Mock for now
-                  avatar: "",
-                }}
-                // Force action buttons
-                onEdit={() => console.log("Edit", employee.id)}
-                onDelete={() => handleDelete(employee.id)}
-              />
-            ))
-          )}
-        </Tbody>
-      </HRMSTable>
-    </Box>
+            <Tbody>
+              {employees.length === 0 ? (
+                <Tr>
+                  <Td colSpan={6} py={16} textAlign="center" borderColor="transparent">
+                    <VStack spacing={2} color="gray.400">
+                      <Text fontSize="sm">No employees found</Text>
+                    </VStack>
+                  </Td>
+                </Tr>
+              ) : (
+                employees.map((emp) => {
+                  const [bgColor, textColor] = getAvatarColors(emp.name);
+                  return (
+                    <Tr
+                      key={emp.id}
+                      borderBottom="1px solid" borderColor="gray.50"
+                      _hover={{ bg: "gray.50" }}
+                      transition="background 0.15s"
+                    >
+                      {/* EMP ID */}
+                      <Td py={4} borderColor="gray.50">
+                        <Text fontSize="sm" color="gray.500" fontWeight="medium" fontFamily="mono">
+                          {getEmpId(emp.id)}
+                        </Text>
+                      </Td>
+
+                      {/* Official Identity */}
+                      <Td py={4} borderColor="gray.50" minW="220px">
+                        <HStack spacing={3}>
+                          <Avatar
+                            size="sm" name={emp.name}
+                            bg={bgColor} color={textColor}
+                            fontWeight="bold" fontSize="xs"
+                          />
+                          <VStack spacing={0} align="start">
+                            <Text fontSize="sm" fontWeight="semibold" color="gray.800" noOfLines={1}>
+                              {emp.name}
+                            </Text>
+                            <Text fontSize="xs" color="gray.400">
+                              {emp.email || "—"}
+                            </Text>
+                          </VStack>
+                        </HStack>
+                      </Td>
+
+                      {/* Department */}
+                      <Td py={4} borderColor="gray.50">
+                        <Text fontSize="sm" color="gray.600">{emp.department || "—"}</Text>
+                      </Td>
+
+                      {/* Designation badge */}
+                      <Td py={4} borderColor="gray.50">
+                        <Badge
+                          fontSize="2xs" fontWeight="bold" letterSpacing="wider"
+                          textTransform="uppercase" colorScheme="purple"
+                          variant="subtle" borderRadius="full" px={3} py={1}
+                        >
+                          {emp.designation || "—"}
+                        </Badge>
+                      </Td>
+
+                      {/* Modify */}
+                      <Td py={4} borderColor="gray.50">
+                        <Button
+                          size="sm" variant="ghost"
+                          leftIcon={<FiEdit2 size={13} />}
+                          color="orange.400" fontWeight="semibold" fontSize="sm"
+                          _hover={{ bg: "orange.50" }}
+                          onClick={() => onEdit(emp)}
+                        >
+                          Modify File
+                        </Button>
+                      </Td>
+
+                      {/* Delete → opens TOTP modal */}
+                      <Td py={4} borderColor="gray.50">
+                        <IconButton
+                          icon={<FiTrash2 size={15} />}
+                          size="sm" variant="ghost"
+                          color="red.400"
+                          _hover={{ bg: "red.50" }}
+                          aria-label="Delete employee"
+                          onClick={() => setDeleteTarget(emp)}   // ✅ opens modal
+                        />
+                      </Td>
+                    </Tr>
+                  );
+                })
+              )}
+            </Tbody>
+          </Table>
+        </Box>
+      </Box>
+
+      {/* ── Secure Delete Modal ───────────────────────────── */}
+      <DeleteEmployeeModal
+        isOpen={!!deleteTarget}
+        onClose={() => setDeleteTarget(null)}
+        employee={deleteTarget}
+      />
+    </>
   );
 };
 
