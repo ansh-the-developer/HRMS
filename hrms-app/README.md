@@ -1874,3 +1874,155 @@ hrms-app/                                           ✅ TURBO MONOREPO
 4. **✅ 0 Broken FKs** (RLS Policy B + data integrity fixed)
 5. **✅ Production Ready** (React Query v5 + error handling)
 
+//////////////////////////////////////////////////////////////////////////
+
+## **Today's Work Summary (March 28, 2026)**
+
+***
+
+### **Morning: Deployment Crisis → Fixed**
+```
+🔧 Netlify build failing → DevTools missing dep
+🔧 Removed @tanstack/react-query-devtools import
+🔧 Fixed queryClient.js → commented DevTools
+🔧 Fixed vite.config.js → HMR overlay disabled
+🔧 Fixed monorepo → always install from ROOT
+🔧 Fixed react-router chunks → corrupted deps
+✅ Production deployed → Netlify GREEN
+```
+
+### **Phase 1: Employee DB Schema Extension**
+```
+✅ 1.1 ALTER employees → 5 new columns:
+        employee_type, work_location, 
+        monthly_ctc, blood_group, 
+        emergency_contact
+
+✅ 1.2 CREATE employee_compliance:
+        epfo_uan, pran, esic_ip, 
+        pan, e_shram_uan
+
+✅ 1.3 CREATE employee_banking:
+        primary_bank (JSONB)
+        secondary_bank (JSONB)
+
+✅ 1.4 CREATE employee_documents:
+        gov_id_proof, employment_docs,
+        offer_letter, photo_url, 
+        signature_url
+
+✅ 1.5 RLS policies → all 3 new tables
+✅ 1.6 JOIN test → 1 row, all columns ✅
+```
+
+***
+
+## **README Update:**
+
+```markdown
+## 📅 March 28, 2026
+
+### 🚀 Deployment Fix
+- Removed `@tanstack/react-query-devtools` from build
+- Fixed Vite HMR infinite loop
+- Fixed monorepo root install issue
+- Fixed react-router corrupted chunks
+- ✅ Netlify production deploy GREEN
+
+### 🗄️ Employee Schema Extension (Phase 1)
+Extended `employees` table + 3 new tables:
+
+**ALTER employees:**
+- `employee_type` (Permanent/Contract/Intern/Probation/Freelancer)
+- `work_location`
+- `monthly_ctc`
+- `blood_group`
+- `emergency_contact`
+
+**NEW: `employee_compliance`**
+- EPFO UAN, PRAN, ESIC IP, PAN, e-Shram UAN
+- FK → employees.id (CASCADE DELETE)
+
+**NEW: `employee_banking`**
+- Primary + Secondary bank (JSONB)
+- FK → employees.id (CASCADE DELETE)
+
+**NEW: `employee_documents`**
+- Gov ID, Employment docs, Photo, Signature URLs
+- FK → employees.id (CASCADE DELETE)
+
+**Security:**
+- RLS enabled on all 3 tables
+- anon + authenticated policies
+
+### 🔮 Next
+- [ ] Phase 2: Supabase Storage Buckets
+- [ ] Phase 3: API Layer
+- [ ] Phase 4: Form Integration
+- [ ] Phase 5: Polish + Deploy
+```
+
+***
+
+## **Commit Message:**
+```
+feat: employee schema extension + deployment fix
+
+- fix: remove DevTools import (Netlify build)
+- fix: vite HMR infinite loop + monorepo root install
+- feat: ALTER employees (+5 columns)
+- feat: CREATE employee_compliance table
+- feat: CREATE employee_banking table (JSONB)
+- feat: CREATE employee_documents table
+- feat: RLS policies on all new tables
+- test: JOIN verified across all 4 tables
+```
+
+///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
+
+## **🎉 Phase 2 Complete!**
+
+```
+✅ employee-photos     → bucket live (5MB, jpg/png/webp)
+✅ employee-docs       → bucket live (10MB, pdf)
+✅ employee-signatures → bucket live (2MB, png/jpg)
+✅ RLS policies        → all 3 buckets
+✅ Public URLs         → enabled
+```
+
+***
+
+## **Phase 2 Summary:**
+```
+✅ 2.1 employee-photos bucket
+✅ 2.2 employee-docs bucket
+✅ 2.3 employee-signatures bucket
+✅ 2.4 RLS policies → anon + authenticated
+✅ 2.5 Verified → all buckets public
+```
+
+***
+
+## **Progress:**
+```
+✅ PHASE 1 → DB Schema (4 tables)
+✅ PHASE 2 → Storage Buckets (3 buckets)
+⏳ PHASE 3 → API Layer
+⏳ PHASE 4 → Form Integration
+⏳ PHASE 5 → Polish
+```
+
+***
+
+**Ready for Phase 3 (API Layer)?**
+
+```
+PHASE 3: API Layer
+  3.1 ☐ getEmployeeProfile(id)
+  3.2 ☐ createEmployeeProfile(payload)
+  3.3 ☐ updateEmployeeProfile(id, payload)
+  3.4 ☐ uploadFile(bucket, file)
+  3.5 ☐ Update React Query hooks
+```
+
