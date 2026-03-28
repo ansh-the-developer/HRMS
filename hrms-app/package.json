@@ -21,7 +21,7 @@
     "turbo": "^2.8.3"
   },
   "dependencies": {
-    "@tanstack/react-query-devtools": "^5.95.2",
+    "@tanstack/react-query-devtools": "^5.59.16",
     "otplib": "^13.4.0"
   }
 }
