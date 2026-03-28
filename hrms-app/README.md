@@ -2094,3 +2094,165 @@ Exposes: `{ profile, loading, saving, error, fetchProfile, saveProfile, uploadPr
 | 5 | `EmployeeMasterForm` upgraded | ✅ Done |
 | **6** | **File uploads in Verification Vault** | ⬅️ Next |
 | 7 | `EmployeeProfilePage` (view-only) | After 6 |
+
+///////////////////////////////////////////
+////////////////////////////////////////////
+## Phase 6 ✅ — Done
+
+**Files touched:**
+- `EmployeeMasterForm.jsx` — create/edit modal, file state, wired UploadBoxes, 3-step submit flow
+- `employeeApi.js` — fixed `updateEmployeeProfile` to skip empty employee payload (fixed 400 error)
+
+**Upload flow:** Save employee → upload files → save URLs to `employee_documents`
+
+**Vault UI:** PDFs show `Uploaded ✓` | Images show preview thumbnail
+
+***
+
+**Phase 7 tomorrow → `EmployeeProfilePage` (read-only view) 🚀**
+
+////////////////////////////////////////////////////
+///////////////////////////////////////////////////
+
+```
+hrms-app/                                           ✅ TURBO MONOREPO
+├── netlify.toml                                    ✅ Deploy config (ROOT)
+├── package.json                                    ✅ Turbo orchestrator
+├── turbo.json                                      ✅ Build pipeline
+│
+├── apps/
+│   └── frontend-ui-monorepo/                       ✅ VITE 5.4.8 + CHAKRA v2 + RQ v5
+│       ├── public/
+│       │   ├── favicon.ico
+│       │   └── vite.svg
+│       │
+│       ├── src/
+│       │   ├── components/
+│       │   │   └── atomic/                         ✅ Atomic Design System
+│       │   │       ├── atoms/                      ✅ 6 primitives
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSButton.jsx          ✅ Purple gradient CTA
+│       │   │       │   ├── HRMSInput.jsx           ✅ Focus states
+│       │   │       │   ├── Logo.jsx
+│       │   │       │   ├── SectionTitle.jsx
+│       │   │       │   ├── SidebarToggleButton.jsx
+│       │   │       │   └── StatusDot.jsx
+│       │   │       │
+│       │   │       ├── molecules/                  ✅ 7 composable items
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSCard.jsx
+│       │   │       │   ├── InfoRow.jsx
+│       │   │       │   ├── LegendItem.jsx
+│       │   │       │   ├── EmployeeConfigItem.jsx
+│       │   │       │   ├── DepartmentListItem.jsx  ✅ Icons fixed
+│       │   │       │   ├── EmployeeTableRow.jsx    ✅ Icons fixed
+│       │   │       │   └── BirthdayListItem.jsx    ✅ Month/Day display
+│       │   │       │
+│       │   │       ├── organisms/                  ✅ 10 cards + layouts
+│       │   │       │   ├── HRMSSidebar.jsx         ✅ Collapsible nav
+│       │   │       │   ├── TopBar.jsx              ✅ Profile + notifications
+│       │   │       │   ├── NoticeBoardCard.jsx     ✅ Icons removed
+│       │   │       │   ├── HolidaysCard.jsx        ✅ Icons removed
+│       │   │       │   ├── CompanyEventsCard.jsx
+│       │   │       │   ├── BirthdayTrackerCard.jsx ✅ 🎂 React Query LIVE
+│       │   │       │   ├── CalendarCard.jsx        ✅ 📅 React Query + badges
+│       │   │       │   ├── EmployeeTable.jsx       ✅ TOTP Delete Modal
+│       │   │       │   ├── EmployeeConfigCard.jsx  ✅ ⚠️ DEPRECATED
+│       │   │       │   └── AttendanceConfigCard.jsx
+│       │   │       │
+│       │   │       └── templates/
+│       │   │           └── DashboardLayout.jsx     ✅ Sidebar + Topbar wrapper
+│       │   │
+│       │   ├── contexts/                           ✅ Global state
+│       │   │   └── CalendarContext.jsx             ✅ Birthday ↔ Calendar sync
+│       │   │
+│       │   ├── hooks/                              ✅ React Query v5 Hooks
+│       │   │   ├── index.js                        ✅ Barrel export
+│       │   │   ├── useEmployees.js                 ✅ List + CRUD ops
+│       │   │   ├── useEmployeeProfile.js           ✅ NEW — full profile fetch (Phase 6)
+│       │   │   ├── useHome.js                      ✅ Dashboard data
+│       │   │   ├── useLeaves.js                    ✅ Leave requests
+│       │   │   └── usePerformance.js               ✅ Reviews data
+│       │   │
+│       │   ├── features/                           ✅ Feature-sliced by domain
+│       │   │   ├── auth/
+│       │   │   │   └── pages/
+│       │   │   │       └── ResetPasswordPage.jsx   ✅ Icons fixed
+│       │   │   │
+│       │   │   ├── home/
+│       │   │   │   └── pages/
+│       │   │   │       └── HomePage.jsx            ✅ Dashboard (RQ ready)
+│       │   │   │
+│       │   │   ├── employee/                       ✅ FULL CRUD + TOTP + MASTER FORM
+│       │   │   │   ├── components/                 ✅ NEW folder (Phase 6)
+│       │   │   │   │   └── EmployeeMasterForm.jsx  ✅ NEW — Create/Edit modal
+│       │   │   │   │                                   4 sections: KYC · Corporate
+│       │   │   │   │                                   Compliance · Verification Vault
+│       │   │   │   │                                   File uploads + DB prefill
+│       │   │   │   └── pages/
+│       │   │   │       └── EmployeeListPage.jsx    ✅ Table + modals + RQ
+│       │   │   │
+│       │   │   ├── attendance/
+│       │   │   │   └── pages/
+│       │   │   │       └── WorkingHoursPage.jsx    ✅ Icons fixed
+│       │   │   │
+│       │   │   ├── leaves/
+│       │   │   │   └── components/
+│       │   │   │       └── LeaveRequestForm.jsx    ✅ Icons fixed
+│       │   │   │
+│       │   │   ├── performance/                    ✅ Supabase LIVE
+│       │   │   │   └── pages/
+│       │   │   │       └── PerformanceReviewsPage.jsx
+│       │   │   │
+│       │   │   └── payroll/
+│       │   │       └── pages/
+│       │   │           └── SalaryStructurePage.jsx ✅ Icons removed
+│       │   │
+│       │   ├── services/                           ✅ Supabase API layer
+│       │   │   ├── employeeApi.js                  ✅ EXPANDED (Phase 6)
+│       │   │   │                                       getEmployeeProfile()
+│       │   │   │                                       createEmployeeProfile()
+│       │   │   │                                       updateEmployeeProfile() ← 400 fix
+│       │   │   │                                       uploadFile()
+│       │   │   │                                       deleteFile()
+│       │   │   │                                       deleteEmployeeProfile()
+│       │   │   ├── homeApi.js                      ✅ Notices + Birthdays
+│       │   │   ├── leaveApi.js                     ✅ Leave endpoints
+│       │   │   └── performanceApi.js               ✅ Review endpoints
+│       │   │
+│       │   ├── lib/                                ✅ Core utils
+│       │   │   ├── supabaseClient.js               ✅ LIVE connection
+│       │   │   ├── queryClient.js                  ✅ React Query v5 + DevTools
+│       │   │   └── totpUtils.js                    ✅ Native Web Crypto TOTP
+│       │   │
+│       │   ├── routes/                             ✅ Client-side routing
+│       │   │   ├── AppRoutes.jsx
+│       │   │   ├── HomeRoutes.jsx
+│       │   │   └── AuthRoutes.jsx
+│       │   │
+│       │   ├── App.jsx                             ✅ Providers stack
+│       │   └── main.jsx                            ✅ Entry point + QueryClient
+│       │
+│       ├── package.json                            ✅ @tanstack/react-query v5
+│       ├── vite.config.js                          ✅ Chakra + aliases optimized
+│       └── tailwind.config.js                      ✅ Custom theme
+│
+├── packages/
+│   ├── ui/                                         ✅ Shared components (future)
+│   └── shared/                                     ✅ Types + utils (future)
+│
+└── README.md                                       ✅ Updated
+
+── SUPABASE STORAGE BUCKETS ──────────────────────  ✅ NEW (Phase 6)
+   employee-docs          → gov_id_proof, employment_docs
+   employee-photos        → photo_url
+   employee-signatures    → signature_url
+
+── SUPABASE DB TABLES ────────────────────────────
+   employees              ✅ core
+   employee_compliance    ✅ EPFO · PAN · ESIC · PRAN · E-Shram
+   employee_banking       ✅ primary + secondary bank (JSONB)
+   employee_documents     ✅ NEW — file URLs (Phase 6)
+```
+
+**Phase 7 tomorrow → `EmployeeProfilePage` 🚀**

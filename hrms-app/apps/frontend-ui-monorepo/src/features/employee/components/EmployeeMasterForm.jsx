@@ -9,8 +9,13 @@ import {
 import { FiUpload, FiImage, FiEdit2 } from "react-icons/fi";
 import { MdOutlineShield } from "react-icons/md";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
-import { createEmployeeProfile, updateEmployeeProfile } from "@/services/employeeApi";
+import {
+  createEmployeeProfile,
+  updateEmployeeProfile,
+  uploadFile,
+} from "@/services/employeeApi";
 import { useQueryClient } from "@tanstack/react-query";
+
 
 const SectionHeader = ({ title }) => (
   <Flex align="center" gap={3} mb={5}>
@@ -21,11 +26,13 @@ const SectionHeader = ({ title }) => (
   </Flex>
 );
 
+
 const FieldLabel = ({ children }) => (
   <Text fontSize="2xs" fontWeight="semibold" color="gray.500" textTransform="uppercase" letterSpacing="wider" mb={1}>
     {children}
   </Text>
 );
+
 
 const iStyle = {
   bg: "gray.50",
@@ -38,23 +45,46 @@ const iStyle = {
   _focus: { borderColor: "purple.400", bg: "white", boxShadow: "0 0 0 1px #7152F3" },
 };
 
-const UploadBox = ({ label, hint, Icon = FiUpload }) => (
-  <Box>
-    <Text fontSize="2xs" fontWeight="semibold" color="whiteAlpha.600" textTransform="uppercase" letterSpacing="wider" mb={2}>
-      {label}
-    </Text>
-    <Flex
-      border="2px dashed" borderColor="whiteAlpha.300" borderRadius="xl"
-      p={6} direction="column" align="center" justify="center"
-      cursor="pointer" gap={2}
-      _hover={{ borderColor: "whiteAlpha.500", bg: "whiteAlpha.100" }}
-      transition="all 0.2s"
-    >
-      <Icon size={22} color="rgba(255,255,255,0.4)" />
-      <Text fontSize="xs" color="whiteAlpha.500">{hint}</Text>
-    </Flex>
-  </Box>
-);
+
+const UploadBox = ({ label, hint, Icon = FiUpload, accept, onChange, previewUrl, fileName }) => {
+  const inputRef = React.useRef();
+  return (
+    <Box>
+      <Text fontSize="2xs" fontWeight="semibold" color="whiteAlpha.600"
+        textTransform="uppercase" letterSpacing="wider" mb={2}>
+        {label}
+      </Text>
+      <Flex
+        border="2px dashed"
+        borderColor={fileName ? "blue.400" : "whiteAlpha.300"}
+        borderRadius="xl" p={6} direction="column" align="center"
+        justify="center" cursor="pointer" gap={2}
+        bg={fileName ? "whiteAlpha.200" : "transparent"}
+        _hover={{ borderColor: "whiteAlpha.500", bg: "whiteAlpha.100" }}
+        transition="all 0.2s"
+        onClick={() => inputRef.current?.click()}
+      >
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          style={{ display: "none" }}
+          onChange={(e) => onChange?.(e.target.files[0])}
+        />
+        {previewUrl && accept?.includes("image") ? (
+          <Box as="img" src={previewUrl} h="60px" w="60px" objectFit="cover" borderRadius="md" />
+        ) : (
+          <Icon size={22} color={fileName ? "#60A5FA" : "rgba(255,255,255,0.4)"} />
+        )}
+        <Text fontSize="xs" color={fileName ? "blue.300" : "whiteAlpha.500"}
+          textAlign="center" noOfLines={1} maxW="150px">
+          {fileName || hint}
+        </Text>
+      </Flex>
+    </Box>
+  );
+};
+
 
 const INITIAL_FORM = {
   name:        "",
@@ -63,6 +93,7 @@ const INITIAL_FORM = {
   designation: "",
   birthdate:   "",
 };
+
 
 const INITIAL_UI = {
   marital_status:           "Single",
@@ -88,16 +119,33 @@ const INITIAL_UI = {
   portal_password:          "",
 };
 
+
+// ✅ Outside component so it's stable
+const INITIAL_FILES = {
+  gov_id_proof:    null,
+  employment_docs: null,
+  photo_url:       null,
+  signature_url:   null,
+};
+
+
 const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
   const toast = useToast();
   const queryClient = useQueryClient();
   const [form, setForm]           = useState(INITIAL_FORM);
   const [ui, setUi]               = useState(INITIAL_UI);
+  const [files, setFiles]         = useState(INITIAL_FILES);
   const [isPending, setIsPending] = useState(false);
   const isEditing                 = !!employee;
 
+
+  const setFile = (field) => (file) =>
+    setFiles((p) => ({ ...p, [field]: file }));
+
+
   useEffect(() => {
     if (!isOpen) return;
+
 
     if (employee) {
       setForm({
@@ -108,24 +156,22 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
         birthdate:   employee.birthdate   || "",
       });
 
+
       setUi({
         marital_status:           INITIAL_UI.marital_status,
-        // ✅ FIXED: prefill from DB columns
-        personal_number:          employee.personal_number  || "",
-        present_address:          employee.present_address  || "",
-        emp_id:                   employee.emp_code         || "",
-        emp_type:                 employee.employee_type    || "Permanent",
-        location:                 employee.work_location    || "",
-        monthly_ctc:              employee.monthly_ctc      || "",
-        blood_group:              employee.blood_group      || "",
-        emergency_contact:        employee.emergency_contact|| "",
-        // Compliance
+        personal_number:          employee.personal_number   || "",
+        present_address:          employee.present_address   || "",
+        emp_id:                   employee.emp_code          || "",
+        emp_type:                 employee.employee_type     || "Permanent",
+        location:                 employee.work_location     || "",
+        monthly_ctc:              employee.monthly_ctc       || "",
+        blood_group:              employee.blood_group       || "",
+        emergency_contact:        employee.emergency_contact || "",
         epfo_uan:                 employee.compliance?.epfo_uan    || "",
         pran:                     employee.compliance?.pran        || "",
         esic_ip:                  employee.compliance?.esic_ip     || "",
         pan:                      employee.compliance?.pan         || "",
         e_shram_uan:              employee.compliance?.e_shram_uan || "",
-        // Banking
         primary_bank_name:        employee.banking?.primary_bank?.bank_name       || "",
         primary_account_number:   employee.banking?.primary_bank?.account_number  || "",
         primary_ifsc:             employee.banking?.primary_bank?.ifsc_code        || "",
@@ -135,14 +181,22 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
         portal_password:          "",
       });
 
+
+      // ✅ Reset files on edit open
+      setFiles(INITIAL_FILES);
+
+
     } else {
       setForm(INITIAL_FORM);
       setUi(INITIAL_UI);
+      setFiles(INITIAL_FILES);
     }
   }, [employee, isOpen]);
 
+
   const setF = (field) => (e) => setForm((p) => ({ ...p, [field]: e.target.value }));
   const setU = (field) => (e) => setUi((p) => ({ ...p, [field]: e.target.value }));
+
 
   const handleSubmit = async () => {
     if (!form.name.trim()) {
@@ -150,8 +204,13 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
       return;
     }
 
+
     setIsPending(true);
     try {
+      // ✅ Step 1: Create/update employee + compliance + banking first
+      let savedEmployee;
+
+
       const employeePayload = {
         name:              form.name,
         email:             form.email       || null,
@@ -163,11 +222,11 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
         emergency_contact: ui.emergency_contact || null,
         work_location:     ui.location          || null,
         employee_type:     ui.emp_type          || null,
-        // ✅ FIXED: map ui fields to correct DB columns
         emp_code:          ui.emp_id            || null,
         personal_number:   ui.personal_number   || null,
         present_address:   ui.present_address   || null,
       };
+
 
       const compliancePayload = {
         epfo_uan:    ui.epfo_uan    || null,
@@ -176,6 +235,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
         esic_ip:     ui.esic_ip     || null,
         e_shram_uan: ui.e_shram_uan || null,
       };
+
 
       const bankingPayload = {
         primary_bank: {
@@ -190,24 +250,65 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
         },
       };
 
+
       if (isEditing) {
-        await updateEmployeeProfile(employee.id, {
+        savedEmployee = await updateEmployeeProfile(employee.id, {
           employee:   employeePayload,
           compliance: compliancePayload,
           banking:    bankingPayload,
         });
-        toast({ title: "Employee updated!", status: "success", duration: 3000, isClosable: true });
       } else {
-        await createEmployeeProfile({
+        savedEmployee = await createEmployeeProfile({
           employee:   employeePayload,
           compliance: compliancePayload,
           banking:    bankingPayload,
         });
-        toast({ title: "Employee created!", status: "success", duration: 3000, isClosable: true });
       }
+
+
+      const empId = savedEmployee.id;
+
+
+      // ✅ Step 2: Upload files to storage + collect URLs
+      const [govUrl, empDocUrl, photoUrl, signUrl] = await Promise.all([
+        files.gov_id_proof
+          ? uploadFile("employee-docs",       files.gov_id_proof,    empId)
+          : Promise.resolve(employee?.documents?.gov_id_proof    || null),
+        files.employment_docs
+          ? uploadFile("employee-docs",       files.employment_docs, empId)
+          : Promise.resolve(employee?.documents?.employment_docs || null),
+        files.photo_url
+          ? uploadFile("employee-photos",     files.photo_url,       empId)
+          : Promise.resolve(employee?.documents?.photo_url       || null),
+        files.signature_url
+          ? uploadFile("employee-signatures", files.signature_url,   empId)
+          : Promise.resolve(employee?.documents?.signature_url   || null),
+      ]);
+
+
+      // ✅ Step 3: Save document URLs to employee_documents
+      const hasAnyDoc = govUrl || empDocUrl || photoUrl || signUrl;
+      if (hasAnyDoc) {
+        await updateEmployeeProfile(empId, {
+          documents: {
+            gov_id_proof:    govUrl,
+            employment_docs: empDocUrl,
+            photo_url:       photoUrl,
+            signature_url:   signUrl,
+          },
+        });
+      }
+
+
+      toast({
+        title: isEditing ? "Employee updated!" : "Employee created!",
+        status: "success", duration: 3000, isClosable: true,
+      });
+
 
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       onSuccess();
+
 
     } catch (err) {
       toast({ title: "Error saving record", description: err.message, status: "error", duration: 5000, isClosable: true });
@@ -216,10 +317,12 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
     }
   };
 
+
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="2xl" scrollBehavior="inside" motionPreset="slideInBottom">
       <ModalOverlay bg="blackAlpha.500" backdropFilter="blur(4px)" />
       <ModalContent borderRadius="2xl" mx={4} my={6} maxH="90vh" overflow="hidden">
+
 
         <ModalHeader pb={3} pt={6} px={8}>
           <Text fontSize="xl" fontWeight="bold" color="gray.900">
@@ -232,8 +335,10 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
         <ModalCloseButton top={5} right={6} />
         <Divider borderColor="gray.100" />
 
+
         <ModalBody px={8} py={6} overflowY="auto">
           <VStack spacing={8} align="stretch">
+
 
             {/* ── PERSONAL IDENTITY (KYC) ── */}
             <Box>
@@ -266,6 +371,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                 </GridItem>
               </Grid>
             </Box>
+
 
             {/* ── CORPORATE IDENTITY ── */}
             <Box>
@@ -321,6 +427,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               </Grid>
             </Box>
 
+
             {/* ── STATUTORY & COMPLIANCE ── */}
             <Box>
               <SectionHeader title="Statutory & Compliance" />
@@ -338,6 +445,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                   </GridItem>
                 ))}
               </Grid>
+
 
               <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
                 <Box border="1px solid" borderColor="gray.200" borderRadius="xl" p={4}>
@@ -367,18 +475,60 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               </Grid>
             </Box>
 
+
             {/* ── VERIFICATION VAULT ── */}
             <Box bg="#182140" borderRadius="2xl" p={6}>
               <HStack spacing={3} mb={5}>
                 <MdOutlineShield size={22} color="#60A5FA" />
                 <Text fontWeight="bold" color="white" fontSize="lg">Verification Vault</Text>
               </HStack>
+
+
+              {/* ✅ Wired upload boxes with document status display */}
               <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4} mb={5}>
-                <UploadBox label="Government Docs"    hint="Click to upload • PDF recommended"         Icon={FiUpload} />
-                <UploadBox label="Employment Dossier" hint="Click to upload • PDF recommended"         Icon={FiUpload} />
-                <UploadBox label="Employee Photo"     hint="Click to upload • WEBP or JPG recommended" Icon={FiImage}  />
-                <UploadBox label="Signature"          hint="Click to upload • PNG recommended"         Icon={FiEdit2}  />
+                <UploadBox
+                  label="Government Docs"
+                  hint="Click to upload • PDF recommended"
+                  Icon={FiUpload}
+                  accept=".pdf,.doc,.docx"
+                  onChange={setFile("gov_id_proof")}
+                  fileName={
+                    files.gov_id_proof?.name ||
+                    (employee?.documents?.gov_id_proof ? "Uploaded ✓" : null)
+                  }
+                />
+                <UploadBox
+                  label="Employment Dossier"
+                  hint="Click to upload • PDF recommended"
+                  Icon={FiUpload}
+                  accept=".pdf,.doc,.docx"
+                  onChange={setFile("employment_docs")}
+                  fileName={
+                    files.employment_docs?.name ||
+                    (employee?.documents?.employment_docs ? "Uploaded ✓" : null)
+                  }
+                />
+                <UploadBox
+                  label="Employee Photo"
+                  hint="Click to upload • WEBP or JPG recommended"
+                  Icon={FiImage}
+                  accept="image/*"
+                  onChange={setFile("photo_url")}
+                  fileName={files.photo_url?.name}
+                  previewUrl={files.photo_url ? URL.createObjectURL(files.photo_url) : employee?.documents?.photo_url}
+                />
+                <UploadBox
+                  label="Signature"
+                  hint="Click to upload • PNG recommended"
+                  Icon={FiEdit2}
+                  accept="image/png,image/jpeg"
+                  onChange={setFile("signature_url")}
+                  fileName={files.signature_url?.name}
+                  previewUrl={files.signature_url ? URL.createObjectURL(files.signature_url) : employee?.documents?.signature_url}
+                />
               </Grid>
+
+
               <Box bg="whiteAlpha.100" borderRadius="xl" p={4}>
                 <Text fontSize="2xs" fontWeight="bold" color="whiteAlpha.600" textTransform="uppercase" letterSpacing="wider" mb={3}>
                   Portal Password Manager
@@ -394,8 +544,10 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               </Box>
             </Box>
 
+
           </VStack>
         </ModalBody>
+
 
         <ModalFooter px={8} py={5} borderTop="1px solid" borderColor="gray.100">
           <Flex justify="flex-end" align="center" gap={4} w="full">
@@ -408,9 +560,11 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
           </Flex>
         </ModalFooter>
 
+
       </ModalContent>
     </Modal>
   );
 };
+
 
 export default EmployeeMasterForm;

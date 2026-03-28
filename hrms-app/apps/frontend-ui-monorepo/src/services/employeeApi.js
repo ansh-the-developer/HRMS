@@ -228,52 +228,41 @@ export async function updateEmployeeProfile(id, payload) {
   const { employee, compliance, banking, documents } = payload;
 
   try {
-    // 1. Update core employee
-    const { data: emp, error: empError } = await supabase
-      .from("employees")
-      .update(employee)
-      .eq("id", id)
-      .select()
-      .single();
-    if (empError) throw empError;
+    let emp = null;
 
-    // 2. UPSERT extensions in parallel
-    // UPSERT = INSERT if not exists, UPDATE if exists
+    // ✅ Only update employees table if payload provided
+    if (employee && Object.keys(employee).length > 0) {
+      const { data, error: empError } = await supabase
+        .from("employees")
+        .update(employee)
+        .eq("id", id)
+        .select()
+        .single();
+      if (empError) throw empError;
+      emp = data;
+    }
+
+    // UPSERT extensions in parallel (unchanged)
     const extensions = await Promise.all([
-
-      // Compliance
       compliance ? supabase
         .from("employee_compliance")
-        .upsert(
-          { ...compliance, employee_id: id },
-          { onConflict: "employee_id" }
-        )
+        .upsert({ ...compliance, employee_id: id }, { onConflict: "employee_id" })
         .select().single()
         : Promise.resolve({ data: null, error: null }),
 
-      // Banking
       banking ? supabase
         .from("employee_banking")
-        .upsert(
-          { ...banking, employee_id: id },
-          { onConflict: "employee_id" }
-        )
+        .upsert({ ...banking, employee_id: id }, { onConflict: "employee_id" })
         .select().single()
         : Promise.resolve({ data: null, error: null }),
 
-      // Documents
       documents ? supabase
         .from("employee_documents")
-        .upsert(
-          { ...documents, employee_id: id },
-          { onConflict: "employee_id" }
-        )
+        .upsert({ ...documents, employee_id: id }, { onConflict: "employee_id" })
         .select().single()
         : Promise.resolve({ data: null, error: null }),
-
     ]);
 
-    // Check extension errors
     extensions.forEach(({ error }, i) => {
       const tables = ["compliance", "banking", "documents"];
       if (error && import.meta.env.DEV) {
@@ -282,11 +271,11 @@ export async function updateEmployeeProfile(id, payload) {
     });
 
     if (import.meta.env.DEV) {
-      console.log(`✅ Employee profile updated: ${emp.name} (${id.slice(0,8)})`);
+      console.log(`✅ Employee profile updated: (${id.slice(0, 8)})`);
     }
 
     return {
-      ...emp,
+      ...(emp || { id }),
       compliance: extensions[0].data || {},
       banking:    extensions[1].data || {},
       documents:  extensions[2].data || {},
