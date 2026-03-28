@@ -9,10 +9,9 @@ import {
 import { FiUpload, FiImage, FiEdit2 } from "react-icons/fi";
 import { MdOutlineShield } from "react-icons/md";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
-import { useCreateEmployee, useUpdateEmployee } from "@/hooks";
+import { createEmployeeProfile, updateEmployeeProfile } from "@/services/employeeApi";
+import { useQueryClient } from "@tanstack/react-query";
 
-
-// ── Section header with purple left bar ─────────────────────────────
 const SectionHeader = ({ title }) => (
   <Flex align="center" gap={3} mb={5}>
     <Box w="3px" h="14px" bg="purple.600" borderRadius="full" flexShrink={0} />
@@ -57,64 +56,87 @@ const UploadBox = ({ label, hint, Icon = FiUpload }) => (
   </Box>
 );
 
-// ── Only DB columns ─────────────────────────────────────────────────
 const INITIAL_FORM = {
-  name:        "",   // DB: name
-  email:       "",   // DB: email
-  department:  "",   // DB: department
-  designation: "",   // DB: designation
-  birthdate:   "",   // DB: birthdate
+  name:        "",
+  email:       "",
+  department:  "",
+  designation: "",
+  birthdate:   "",
 };
 
-// ── UI-only fields (not saved to DB) ────────────────────────────────
 const INITIAL_UI = {
-  marital_status:          "Single",
-  personal_number:         "",
-  present_address:         "",
-  emp_type:                "Permanent",
-  location:                "",
-  emp_id:                  "",
-  monthly_ctc:             "",
-  blood_group:             "",
-  emergency_contact:       "",
-  epfo_uan:                "",
-  pran:                    "",
-  esic_ip:                 "",
-  pan:                     "",
-  e_shram_uan:             "",
-  primary_bank_name:       "",
-  primary_account_number:  "",
-  primary_ifsc:            "",
-  secondary_bank_name:     "",
-  secondary_account_number:"",
-  secondary_ifsc:          "",
-  portal_password:         "",
+  marital_status:           "Single",
+  personal_number:          "",
+  present_address:          "",
+  emp_type:                 "Permanent",
+  location:                 "",
+  emp_id:                   "",
+  monthly_ctc:              "",
+  blood_group:              "",
+  emergency_contact:        "",
+  epfo_uan:                 "",
+  pran:                     "",
+  esic_ip:                  "",
+  pan:                      "",
+  e_shram_uan:              "",
+  primary_bank_name:        "",
+  primary_account_number:   "",
+  primary_ifsc:             "",
+  secondary_bank_name:      "",
+  secondary_account_number: "",
+  secondary_ifsc:           "",
+  portal_password:          "",
 };
 
 const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
   const toast = useToast();
-  const [form, setForm]   = useState(INITIAL_FORM);
-  const [ui, setUi]       = useState(INITIAL_UI);
-  const isEditing         = !!employee;
+  const queryClient = useQueryClient();
+  const [form, setForm]           = useState(INITIAL_FORM);
+  const [ui, setUi]               = useState(INITIAL_UI);
+  const [isPending, setIsPending] = useState(false);
+  const isEditing                 = !!employee;
 
-  const createEmployee = useCreateEmployee();
-  const updateEmployee = useUpdateEmployee();
-  const isPending = createEmployee.isPending || updateEmployee.isPending;
-
-  // Prefill DB fields when editing
   useEffect(() => {
-    if (isOpen) {
-      if (employee) {
-        setForm({
-          name:        employee.name        || "",
-          email:       employee.email       || "",
-          department:  employee.department  || "",
-          designation: employee.designation || "",
-          birthdate:   employee.birthdate   || "",
-        });
-      } else {
-        setForm(INITIAL_FORM);
-      }
+    if (!isOpen) return;
+
+    if (employee) {
+      setForm({
+        name:        employee.name        || "",
+        email:       employee.email       || "",
+        department:  employee.department  || "",
+        designation: employee.designation || "",
+        birthdate:   employee.birthdate   || "",
+      });
+
+      setUi({
+        marital_status:           INITIAL_UI.marital_status,
+        // ✅ FIXED: prefill from DB columns
+        personal_number:          employee.personal_number  || "",
+        present_address:          employee.present_address  || "",
+        emp_id:                   employee.emp_code         || "",
+        emp_type:                 employee.employee_type    || "Permanent",
+        location:                 employee.work_location    || "",
+        monthly_ctc:              employee.monthly_ctc      || "",
+        blood_group:              employee.blood_group      || "",
+        emergency_contact:        employee.emergency_contact|| "",
+        // Compliance
+        epfo_uan:                 employee.compliance?.epfo_uan    || "",
+        pran:                     employee.compliance?.pran        || "",
+        esic_ip:                  employee.compliance?.esic_ip     || "",
+        pan:                      employee.compliance?.pan         || "",
+        e_shram_uan:              employee.compliance?.e_shram_uan || "",
+        // Banking
+        primary_bank_name:        employee.banking?.primary_bank?.bank_name       || "",
+        primary_account_number:   employee.banking?.primary_bank?.account_number  || "",
+        primary_ifsc:             employee.banking?.primary_bank?.ifsc_code        || "",
+        secondary_bank_name:      employee.banking?.secondary_bank?.bank_name      || "",
+        secondary_account_number: employee.banking?.secondary_bank?.account_number || "",
+        secondary_ifsc:           employee.banking?.secondary_bank?.ifsc_code      || "",
+        portal_password:          "",
+      });
+
+    } else {
+      setForm(INITIAL_FORM);
       setUi(INITIAL_UI);
     }
   }, [employee, isOpen]);
@@ -128,26 +150,69 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
       return;
     }
 
-    // ✅ Only save actual DB columns
-    const payload = {
-      name:        form.name,
-      email:       form.email       || null,
-      department:  form.department  || null,
-      designation: form.designation || null,
-      birthdate:   form.birthdate   || null,
-    };
-
+    setIsPending(true);
     try {
+      const employeePayload = {
+        name:              form.name,
+        email:             form.email       || null,
+        department:        form.department  || null,
+        designation:       form.designation || null,
+        birthdate:         form.birthdate   || null,
+        monthly_ctc:       ui.monthly_ctc       || null,
+        blood_group:       ui.blood_group       || null,
+        emergency_contact: ui.emergency_contact || null,
+        work_location:     ui.location          || null,
+        employee_type:     ui.emp_type          || null,
+        // ✅ FIXED: map ui fields to correct DB columns
+        emp_code:          ui.emp_id            || null,
+        personal_number:   ui.personal_number   || null,
+        present_address:   ui.present_address   || null,
+      };
+
+      const compliancePayload = {
+        epfo_uan:    ui.epfo_uan    || null,
+        pan:         ui.pan         || null,
+        pran:        ui.pran        || null,
+        esic_ip:     ui.esic_ip     || null,
+        e_shram_uan: ui.e_shram_uan || null,
+      };
+
+      const bankingPayload = {
+        primary_bank: {
+          bank_name:      ui.primary_bank_name      || "",
+          account_number: ui.primary_account_number || "",
+          ifsc_code:      ui.primary_ifsc            || "",
+        },
+        secondary_bank: {
+          bank_name:      ui.secondary_bank_name      || "",
+          account_number: ui.secondary_account_number || "",
+          ifsc_code:      ui.secondary_ifsc            || "",
+        },
+      };
+
       if (isEditing) {
-        await updateEmployee.mutateAsync({ id: employee.id, updates: payload });
+        await updateEmployeeProfile(employee.id, {
+          employee:   employeePayload,
+          compliance: compliancePayload,
+          banking:    bankingPayload,
+        });
         toast({ title: "Employee updated!", status: "success", duration: 3000, isClosable: true });
       } else {
-        await createEmployee.mutateAsync(payload);
+        await createEmployeeProfile({
+          employee:   employeePayload,
+          compliance: compliancePayload,
+          banking:    bankingPayload,
+        });
         toast({ title: "Employee created!", status: "success", duration: 3000, isClosable: true });
       }
+
+      queryClient.invalidateQueries({ queryKey: ["employees"] });
       onSuccess();
+
     } catch (err) {
       toast({ title: "Error saving record", description: err.message, status: "error", duration: 5000, isClosable: true });
+    } finally {
+      setIsPending(false);
     }
   };
 
@@ -261,11 +326,11 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               <SectionHeader title="Statutory & Compliance" />
               <Grid templateColumns={{ base: "1fr", md: "repeat(5, 1fr)" }} gap={3} mb={5}>
                 {[
-                  ["EPFO (UAN)", "epfo_uan", false],
-                  ["PRAN",       "pran",     false],
-                  ["ESIC IP",    "esic_ip",  false],
-                  ["PAN",        "pan",      false],
-                  ["E-SHRAM UAN","e_shram_uan", true],
+                  ["EPFO (UAN)", "epfo_uan",   false],
+                  ["PRAN",       "pran",        false],
+                  ["ESIC IP",    "esic_ip",     false],
+                  ["PAN",        "pan",         false],
+                  ["E-SHRAM UAN","e_shram_uan", true ],
                 ].map(([label, field, highlight]) => (
                   <GridItem key={field}>
                     <FieldLabel>{label}</FieldLabel>
@@ -274,7 +339,6 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                 ))}
               </Grid>
 
-              {/* Bank Accounts */}
               <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4}>
                 <Box border="1px solid" borderColor="gray.200" borderRadius="xl" p={4}>
                   <Text fontSize="2xs" fontWeight="bold" color="purple.500" textTransform="uppercase" letterSpacing="wider" mb={3}>
@@ -303,20 +367,18 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               </Grid>
             </Box>
 
-            {/* ── VERIFICATION VAULT (dark) ── */}
+            {/* ── VERIFICATION VAULT ── */}
             <Box bg="#182140" borderRadius="2xl" p={6}>
               <HStack spacing={3} mb={5}>
                 <MdOutlineShield size={22} color="#60A5FA" />
                 <Text fontWeight="bold" color="white" fontSize="lg">Verification Vault</Text>
               </HStack>
-
               <Grid templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }} gap={4} mb={5}>
-                <UploadBox label="Government Docs"     hint="Click to upload • PDF recommended"          Icon={FiUpload} />
-                <UploadBox label="Employment Dossier"  hint="Click to upload • PDF recommended"          Icon={FiUpload} />
-                <UploadBox label="Employee Photo"      hint="Click to upload • WEBP or JPG recommended"  Icon={FiImage}  />
-                <UploadBox label="Signature"           hint="Click to upload • PNG recommended"          Icon={FiEdit2}  />
+                <UploadBox label="Government Docs"    hint="Click to upload • PDF recommended"         Icon={FiUpload} />
+                <UploadBox label="Employment Dossier" hint="Click to upload • PDF recommended"         Icon={FiUpload} />
+                <UploadBox label="Employee Photo"     hint="Click to upload • WEBP or JPG recommended" Icon={FiImage}  />
+                <UploadBox label="Signature"          hint="Click to upload • PNG recommended"         Icon={FiEdit2}  />
               </Grid>
-
               <Box bg="whiteAlpha.100" borderRadius="xl" p={4}>
                 <Text fontSize="2xs" fontWeight="bold" color="whiteAlpha.600" textTransform="uppercase" letterSpacing="wider" mb={3}>
                   Portal Password Manager

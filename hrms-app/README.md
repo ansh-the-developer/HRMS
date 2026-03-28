@@ -2059,3 +2059,38 @@ feat: employee schema extension + deployment fix
 Exposes: `{ profile, loading, saving, error, fetchProfile, saveProfile, uploadProfileFile }`
 
 ---
+
+////////////////////////////////////
+///////////////////////////////////
+**✅ Phase 5 complete. CRUD fully working with all fields retaining.**
+
+***
+
+## **README — Append this block:**
+
+```md
+---
+
+## Phase 5 — EmployeeMasterForm Upgraded ✅
+`src/features/employee/components/EmployeeMasterForm.jsx`
+`src/features/employee/pages/EmployeeListPage.jsx`
+
+- Form now saves to all 3 tables: `employees` + `employee_compliance` + `employee_banking`
+- Edit flow fetches full profile via `getEmployeeProfile` before opening form
+- All fields retain on re-open: personal, compliance, banking, emp_code
+- New DB columns added: `emp_code`, `personal_number`, `present_address`
+
+---
+```
+
+***
+
+## **Where we stand:**
+
+| Phase | Task | Status |
+|---|---|---|
+| 3 | `employeeApi.js` | ✅ Done |
+| 4 | `useEmployeeProfile` hook | ✅ Done |
+| 5 | `EmployeeMasterForm` upgraded | ✅ Done |
+| **6** | **File uploads in Verification Vault** | ⬅️ Next |
+| 7 | `EmployeeProfilePage` (view-only) | After 6 |

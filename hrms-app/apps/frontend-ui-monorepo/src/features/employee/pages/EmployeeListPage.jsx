@@ -1,19 +1,23 @@
 import React, { useState } from "react";
-import { Box, Flex, Text, Spinner, VStack } from "@chakra-ui/react";
+import { Box, Flex, Text, useToast } from "@chakra-ui/react";
 import { useLocation, useSearchParams } from "react-router-dom";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import EmployeeTable from "@/components/atomic/organisms/EmployeeTable";
 import EmployeeMasterForm from "@/features/employee/components/EmployeeMasterForm";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 import { useEmployees } from "@/hooks";
+import { getEmployeeProfile } from "@/services/employeeApi";
 
 const EmployeeListPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const toast = useToast();
+
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState(null);
+  const [loadingProfile, setLoadingProfile] = useState(false);
 
-  const filterType = searchParams.get("filterType") || location.state?.filterType;
+  const filterType  = searchParams.get("filterType")  || location.state?.filterType;
   const filterValue = searchParams.get("filterValue") || location.state?.filterValue;
 
   const { data: employees = [], isLoading, error, refetch } = useEmployees({ filterType, filterValue });
@@ -23,9 +27,24 @@ const EmployeeListPage = () => {
     setIsFormOpen(true);
   };
 
-  const handleEdit = (employee) => {
-    setEditingEmployee(employee);
-    setIsFormOpen(true);
+  // ✅ Fetch full profile (compliance + banking) before opening form
+  const handleEdit = async (employee) => {
+    setLoadingProfile(true);
+    try {
+      const fullProfile = await getEmployeeProfile(employee.id);
+      setEditingEmployee(fullProfile);
+      setIsFormOpen(true);
+    } catch (err) {
+      toast({
+        title: "Failed to load employee profile",
+        description: err.message,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    } finally {
+      setLoadingProfile(false);
+    }
   };
 
   const handleClose = () => {
@@ -41,7 +60,6 @@ const EmployeeListPage = () => {
   return (
     <DashboardLayout>
       <Box px={{ base: 4, md: 8 }} py={6} minH="100vh" bg="gray.50">
-        {/* ── Page Header ── */}
         <Flex justify="space-between" align="flex-start" mb={6}>
           <Box>
             <Text fontSize="2xl" fontWeight="bold" color="gray.900" lineHeight="1.2">
@@ -56,17 +74,15 @@ const EmployeeListPage = () => {
           </HRMSButton>
         </Flex>
 
-        {/* ── Table ── */}
         <EmployeeTable
           employees={employees}
-          isLoading={isLoading}
+          isLoading={isLoading || loadingProfile}
           error={error}
           refetchEmployees={refetch}
           onEdit={handleEdit}
         />
       </Box>
 
-      {/* ── Create / Edit Modal ── */}
       <EmployeeMasterForm
         isOpen={isFormOpen}
         onClose={handleClose}
