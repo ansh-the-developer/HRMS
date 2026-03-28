@@ -2045,3 +2045,17 @@ feat: employee schema extension + deployment fix
 `employee-photos` · `employee-docs` · `employee-signatures`
 
 ---
+//////////////////////////////////////
+/////////////////////////////////////
+---
+
+## Phase 4 — useEmployeeProfile Hook ✅
+`src/features/employee/hooks/useEmployeeProfile.js`
+
+- `fetchProfile()` — loads all 4 tables on mount via `getEmployeeProfile`
+- `saveProfile(payload)` — calls `updateEmployeeProfile`, updates local state
+- `uploadProfileFile(bucket, file, field, section)` — deletes old → uploads new → saves URL
+
+Exposes: `{ profile, loading, saving, error, fetchProfile, saveProfile, uploadProfileFile }`
+
+---
