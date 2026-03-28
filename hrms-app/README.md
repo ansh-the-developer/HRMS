@@ -2015,14 +2015,33 @@ feat: employee schema extension + deployment fix
 
 ***
 
-**Ready for Phase 3 (API Layer)?**
+///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////
 
-```
-PHASE 3: API Layer
-  3.1 ☐ getEmployeeProfile(id)
-  3.2 ☐ createEmployeeProfile(payload)
-  3.3 ☐ updateEmployeeProfile(id, payload)
-  3.4 ☐ uploadFile(bucket, file)
-  3.5 ☐ Update React Query hooks
-```
+---
 
+## Phase 3 — Employee API Layer ✅
+`src/services/employeeApi.js`
+
+### Core CRUD (existing)
+- `getEmployees({ filterType, filterValue })` — list with filters
+- `getEmployeeById(id)` — single row
+- `createEmployee(payload)` — insert core row
+- `updateEmployee(id, updates)` — update core row
+- `deleteEmployee(id)` — cascade delete + null FKs
+
+### Extended Profile (3.1–3.5)
+- `getEmployeeProfile(id)` — parallel fetch all 4 tables
+- `createEmployeeProfile(payload)` — insert all 4 tables
+- `updateEmployeeProfile(id, payload)` — update + upsert all 4 tables
+- `uploadFile(bucket, file, employeeId)` → public URL
+- `deleteFile(bucket, fileUrl)` — storage cleanup
+- `deleteEmployeeProfile(id)` — delete all 4 tables + all storage files
+
+### Tables covered
+`employees` · `employee_compliance` · `employee_banking` · `employee_documents`
+
+### Storage buckets
+`employee-photos` · `employee-docs` · `employee-signatures`
+
+---
