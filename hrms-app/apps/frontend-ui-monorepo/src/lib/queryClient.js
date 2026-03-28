@@ -1,19 +1,12 @@
-// src/lib/queryClient.js
+// src/lib/queryClient.js → SAVE THIS → then start server
 import { QueryClient } from "@tanstack/react-query";
-import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+// import { ReactQueryDevtools } from "@tanstack/react-query-devtools"; // COMMENTED
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      cacheTime: 10 * 60 * 1000, // 10 minutes
-      retry: 2,
-      refetchOnWindowFocus: false,
-    },
-    mutations: {
+      staleTime: 5 * 60 * 1000,
       retry: 1,
     },
   },
 });
-
-export { ReactQueryDevtools };
