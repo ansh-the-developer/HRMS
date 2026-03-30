@@ -36,8 +36,8 @@ const ColHeader = ({ children }) => (
   </Th>
 );
 
-const EmployeeTable = ({ employees = [], isLoading, error, refetchEmployees, onEdit }) => {
-  const [deleteTarget, setDeleteTarget] = useState(null); // employee to delete
+const EmployeeTable = ({ employees = [], isLoading, error, refetchEmployees, onEdit, onRowClick }) => { // ✅ added onRowClick
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   if (isLoading) {
     return (
@@ -88,8 +88,10 @@ const EmployeeTable = ({ employees = [], isLoading, error, refetchEmployees, onE
                     <Tr
                       key={emp.id}
                       borderBottom="1px solid" borderColor="gray.50"
-                      _hover={{ bg: "gray.50" }}
+                      _hover={{ bg: "purple.50" }}             // ✅ purple tint on hover
                       transition="background 0.15s"
+                      cursor="pointer"                          // ✅ pointer cursor
+                      onClick={() => onRowClick?.(emp)}         // ✅ row click → profile
                     >
                       {/* EMP ID */}
                       <Td py={4} borderColor="gray.50">
@@ -133,20 +135,20 @@ const EmployeeTable = ({ employees = [], isLoading, error, refetchEmployees, onE
                         </Badge>
                       </Td>
 
-                      {/* Modify */}
+                      {/* Modify — stop propagation so row click doesn't fire */}
                       <Td py={4} borderColor="gray.50">
                         <Button
                           size="sm" variant="ghost"
                           leftIcon={<FiEdit2 size={13} />}
                           color="orange.400" fontWeight="semibold" fontSize="sm"
                           _hover={{ bg: "orange.50" }}
-                          onClick={() => onEdit(emp)}
+                          onClick={(e) => { e.stopPropagation(); onEdit(emp); }} // ✅ stopPropagation
                         >
                           Modify File
                         </Button>
                       </Td>
 
-                      {/* Delete → opens TOTP modal */}
+                      {/* Delete — stop propagation so row click doesn't fire */}
                       <Td py={4} borderColor="gray.50">
                         <IconButton
                           icon={<FiTrash2 size={15} />}
@@ -154,7 +156,7 @@ const EmployeeTable = ({ employees = [], isLoading, error, refetchEmployees, onE
                           color="red.400"
                           _hover={{ bg: "red.50" }}
                           aria-label="Delete employee"
-                          onClick={() => setDeleteTarget(emp)}   // ✅ opens modal
+                          onClick={(e) => { e.stopPropagation(); setDeleteTarget(emp); }} // ✅ stopPropagation
                         />
                       </Td>
                     </Tr>
@@ -166,7 +168,7 @@ const EmployeeTable = ({ employees = [], isLoading, error, refetchEmployees, onE
         </Box>
       </Box>
 
-      {/* ── Secure Delete Modal ───────────────────────────── */}
+      {/* ── Secure Delete Modal ── */}
       <DeleteEmployeeModal
         isOpen={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}

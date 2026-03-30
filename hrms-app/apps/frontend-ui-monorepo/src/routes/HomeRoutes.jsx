@@ -13,6 +13,7 @@ import EmployeeDesignationsPage from "@/features/employee/pages/EmployeeDesignat
 import EmployeeStatusesPage from "@/features/employee/pages/EmployeeStatusesPage";
 import EmployeeTypesPage from "@/features/employee/pages/EmployeeTypesPage";
 import EmployeeExportPage from "@/features/employee/pages/EmployeeExportPage";
+import EmployeeProfilePage from "@/features/employee/components/EmployeeProfilePage";
 
 // Attendance
 import AttendanceDashboardPage from "@/features/attendance/pages/AttendanceDashboardPage";
@@ -40,7 +41,7 @@ import PerformanceHistoryPage from "@/features/performance/pages/PerformanceHist
 import PerformanceReviewDetailPage from "@/features/performance/pages/PerformanceReviewDetailPage";
 import PerformanceNewReviewPage from "@/features/performance/pages/PerformanceNewReviewPage";
 
-// Payroll ⭐ NEW MODULE
+// Payroll
 import PayrollDashboardPage from "@/features/payroll/pages/PayrollDashboardPage";
 import ReimbursementStatusPage from "@/features/payroll/pages/ReimbursementStatusPage";
 import SalaryStructurePage from "@/features/payroll/pages/SalaryStructurePage";
@@ -48,7 +49,8 @@ import PayrollSlipsPage from "@/features/payroll/pages/PayrollSlipsPage";
 import RecordPaymentPage from "@/features/payroll/pages/RecordPaymentPage";
 import PendingPaymentsPage from "@/features/payroll/pages/PendingPaymentsPage";
 import PayrollOverviewPage from "@/features/payroll/pages/PayrollOverviewPage";
-// ── Settings ──
+
+// Settings
 import SettingsDashboardPage from "@/features/settings/pages/SettingsDashboardPage";
 import UserManagementPage from "@/features/settings/pages/UserManagementPage";
 import CompanyDetailsPage from "@/features/settings/pages/CompanyDetailsPage";
@@ -123,6 +125,15 @@ const HomeRoutes = () => (
       element={
         <ProtectedRoute>
           <EmployeeExportPage />
+        </ProtectedRoute>
+      }
+    />
+    {/* ✅ LAST — dynamic segment after all static subroutes */}
+    <Route
+      path="/employees/:id"
+      element={
+        <ProtectedRoute>
+          <EmployeeProfilePage />
         </ProtectedRoute>
       }
     />
@@ -293,7 +304,7 @@ const HomeRoutes = () => (
       }
     />
 
-    {/* ================= Payroll ⭐ NEW ================= */}
+    {/* ================= Payroll ================= */}
     <Route
       path="/payroll"
       element={
@@ -350,8 +361,8 @@ const HomeRoutes = () => (
         </ProtectedRoute>
       }
     />
+
     {/* ================= Settings ================= */}
-    {/* ── Settings ── */}
     <Route
       path="/settings"
       element={

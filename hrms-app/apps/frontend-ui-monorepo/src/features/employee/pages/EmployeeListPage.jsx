@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Box, Flex, Text, useToast } from "@chakra-ui/react";
-import { useLocation, useSearchParams } from "react-router-dom";
+import { useLocation, useSearchParams, useNavigate } from "react-router-dom"; // ✅ added useNavigate
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import EmployeeTable from "@/components/atomic/organisms/EmployeeTable";
 import EmployeeMasterForm from "@/features/employee/components/EmployeeMasterForm";
@@ -11,6 +11,7 @@ import { getEmployeeProfile } from "@/services/employeeApi";
 const EmployeeListPage = () => {
   const location = useLocation();
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate(); // ✅ NEW
   const toast = useToast();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -25,6 +26,11 @@ const EmployeeListPage = () => {
   const handleAddNew = () => {
     setEditingEmployee(null);
     setIsFormOpen(true);
+  };
+
+  // ✅ NEW — navigate to profile page on row click
+  const handleRowClick = (employee) => {
+    navigate(`/employees/${employee.id}`);
   };
 
   // ✅ Fetch full profile (compliance + banking) before opening form
@@ -80,6 +86,7 @@ const EmployeeListPage = () => {
           error={error}
           refetchEmployees={refetch}
           onEdit={handleEdit}
+          onRowClick={handleRowClick} // ✅ NEW
         />
       </Box>
 
