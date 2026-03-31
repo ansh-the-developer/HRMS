@@ -1,4 +1,3 @@
-// src/components/atomic/organisms/UserProfileMenu.jsx
 import {
   Avatar,
   Box,
@@ -12,13 +11,31 @@ import {
   IconButton,
 } from "@chakra-ui/react";
 import { FiChevronDown, FiLogOut } from "react-icons/fi";
-import { useAuth0 } from "@auth0/auth0-react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
-  const { user, logout } = useAuth0();
-  if (!user) return null;
+  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
 
-  const handleLogout = () => logout({ returnTo: window.location.origin });
+  const displayName =
+    user?.user_metadata?.full_name ||
+    user?.user_metadata?.name ||
+    user?.email ||
+    "User";
+
+  const avatarUrl = user?.user_metadata?.avatar_url || undefined;
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/login", { replace: true });
+    } catch (err) {
+      console.error("Logout failed:", err.message);
+    }
+  };
+
+  if (!user) return null;
 
   const isIcon = variant === "icon";
 
@@ -35,8 +52,8 @@ const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
         icon={
           isIcon ? (
             <Avatar
-              src={user.picture}
-              name={user.name}
+              src={avatarUrl}
+              name={displayName}
               borderRadius="md"
               boxSize="30px"
             />
@@ -54,10 +71,10 @@ const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
         minW="auto"
       >
         {!isIcon && (
-          <Flex align="center" gap={2} maxW="180px">
+          <Flex align="center" gap={2} maxW="220px">
             <Avatar
-              src={user.picture}
-              name={user.name}
+              src={avatarUrl}
+              name={displayName}
               borderRadius="md"
               boxSize="32px"
               flexShrink={0}
@@ -69,7 +86,7 @@ const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
                 lineHeight="short"
                 noOfLines={1}
               >
-                {user.name}
+                {displayName}
               </Text>
               <Text
                 fontSize="xs"
@@ -96,6 +113,7 @@ const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
           icon={<FiLogOut />}
           fontSize="sm"
           py={2}
+          color="red.500"
           onClick={handleLogout}
         >
           Logout
