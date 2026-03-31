@@ -1,26 +1,45 @@
-import React from "react";
+import React, { useState } from "react";
 import {
-  Box,
-  Button,
-  Image,
-  Input,
-  Text,
-  Link,
-  Checkbox,
-  Grid,
-  VStack,
-  HStack,
-  Heading,
-  FormControl,
-  FormLabel,
+  Box, Button, Grid, VStack, Heading,
+  Text, FormControl, FormLabel, Input,
+  Alert, AlertIcon, Image,
 } from "@chakra-ui/react";
-import passwordForgotImage from "../../../assets/forgetPassword.png";
+import { useNavigate } from "react-router-dom";
+import buildingImage from "../../../assets/loginPagePic.jpg";
 import Logo from "../../../components/atomic/atoms/Logo";
+import { useAuth } from "@/hooks/useAuth"; // ✅
 
 const ForgotPasswordPage = () => {
+  const navigate = useNavigate();
+const { forgotPassword: resetPassword } = useAuth(); // destructure alias
+  const [email, setEmail]     = useState("");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [error, setError]     = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      await resetPassword(email);
+      setSuccess(true); // ✅ Show confirmation, don't redirect immediately
+    } catch (err) {
+      setError(err.message || "Failed to send reset email. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <Grid templateColumns={{ base: "1fr", md: "repeat(2,1fr)" }}>
-      <Box as="section" p={10} w={{ base: "100%", md: "auto" }}>
+    <Grid
+      templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
+      h="100vh"
+      w="100vw"
+    >
+      {/* Left Section */}
+      <Box as="section" p={10}>
         <Grid
           h="100%"
           templateRows="auto 1fr"
@@ -31,49 +50,121 @@ const ForgotPasswordPage = () => {
         >
           <Logo />
 
-          <VStack spacing={4} align="stretch">
-            <Box>
-              <Text>Password Recovery</Text>
+          <VStack spacing={6} align="stretch">
+            <Box textAlign="center">
+              <Text fontSize="sm" color="gray.600">
+                Forgot your password?
+              </Text>
               <Heading
                 bgGradient="linear(to-r, #307DC5, #BDBBB9)"
                 bgClip="text"
+                as="h1"
+                size="lg"
+                mb={2}
               >
-                Forgot your password?
+                Reset Password
               </Heading>
-              <Text pt={4}>
-                Kindly enter the email address address linked to this account
-                and we will send you a code to enable you change your password .
-              </Text>
             </Box>
 
-            <FormControl pt={10}>
-              <FormLabel>Email address</FormLabel>
-              <Input
-                placeholder="Enter email address"
-                size="lg"
-                type="password"
-              />
-            </FormControl>
+            {/* ── Success State ── */}
+            {success ? (
+              <VStack spacing={5} align="stretch">
+                <Alert status="success" borderRadius="lg" fontSize="sm">
+                  <AlertIcon />
+                  Password reset email sent! Check your inbox.
+                </Alert>
+                <Text fontSize="sm" color="gray.600" textAlign="center">
+                  Didn't receive it? Check your spam folder or try again.
+                </Text>
+                <Button
+                  variant="outline"
+                  colorScheme="blue"
+                  size="lg"
+                  w="100%"
+                  onClick={() => {
+                    setSuccess(false);
+                    setEmail("");
+                  }}
+                >
+                  Try Again
+                </Button>
+                <Button
+                  size="lg"
+                  w="100%"
+                  bgGradient="linear(to-r, #307DC5, #BDBBB9)"
+                  color="white"
+                  _hover={{ opacity: 0.9 }}
+                  onClick={() => navigate("/login")}
+                >
+                  Back to Login
+                </Button>
+              </VStack>
+            ) : (
+              /* ── Request Form ── */
+              <form onSubmit={handleSubmit}>
+                <VStack spacing={5} align="stretch">
+                  {error && (
+                    <Alert status="error" borderRadius="lg" fontSize="sm">
+                      <AlertIcon />
+                      {error}
+                    </Alert>
+                  )}
 
-            <Button
-              size="lg"
-              w="100%"
-              mt={7}
-              bgGradient="linear(to-r, #307DC5, #BDBBB9)"
-              color="white"
-              _hover={{
-                bgGradient: "linear(to-r, #276AAB, #A9A7A5)",
-                opacity: 0.9,
-              }}
-            >
-              send
-            </Button>
+                  <Text fontSize="sm" color="gray.500">
+                    Enter your registered email address. We'll send you a
+                    link to reset your password.
+                  </Text>
+
+                  <FormControl isRequired>
+                    <FormLabel fontSize="sm">Email Address</FormLabel>
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      size="lg"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      autoComplete="email"
+                    />
+                  </FormControl>
+
+                  <Button
+                    type="submit"
+                    size="lg"
+                    w="100%"
+                    mt={2}
+                    bgGradient="linear(to-r, #307DC5, #BDBBB9)"
+                    color="white"
+                    _hover={{ opacity: 0.9 }}
+                    isLoading={loading}
+                    loadingText="Sending..."
+                  >
+                    Send Reset Link
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="md"
+                    w="100%"
+                    color="gray.500"
+                    onClick={() => navigate("/login")}
+                  >
+                    ← Back to Login
+                  </Button>
+                </VStack>
+              </form>
+            )}
           </VStack>
         </Grid>
       </Box>
 
+      {/* Right Section - Image */}
       <Box as="section" display={{ base: "none", md: "block" }}>
-        <Image h="100vh" src={passwordForgotImage} />
+        <Image
+          src={buildingImage}
+          height="100%"
+          width="100%"
+          objectFit="cover"
+        />
       </Box>
     </Grid>
   );

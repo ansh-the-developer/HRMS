@@ -1,6 +1,5 @@
 import React from "react";
-import { Route } from "react-router-dom";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { Routes, Route, Navigate } from "react-router-dom"; // ✅ added Routes
 
 // Home
 import HomePage from "@/features/home/homePage";
@@ -57,345 +56,90 @@ import CompanyDetailsPage from "@/features/settings/pages/CompanyDetailsPage";
 import PermissionsManagerPage from "@/features/settings/pages/PermissionsManagerPage";
 
 const HomeRoutes = () => (
-  <>
-    <Route
-      path="/home"
-      element={
-        <ProtectedRoute>
-          <HomePage />
-        </ProtectedRoute>
-      }
-    />
+  // ✅ Own <Routes> — matches absolute paths independently
+  // ✅ No individual ProtectedRoute needed — AppRoutes wraps all of HomeRoutes
+  <Routes>
+    {/* ── Default redirect ──────────────────────── */}
+    <Route index element={<Navigate to="/home" replace />} />
 
-    {/* ================= Employee ================= */}
-    <Route
-      path="/employees"
-      element={
-        <ProtectedRoute>
-          <EmployeeListPage />
-        </ProtectedRoute>
-      }
-    />
+    {/* ── Home ──────────────────────────────────── */}
+    <Route path="/home" element={<HomePage />} />
+
+    {/* ── Employee ──────────────────────────────── */}
+    <Route path="/employees" element={<EmployeeListPage />} />
     <Route
       path="/employees/departments"
-      element={
-        <ProtectedRoute>
-          <EmployeeDepartmentsPage />
-        </ProtectedRoute>
-      }
+      element={<EmployeeDepartmentsPage />}
     />
-    <Route
-      path="/employees/branches"
-      element={
-        <ProtectedRoute>
-          <EmployeeBranchesPage />
-        </ProtectedRoute>
-      }
-    />
-    {/* Job Titles / Positions */}
+    <Route path="/employees/branches" element={<EmployeeBranchesPage />} />
     <Route
       path="/employees/designations"
-      element={
-        <ProtectedRoute>
-          <EmployeeDesignationsPage />
-        </ProtectedRoute>
-      }
+      element={<EmployeeDesignationsPage />}
     />
-    {/* Employment Statuses */}
-    <Route
-      path="/employees/statuses"
-      element={
-        <ProtectedRoute>
-          <EmployeeStatusesPage />
-        </ProtectedRoute>
-      }
-    />
-    {/* Employee Types */}
-    <Route
-      path="/employees/types"
-      element={
-        <ProtectedRoute>
-          <EmployeeTypesPage />
-        </ProtectedRoute>
-      }
-    />
-    {/* Export */}
-    <Route
-      path="/employees/export"
-      element={
-        <ProtectedRoute>
-          <EmployeeExportPage />
-        </ProtectedRoute>
-      }
-    />
-    {/* ✅ LAST — dynamic segment after all static subroutes */}
-    <Route
-      path="/employees/:id"
-      element={
-        <ProtectedRoute>
-          <EmployeeProfilePage />
-        </ProtectedRoute>
-      }
-    />
+    <Route path="/employees/statuses" element={<EmployeeStatusesPage />} />
+    <Route path="/employees/types" element={<EmployeeTypesPage />} />
+    <Route path="/employees/export" element={<EmployeeExportPage />} />
+    <Route path="/employees/:id" element={<EmployeeProfilePage />} />
 
-    {/* ================= Attendance ================= */}
-    <Route
-      path="/attendance"
-      element={
-        <ProtectedRoute>
-          <AttendanceDashboardPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/attendance/working-days"
-      element={
-        <ProtectedRoute>
-          <WorkingDaysPage />
-        </ProtectedRoute>
-      }
-    />
+    {/* ── Attendance ────────────────────────────── */}
+    <Route path="/attendance" element={<AttendanceDashboardPage />} />
+    <Route path="/attendance/working-days" element={<WorkingDaysPage />} />
     <Route
       path="/attendance/working-days/edit"
-      element={
-        <ProtectedRoute>
-          <EditWorkingDaysPage />
-        </ProtectedRoute>
-      }
+      element={<EditWorkingDaysPage />}
     />
-    <Route
-      path="/attendance/working-hours"
-      element={
-        <ProtectedRoute>
-          <WorkingHoursPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/attendance/working-rules"
-      element={
-        <ProtectedRoute>
-          <WorkingRulesPage />
-        </ProtectedRoute>
-      }
-    />
+    <Route path="/attendance/working-hours" element={<WorkingHoursPage />} />
+    <Route path="/attendance/working-rules" element={<WorkingRulesPage />} />
     <Route
       path="/attendance/working-rules/edit"
-      element={
-        <ProtectedRoute>
-          <EditWorkingRulePage />
-        </ProtectedRoute>
-      }
+      element={<EditWorkingRulePage />}
     />
-    <Route
-      path="/attendance/edit"
-      element={
-        <ProtectedRoute>
-          <EditAttendancePage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/attendance/export"
-      element={
-        <ProtectedRoute>
-          <AttendanceExportPage />
-        </ProtectedRoute>
-      }
-    />
+    <Route path="/attendance/edit" element={<EditAttendancePage />} />
+    <Route path="/attendance/export" element={<AttendanceExportPage />} />
 
-    {/* ================= Leaves ================= */}
-    <Route
-      path="/leaves"
-      element={
-        <ProtectedRoute>
-          <LeavesDashboardPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/leaves/required-form"
-      element={
-        <ProtectedRoute>
-          <LeaveRequiredFormPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/leaves/request-upload"
-      element={
-        <ProtectedRoute>
-          <LeaveRequestUploadPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/leaves/submit-status"
-      element={
-        <ProtectedRoute>
-          <LeaveSubmitStatusPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/leaves/requests"
-      element={
-        <ProtectedRoute>
-          <LeaveRequestListPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/leaves/requests/:id"
-      element={
-        <ProtectedRoute>
-          <LeaveRequestActionPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/leaves/rules"
-      element={
-        <ProtectedRoute>
-          <LeaveRulesPage />
-        </ProtectedRoute>
-      }
-    />
+    {/* ── Leaves ────────────────────────────────── */}
+    <Route path="/leaves" element={<LeavesDashboardPage />} />
+    <Route path="/leaves/required-form" element={<LeaveRequiredFormPage />} />
+    <Route path="/leaves/request-upload" element={<LeaveRequestUploadPage />} />
+    <Route path="/leaves/submit-status" element={<LeaveSubmitStatusPage />} />
+    <Route path="/leaves/requests" element={<LeaveRequestListPage />} />
+    <Route path="/leaves/requests/:id" element={<LeaveRequestActionPage />} />
+    <Route path="/leaves/rules" element={<LeaveRulesPage />} />
     <Route
       path="/leaves/rules/approval-flow"
-      element={
-        <ProtectedRoute>
-          <LeaveRulesApprovalFlowPage />
-        </ProtectedRoute>
-      }
+      element={<LeaveRulesApprovalFlowPage />}
     />
 
-    {/* ================= Performance ================= */}
-    <Route
-      path="/performance"
-      element={
-        <ProtectedRoute>
-          <PerformanceDashboardPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/performance/history"
-      element={
-        <ProtectedRoute>
-          <PerformanceHistoryPage />
-        </ProtectedRoute>
-      }
-    />
+    {/* ── Performance ───────────────────────────── */}
+    <Route path="/performance" element={<PerformanceDashboardPage />} />
+    <Route path="/performance/history" element={<PerformanceHistoryPage />} />
     <Route
       path="/performance/review/:id"
-      element={
-        <ProtectedRoute>
-          <PerformanceReviewDetailPage />
-        </ProtectedRoute>
-      }
+      element={<PerformanceReviewDetailPage />}
     />
-    <Route
-      path="/performance/new"
-      element={
-        <ProtectedRoute>
-          <PerformanceNewReviewPage />
-        </ProtectedRoute>
-      }
-    />
+    <Route path="/performance/new" element={<PerformanceNewReviewPage />} />
 
-    {/* ================= Payroll ================= */}
-    <Route
-      path="/payroll"
-      element={
-        <ProtectedRoute>
-          <PayrollDashboardPage />
-        </ProtectedRoute>
-      }
-    />
+    {/* ── Payroll ───────────────────────────────── */}
+    <Route path="/payroll" element={<PayrollDashboardPage />} />
     <Route
       path="/payroll/reimbursement"
-      element={
-        <ProtectedRoute>
-          <ReimbursementStatusPage />
-        </ProtectedRoute>
-      }
+      element={<ReimbursementStatusPage />}
     />
-    <Route
-      path="/payroll/structure"
-      element={
-        <ProtectedRoute>
-          <SalaryStructurePage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/payroll/payslips"
-      element={
-        <ProtectedRoute>
-          <PayrollSlipsPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/payroll/record"
-      element={
-        <ProtectedRoute>
-          <RecordPaymentPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/payroll/pending"
-      element={
-        <ProtectedRoute>
-          <PendingPaymentsPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/payroll/overview"
-      element={
-        <ProtectedRoute>
-          <PayrollOverviewPage />
-        </ProtectedRoute>
-      }
-    />
+    <Route path="/payroll/structure" element={<SalaryStructurePage />} />
+    <Route path="/payroll/payslips" element={<PayrollSlipsPage />} />
+    <Route path="/payroll/record" element={<RecordPaymentPage />} />
+    <Route path="/payroll/pending" element={<PendingPaymentsPage />} />
+    <Route path="/payroll/overview" element={<PayrollOverviewPage />} />
 
-    {/* ================= Settings ================= */}
-    <Route
-      path="/settings"
-      element={
-        <ProtectedRoute>
-          <SettingsDashboardPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/settings/users/new"
-      element={
-        <ProtectedRoute>
-          <UserManagementPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/settings/company"
-      element={
-        <ProtectedRoute>
-          <CompanyDetailsPage />
-        </ProtectedRoute>
-      }
-    />
-    <Route
-      path="/settings/permissions"
-      element={
-        <ProtectedRoute>
-          <PermissionsManagerPage />
-        </ProtectedRoute>
-      }
-    />
-  </>
+    {/* ── Settings ──────────────────────────────── */}
+    <Route path="/settings" element={<SettingsDashboardPage />} />
+    <Route path="/settings/users/new" element={<UserManagementPage />} />
+    <Route path="/settings/company" element={<CompanyDetailsPage />} />
+    <Route path="/settings/permissions" element={<PermissionsManagerPage />} />
+
+    {/* ── Unknown protected path → home ─────────── */}
+    <Route path="*" element={<Navigate to="/home" replace />} />
+  </Routes>
 );
 
 export default HomeRoutes;

@@ -1,17 +1,21 @@
-import { useAuth0 } from '@auth0/auth0-react';
-import { Navigate } from 'react-router-dom';
-import { Box, Spinner } from '@chakra-ui/react';
+import { Navigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { Center, Spinner } from "@chakra-ui/react";
 
+// ✅ Named export — for HomeRoutes.jsx: import { ProtectedRoute } from "..."
 export const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" h="100vh">
-        <Spinner size="xl" />
-      </Box>
+      <Center h="100vh">
+        <Spinner size="xl" color="blue.500" thickness="4px" />
+      </Center>
     );
   }
 
-  return isAuthenticated ? children : <Navigate to="/login" />;
+  return isAuthenticated ? children : <Navigate to="/login" replace />;
 };
+
+// ✅ Default export — for AppRoutes.jsx: import ProtectedRoute from "..."
+export default ProtectedRoute;

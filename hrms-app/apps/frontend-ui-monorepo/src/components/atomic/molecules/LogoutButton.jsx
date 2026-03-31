@@ -1,15 +1,23 @@
-import { Button } from '@chakra-ui/react';
-import { useAuth0 } from '@auth0/auth0-react';
+import { Button } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth"; // ✅ replaces useAuth0
 
-export const LogoutButton = ({ variant = "solid", colorScheme = "red", size = "md", ...props }) => {
-  const { logout } = useAuth0();
+export const LogoutButton = ({
+  variant = "solid",
+  colorScheme = "red",
+  size = "md",
+  ...props
+}) => {
+  const { signOut } = useAuth();   // ✅ replaces logout()
+  const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout({
-      logoutParams: {
-        returnTo: window.location.origin,  // Changed from /login
-      },
-    });
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/login", { replace: true }); // ✅ redirect after logout
+    } catch (err) {
+      console.error("Logout failed:", err.message);
+    }
   };
 
   return (
