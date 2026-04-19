@@ -8,7 +8,9 @@ import {
 import { useNavigate } from "react-router-dom";
 import buildingImage from "../../../assets/loginPagePic.jpg";
 import Logo from "../../../components/atomic/atoms/Logo";
-import { useAuth } from "@/hooks/useAuth"; // ✅
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabaseClient"; // ✅ needed for signOut after recovery
+
 
 // ── Simple password strength scorer ──────────────────────────────────────
 const getStrength = (pwd) => {
@@ -23,9 +25,10 @@ const getStrength = (pwd) => {
 const strengthLabel = ["", "Weak", "Fair", "Good", "Strong"];
 const strengthColor = ["", "red.400", "orange.400", "yellow.400", "green.400"];
 
+
 const ResetPasswordPage = () => {
   const navigate  = useNavigate();
-  const { updatePassword } = useAuth(); // ✅
+  const { updatePassword } = useAuth();
 
   const [password,        setPassword]        = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -40,7 +43,6 @@ const ResetPasswordPage = () => {
   // ── Guard: Supabase injects #access_token into URL on redirect ───────────
   useEffect(() => {
     const hash = window.location.hash;
-    // Supabase puts type=recovery in the hash when the reset link is clicked
     if (!hash.includes("type=recovery") && !hash.includes("access_token")) {
       setTokenMissing(true);
     }
@@ -65,10 +67,27 @@ const ResetPasswordPage = () => {
 
     setLoading(true);
     try {
-      await updatePassword(password); // ✅ Supabase updateUser({ password })
+      // 1️⃣ Update password using the AAL1 recovery session
+      await updatePassword(password);
+
+      // 2️⃣ CRITICAL: Sign out to destroy the recovery session.
+      //    Supabase requires AAL2 (MFA-verified) to update password when MFA
+      //    is enabled. The recovery link only grants AAL1. We update first,
+      //    then immediately sign out so the user re-authenticates cleanly
+      //    (login → TOTP → home) without hitting the AAL2 error.
+      await supabase.auth.signOut();
+
+      // 3️⃣ Redirect to password-changed confirmation page
       navigate("/password-changed");
     } catch (err) {
-      setError(err.message || "Failed to reset password. Please request a new link.");
+      // If we hit the AAL2 error despite the fix, surface a clear message
+      if (err.message?.includes("AAL2")) {
+        setError(
+          "Your reset link has expired. Please request a new password reset email."
+        );
+      } else {
+        setError(err.message || "Failed to reset password. Please request a new link.");
+      }
     } finally {
       setLoading(false);
     }

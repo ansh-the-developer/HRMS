@@ -1,169 +1,193 @@
-import React, { useState } from "react";
+import { useState } from "react";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
-  Box, Button, Image, Text, Grid, VStack,
-  Heading, FormControl, FormLabel, Input,
-  InputGroup, InputRightElement, IconButton,
-  Alert, AlertIcon, Divider,
+  Box,
+  Button,
+  FormControl,
+  FormLabel,
+  Heading,
+  Input,
+  InputGroup,
+  InputRightElement,
+  IconButton,
+  Text,
+  VStack,
+  Alert,
+  AlertIcon,
+  Link,
+  Divider,
 } from "@chakra-ui/react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
-import buildingImage from "../../../assets/loginPagePic.jpg";
-import Logo from "../../../components/atomic/atoms/Logo";
-import { useAuth } from "@/hooks/useAuth"; // ✅ NEW
+import { useAuth } from "@/hooks/useAuth";
+import { getProfile } from "@/services/profileApi";
+import { Logo } from "@/components/atomic/atoms";
 
 const LoginPage = () => {
+  const { signIn, getMFALevel, listMFAFactors } = useAuth();
   const navigate = useNavigate();
-  const { signIn, isLoading } = useAuth(); // ✅ NEW
 
-  const [email, setEmail]       = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPass, setShowPass] = useState(false);
-  const [error, setError]       = useState("");
-  const [loading, setLoading]   = useState(false);
+  const [showPw, setShowPw] = useState(false);
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setLoading(true);
-    try {
-      const data = await signIn(email, password);
+    setIsLoading(true);
 
-      // ── Check if MFA is required ──────────────────
-      if (data?.session?.user?.factors?.length > 0) {
-        // User has TOTP enrolled → go to MFA verify page
-        navigate("/verify-mfa", {
-          state: {
-            factorId: data.session.user.factors[0].id,
-          },
-        });
+    try {
+      // 1️⃣ Sign in
+      const { user } = await signIn(email, password);
+
+      // 2️⃣ Fetch profile row — null-safe
+      let profile = null;
+      try {
+        profile = await getProfile(user.id);
+        console.log("✅ profile fetched:", profile);
+      } catch (err) {
+        console.warn("⚠️ no profile row found:", err.message);
+      }
+
+      console.log("🔍 must_change_password:", profile?.must_change_password);
+
+      // 3️⃣ No profile OR first-login flag → force password change
+      if (!profile || profile.must_change_password) {
+        navigate("/change-password", { replace: true });
         return;
       }
 
-      // ── No MFA → go straight to home ─────────────
-      navigate("/home");
+      // 4️⃣ Check MFA assurance level
+      const { currentLevel, nextLevel } = await getMFALevel();
+
+      // 4a. Session already at aal2 → straight to app
+      if (currentLevel === "aal2") {
+        navigate("/home", { replace: true });
+        return;
+      }
+
+      // 4b. MFA required → check if enrolled
+      if (nextLevel === "aal2") {
+        const factors = await listMFAFactors();
+        const totpFactor = factors?.totp?.[0];
+
+        if (totpFactor) {
+          // Enrolled but not verified this session → verify
+          navigate("/verify-mfa", {
+            replace: true,
+            state: { factorId: totpFactor.id },
+          });
+        } else {
+          // Never enrolled → force enrolment
+          navigate("/enroll-mfa", { replace: true });
+        }
+        return;
+      }
+
+      // 4c. No MFA requirement → go home
+      navigate("/home", { replace: true });
     } catch (err) {
-      setError(err.message || "Login failed. Please check your credentials.");
+      setError(err.message || "Invalid email or password.");
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <Grid
-      templateColumns={{ base: "1fr", md: "repeat(2, 1fr)" }}
-      h="100vh"
-      w="100vw"
+    <Box
+      minH="100vh"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+      bg="gray.50"
     >
-      {/* Left Section */}
-      <Box as="section" p={10} w={{ base: "100%", md: "auto" }}>
-        <Grid
-          h="100%"
-          templateRows="auto 1fr"
-          gap={8}
-          alignContent="center"
-          maxW="400px"
-          mx="auto"
-        >
-          <Logo />
-
-          <VStack spacing={6} align="stretch">
-            <Box textAlign="center">
-              <Text fontSize="sm" color="gray.600">Welcome Back!</Text>
-              <Heading
-                bgGradient="linear(to-r, #307DC5, #BDBBB9)"
-                bgClip="text"
-                as="h1"
-                size="lg"
-                mb={2}
-              >
-                Please Sign In
-              </Heading>
-            </Box>
-
-            {/* ── Error Alert ── */}
-            {error && (
-              <Alert status="error" borderRadius="lg" fontSize="sm">
-                <AlertIcon />
-                {error}
-              </Alert>
-            )}
-
-            {/* ── Form ── */}
-            <form onSubmit={handleLogin}>
-              <VStack spacing={4} align="stretch">
-                <FormControl isRequired>
-                  <FormLabel fontSize="sm">Email Address</FormLabel>
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    size="lg"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
-                  />
-                </FormControl>
-
-                <FormControl isRequired>
-                  <FormLabel fontSize="sm">Password</FormLabel>
-                  <InputGroup>
-                    <Input
-                      type={showPass ? "text" : "password"}
-                      placeholder="Enter your password"
-                      size="lg"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      autoComplete="current-password"
-                    />
-                    <InputRightElement h="full">
-                      <IconButton
-                        icon={showPass ? <FiEyeOff /> : <FiEye />}
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => setShowPass(!showPass)}
-                        aria-label="Toggle password"
-                      />
-                    </InputRightElement>
-                  </InputGroup>
-                </FormControl>
-
-                {/* Forgot Password */}
-                <Box textAlign="right">
-                  <Text
-                    fontSize="sm"
-                    color="blue.500"
-                    cursor="pointer"
-                    _hover={{ textDecoration: "underline" }}
-                    onClick={() => navigate("/forgot-password")}
-                  >
-                    Forgot password?
-                  </Text>
-                </Box>
-
-                {/* Sign In Button */}
-                <Button
-                  type="submit"
-                  size="lg"
-                  w="100%"
-                  mt={2}
-                  bgGradient="linear(to-r, #307DC5, #BDBBB9)"
-                  color="white"
-                  _hover={{ bgGradient: "linear(to-r, #276AAB, #A9A7A5)", opacity: 0.9 }}
-                  isLoading={loading}
-                  loadingText="Signing in..."
-                >
-                  Sign In
-                </Button>
-              </VStack>
-            </form>
+      <Box
+        bg="white"
+        p={8}
+        borderRadius="xl"
+        boxShadow="lg"
+        w="full"
+        maxW="420px"
+        mx={4}
+      >
+        <VStack spacing={6} align="stretch">
+          {/* Header */}
+          <VStack spacing={2} textAlign="center">
+            <Logo />
+            <Heading size="md" mt={4}>
+              Welcome back
+            </Heading>
+            <Text fontSize="sm" color="gray.500" mt={1}>
+              Sign in to your HRMS account
+            </Text>
           </VStack>
-        </Grid>
-      </Box>
 
-      {/* Right Section - Image */}
-      <Box as="section" display={{ base: "none", md: "block" }}>
-        <Image src={buildingImage} height="100%" width="100%" objectFit="cover" />
+          {error && (
+            <Alert status="error" borderRadius="md" fontSize="sm">
+              <AlertIcon />
+              {error}
+            </Alert>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <VStack spacing={4}>
+              <FormControl isRequired>
+                <FormLabel fontSize="sm">Email</FormLabel>
+                <Input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@company.com"
+                />
+              </FormControl>
+
+              <FormControl isRequired>
+                <FormLabel fontSize="sm">Password</FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showPw ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                  />
+                  <InputRightElement>
+                    <IconButton
+                      size="sm"
+                      variant="ghost"
+                      icon={showPw ? <FiEyeOff /> : <FiEye />}
+                      onClick={() => setShowPw(!showPw)}
+                      aria-label={showPw ? "Hide password" : "Show password"}
+                    />
+                  </InputRightElement>
+                </InputGroup>
+              </FormControl>
+
+              <Box w="full" textAlign="right">
+                <Link
+                  as={RouterLink}
+                  to="/forgot-password"
+                  fontSize="sm"
+                  color="purple.600"
+                >
+                  Forgot password?
+                </Link>
+              </Box>
+
+              <Button
+                type="submit"
+                colorScheme="purple"
+                w="full"
+                isLoading={isLoading}
+                loadingText="Signing in…"
+              >
+                Sign In
+              </Button>
+            </VStack>
+          </form>
+        </VStack>
       </Box>
-    </Grid>
+    </Box>
   );
 };
 
