@@ -1,5 +1,5 @@
 // src/features/employee/components/DeleteEmployeeModal.jsx
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import {
   Modal, ModalOverlay, ModalContent, ModalBody, ModalFooter,
   Box, Flex, Text, Input, Button, VStack, HStack,

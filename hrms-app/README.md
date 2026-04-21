@@ -2778,3 +2778,307 @@ hrms-app/                                             ✅ TURBO MONOREPO
 │   └── shared/                                       ⏳ Types + utils (future)
 │
 └── README.md
+
+
+/////////////////////////////
+/////////////////////////////
+
+
+**Phase 4 — Employee Master Form & Edge Function Auth (Apr 21, 2026)**
+1. Fixed `@/hooks/useProfile` missing import error blocking `ChangePasswordPage` from loading.
+2. Confirmed `EmployeeMasterForm.jsx` structure was logically sound before fixing.
+3. Fixed `useRef` — moved from `React.useRef` inline call to top-level named import.
+4. Fixed preview `useEffect` logic — simplified `photoPreview` / `signPreview` to clean single-URL lifecycle with proper `revokeObjectURL` cleanup.
+5. Fixed compliance mapped inputs — `onChange={setU(field)}` was partially-applied incorrectly; replaced with explicit `(e) => setUi(...)` inline handler.
+6. Extracted `resetAll()` helper — used consistently on modal close and create-mode open.
+7. Added `handleClose` wrapper — ensures state is fully wiped whether user discards or saves.
+8. Added `onClose()` call after successful save — modal now auto-closes on success.
+9. Identified `POST /functions/v1/create-employee-user → 401 Unauthorized` as an Edge Function JWT config issue, not a frontend bug.
+10. Root cause: Edge Function has `verify_jwt = true` (default) but the anon/service key may not be passed correctly — to be fixed tomorrow via `verify_jwt = false` in `config.toml` or passing the service role key explicitly.
+
+***
+hrms-app/                                             ✅ TURBO MONOREPO
+├── netlify.toml                                      ✅ Deploy config (ROOT)
+├── package.json                                      ✅ Turbo orchestrator
+├── turbo.json                                        ✅ Build pipeline
+│
+├── apps/
+│   └── frontend-ui-monorepo/                         ✅ VITE 5.4.8 + CHAKRA v2 + RQ v5
+│       ├── public/
+│       │   ├── favicon.ico
+│       │   └── vite.svg
+│       │
+│       ├── src/
+│       │   │
+│       │   ├── lib/                                  ✅ Core utils
+│       │   │   ├── supabaseClient.js                 ✅ Supabase client (URL + ANON_KEY)
+│       │   │   ├── queryClient.js                    ✅ React Query v5 + DevTools
+│       │   │   └── totpUtils.js                      ✅ Native Web Crypto TOTP (RFC 6238)
+│       │   │
+│       │   ├── contexts/                             ✅ Split for Vite Fast Refresh fix
+│       │   │   ├── AuthContext.js                    ✅ createContext({}) only — no component
+│       │   │   ├── AuthProvider.jsx                  ✅ Provider component only
+│       │   │   │                                         getSession() on mount
+│       │   │   │                                         onAuthStateChange() listener
+│       │   │   │                                         session / user / isLoading
+│       │   │   │                                         isAuthenticated = !!session
+│       │   │   └── CalendarContext.jsx               ✅ Birthday ↔ Calendar sync
+│       │   │
+│       │   ├── hooks/                                ✅ React custom hooks
+│       │   │   ├── index.js                          ✅ Barrel export
+│       │   │   ├── useAuth.js                        ✅ Full Supabase auth hook
+│       │   │   │                                         signIn / signOut (scope:local)
+│       │   │   │                                         forgotPassword / updatePassword
+│       │   │   │                                         enrollMFA / challengeMFA
+│       │   │   │                                         verifyMFA / getMFALevel
+│       │   │   │                                         getMFAFactors / listMFAFactors
+│       │   │   ├── useEmployees.js                   ✅ List + CRUD ops
+│       │   │   ├── useEmployeeProfile.js             ✅ Full profile fetch
+│       │   │   ├── useHome.js                        ✅ Dashboard data
+│       │   │   ├── useLeaves.js                      ✅ Leave requests
+│       │   │   └── usePerformance.js                 ✅ Reviews data
+│       │   │
+│       │   ├── services/                             ✅ Supabase API layer + RQ hooks
+│       │   │   ├── employeeApi.js                    ✅ Full CRUD + file ops
+│       │   │   │                                         createEmployeeProfile()
+│       │   │   │                                         updateEmployeeProfile()
+│       │   │   │                                         uploadFile()
+│       │   │   ├── homeApi.js                        ✅ Notices + Birthdays
+│       │   │   ├── leaveApi.js                       ✅ Leave endpoints
+│       │   │   ├── performanceApi.js                 ✅ Review endpoints
+│       │   │   ├── profileApi.js                     ✅ NEW (Phase 2)
+│       │   │   │                                         getProfile(userId)
+│       │   │   │                                         updateProfile(userId, data)
+│       │   │   └── useProfile.js                     ✅ NEW (Phase 2)
+│       │   │                                             profile / isLoading / error
+│       │   │                                             updateProfile (mutateAsync)
+│       │   │                                             isUpdating / refetch
+│       │   │
+│       │   ├── components/
+│       │   │   ├── ProtectedRoute.jsx                ✅ isLoading → Spinner
+│       │   │   │                                         isAuthenticated → children | /login
+│       │   │   │                                         named + default export
+│       │   │   │
+│       │   │   └── atomic/                           ✅ Atomic Design System
+│       │   │       ├── atoms/                        ✅ 6 primitives
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSButton.jsx            ✅ Gradient CTA
+│       │   │       │   ├── HRMSInput.jsx             ✅ Focus states
+│       │   │       │   ├── Logo.jsx
+│       │   │       │   ├── SectionTitle.jsx
+│       │   │       │   ├── SidebarToggleButton.jsx
+│       │   │       │   └── StatusDot.jsx
+│       │   │       │
+│       │   │       ├── molecules/
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSCard.jsx
+│       │   │       │   ├── InfoRow.jsx
+│       │   │       │   ├── LegendItem.jsx
+│       │   │       │   ├── LogoutButton.jsx          ✅ signOut() scope:local + navigate
+│       │   │       │   ├── EmployeeConfigItem.jsx
+│       │   │       │   ├── DepartmentListItem.jsx    ✅ Icons fixed
+│       │   │       │   ├── EmployeeTableRow.jsx      ✅ Icons fixed
+│       │   │       │   └── BirthdayListItem.jsx      ✅ Month/Day display
+│       │   │       │
+│       │   │       ├── organisms/
+│       │   │       │   ├── HRMSSidebar.jsx           ✅ Collapsible nav
+│       │   │       │   ├── TopBar.jsx                ✅ full_name → name → email fallback
+│       │   │       │   ├── UserProfileMenu.jsx       ✅ avatarUrl from user_metadata
+│       │   │       │   │                                 signOut + navigate on logout
+│       │   │       │   │                                 red Logout MenuItem
+│       │   │       │   ├── NoticeBoardCard.jsx
+│       │   │       │   ├── HolidaysCard.jsx
+│       │   │       │   ├── CompanyEventsCard.jsx
+│       │   │       │   ├── BirthdayTrackerCard.jsx   ✅ React Query LIVE
+│       │   │       │   ├── CalendarCard.jsx          ✅ React Query + badges
+│       │   │       │   ├── EmployeeTable.jsx         ✅ TOTP Delete Modal
+│       │   │       │   ├── EmployeeConfigCard.jsx    ⚠️ DEPRECATED
+│       │   │       │   └── AttendanceConfigCard.jsx
+│       │   │       │
+│       │   │       └── templates/
+│       │   │           └── DashboardLayout.jsx       ✅ Sidebar + Topbar wrapper
+│       │   │
+│       │   ├── features/
+│       │   │   │
+│       │   │   ├── auth/
+│       │   │   │   └── pages/
+│       │   │   │       ├── LoginPage.jsx             ✅ UPDATED (Phase 3)
+│       │   │   │       │                                 signIn() + full post-login router
+│       │   │   │       │                                 must_change_password → /change-password
+│       │   │   │       │                                 getMFALevel + listMFAFactors
+│       │   │   │       │                                 no factors → /enroll-mfa
+│       │   │   │       │                                 AAL1 + factors → /verify-mfa
+│       │   │   │       │                                 AAL2 → /home
+│       │   │   │       │
+│       │   │   │       ├── ChangePasswordPage.jsx    ✅ NEW (Phase 3)
+│       │   │   │       │                                 first-login forced password change
+│       │   │   │       │                                 5-rule password strength checker
+│       │   │   │       │                                 updatePassword()
+│       │   │   │       │                                 updateProfile({ must_change_password: false })
+│       │   │   │       │                                 uses useProfile from @/services/useProfile
+│       │   │   │       │                                 → /enroll-mfa on success
+│       │   │   │       │
+│       │   │   │       ├── MFAEnrollPage.jsx         ✅ NEW (Phase 1)
+│       │   │   │       │                                 enrollMFA() → QR code + secret key
+│       │   │   │       │                                 6-digit TOTP confirm to activate
+│       │   │   │       │                                 shown once on first login only
+│       │   │   │       │                                 → /home on success
+│       │   │   │       │
+│       │   │   │       ├── TwoFactorPage.jsx         ✅ NEW (Phase 1)
+│       │   │   │       │                                 6-digit TOTP entry (every login)
+│       │   │   │       │                                 challengeMFA + verifyMFA
+│       │   │   │       │                                 factorId passed via route state
+│       │   │   │       │                                 → /home on success
+│       │   │   │       │
+│       │   │   │       ├── ForgotPasswordPage.jsx    ✅ forgotPassword()
+│       │   │   │       │                                 two-state UI: form → success message
+│       │   │   │       │                                 Try Again + Back to Login links
+│       │   │   │       │
+│       │   │   │       ├── ResetPasswordPage.jsx     ✅ UPDATED (Phase 3)
+│       │   │   │       │                                 updatePassword()
+│       │   │   │       │                                 supabase.auth.signOut() after update
+│       │   │   │       │                                 AAL2 fix: destroy recovery session
+│       │   │   │       │                                 token guard (type=recovery check)
+│       │   │   │       │                                 password strength bar (4 levels)
+│       │   │   │       │                                 live match feedback
+│       │   │   │       │
+│       │   │   │       ├── VerifyEmailPage.jsx       ✅ Email confirmation handler
+│       │   │   │       └── PasswordChangedPage.jsx   ✅ Post-reset confirmation screen
+│       │   │   │
+│       │   │   ├── home/
+│       │   │   │   └── pages/
+│       │   │   │       └── HomePage.jsx              ✅ Dashboard (RQ ready)
+│       │   │   │
+│       │   │   ├── employee/                         ✅ FULL CRUD + TOTP + MASTER FORM
+│       │   │   │   ├── components/
+│       │   │   │   │   └── EmployeeMasterForm.jsx    ✅ FIXED (Phase 4)
+│       │   │   │   │                                     Create / Edit modal
+│       │   │   │   │                                     useRef import fixed (top-level)
+│       │   │   │   │                                     photoPreview / signPreview — clean
+│       │   │   │   │                                     single-URL useEffect lifecycle
+│       │   │   │   │                                     revokeObjectURL on cleanup
+│       │   │   │   │                                     compliance mapped inputs onChange fixed
+│       │   │   │   │                                     resetAll() helper extracted
+│       │   │   │   │                                     handleClose resets + calls onClose
+│       │   │   │   │                                     onClose() called after save success
+│       │   │   │   │                                     supabase.functions.invoke()
+│       │   │   │   │                                     → create-employee-user edge fn
+│       │   │   │   │                                     ⚠️ 401 pending fix (Phase 5)
+│       │   │   │   │
+│       │   │   │   └── pages/
+│       │   │   │       ├── EmployeeListPage.jsx      ✅ Table + modals + RQ
+│       │   │   │       ├── EmployeeDepartmentsPage.jsx
+│       │   │   │       ├── EmployeeBranchesPage.jsx
+│       │   │   │       ├── EmployeeDesignationsPage.jsx
+│       │   │   │       ├── EmployeeStatusesPage.jsx
+│       │   │   │       ├── EmployeeTypesPage.jsx
+│       │   │   │       └── EmployeeExportPage.jsx
+│       │   │   │
+│       │   │   ├── attendance/
+│       │   │   │   ├── pages/
+│       │   │   │   │   ├── AttendanceDashboardPage.jsx
+│       │   │   │   │   ├── WorkingDaysPage.jsx
+│       │   │   │   │   ├── WorkingHoursPage.jsx      ✅ Icons fixed
+│       │   │   │   │   ├── WorkingRulesPage.jsx
+│       │   │   │   │   ├── EditWorkingRulePage.jsx
+│       │   │   │   │   ├── EditAttendancePage.jsx
+│       │   │   │   │   ├── EditWorkingDaysPage.jsx
+│       │   │   │   │   └── AttendanceExportPage.jsx
+│       │   │   │   └── constants/
+│       │   │   │       └── attendanceMockData.js
+│       │   │   │
+│       │   │   ├── leaves/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── LeaveRequestForm.jsx      ✅ Icons fixed
+│       │   │   │   │   └── LeaveUploadOverlay.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── LeavesDashboardPage.jsx
+│       │   │   │       ├── LeaveRequiredFormPage.jsx
+│       │   │   │       ├── LeaveRequestUploadPage.jsx
+│       │   │   │       ├── LeaveSubmitStatusPage.jsx
+│       │   │   │       ├── LeaveRequestListPage.jsx
+│       │   │   │       ├── LeaveRequestActionPage.jsx
+│       │   │   │       ├── LeaveRulesPage.jsx
+│       │   │   │       └── LeaveRulesApprovalFlowPage.jsx
+│       │   │   │
+│       │   │   ├── performance/                      ✅ Supabase LIVE
+│       │   │   │   └── pages/
+│       │   │   │       ├── PerformanceDashboardPage.jsx
+│       │   │   │       ├── PerformanceHistoryPage.jsx
+│       │   │   │       ├── PerformanceReviewDetailPage.jsx
+│       │   │   │       └── PerformanceNewReviewPage.jsx
+│       │   │   │
+│       │   │   ├── payroll/
+│       │   │   │   ├── constants/
+│       │   │   │   │   └── payrollMockData.js
+│       │   │   │   └── pages/
+│       │   │   │       ├── PayrollDashboardPage.jsx
+│       │   │   │       ├── PendingPaymentsPage.jsx
+│       │   │   │       ├── RecordPaymentPage.jsx
+│       │   │   │       ├── SalaryStructurePage.jsx   ✅ Icons removed
+│       │   │   │       ├── ReimbursementStatusPage.jsx
+│       │   │   │       ├── PayrollSlipsPage.jsx
+│       │   │   │       └── PayrollOverviewPage.jsx
+│       │   │   │
+│       │   │   └── settings/
+│       │   │       └── pages/
+│       │   │           ├── SettingsDashboardPage.jsx
+│       │   │           ├── UserManagementPage.jsx
+│       │   │           ├── CompanyDetailsPage.jsx
+│       │   │           └── PermissionsManagerPage.jsx
+│       │   │
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx                     ✅ UPDATED (Phase 3)
+│       │   │   │                                         /login          → bare (no guard)
+│       │   │   │                                         /change-password → unguarded
+│       │   │   │                                         /enroll-mfa     → unguarded
+│       │   │   │                                         /verify-mfa     → unguarded
+│       │   │   │                                         /reset-password → unguarded
+│       │   │   │                                         /verify-email   → unguarded
+│       │   │   │                                         /password-changed → unguarded
+│       │   │   │                                         path="*" → ProtectedRoute → HomeRoutes
+│       │   │   │
+│       │   │   ├── AuthRoutes.jsx                    ✅ All 8 auth pages mapped
+│       │   │   │                                         login / change-password / enroll-mfa
+│       │   │   │                                         verify-mfa / forgot-password
+│       │   │   │                                         reset-password / verify-email
+│       │   │   │                                         password-changed
+│       │   │   │
+│       │   │   └── HomeRoutes.jsx                    ✅ Absolute paths + * fallback
+│       │   │                                             wrapped in <Routes>
+│       │   │                                             no per-route ProtectedRoute
+│       │   │
+│       │   ├── assets/
+│       │   │   └── loginPagePic.jpg
+│       │   │
+│       │   ├── App.jsx                               ✅ Provider stack
+│       │   │                                             ChakraProvider
+│       │   │                                             QueryClientProvider
+│       │   │                                             AuthProvider
+│       │   │                                             CalendarProvider
+│       │   │                                             ReactQueryDevtools
+│       │   │
+│       │   └── main.jsx                              ✅ BrowserRouter lives here ONLY
+│       │
+│       ├── supabase/                                 ✅ Edge Functions
+│       │   └── functions/
+│       │       └── create-employee-user/
+│       │           ├── index.ts                      ⚠️ 401 PENDING FIX (Phase 5)
+│       │           │                                     creates Supabase Auth user
+│       │           │                                     called from EmployeeMasterForm
+│       │           │                                     needs verify_jwt = false OR
+│       │           │                                     service_role key in Authorization
+│       │           └── config.toml                   ⚠️ PENDING — add verify_jwt = false
+│       │
+│       ├── .env.local                                ✅ 2 vars only
+│       │                                                 VITE_SUPABASE_URL
+│       │                                                 VITE_SUPABASE_ANON_KEY
+│       ├── package.json                              ✅ @auth0/auth0-react REMOVED
+│       ├── vite.config.js                            ✅ Chakra + @ alias optimized
+│       └── tailwind.config.js
+│
+├── packages/
+│   ├── ui/                                           ⏳ Shared components (future)
+│   └── shared/                                       ⏳ Types + utils (future)
+│
+└── README.md                                         ✅ Updated through Phase 4
