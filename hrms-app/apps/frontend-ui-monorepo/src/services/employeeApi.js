@@ -1,6 +1,7 @@
 // src/services/employeeApi.js
 import { supabase } from "@/lib/supabaseClient";
 
+
 export async function getEmployees({ filterType, filterValue } = {}) {
   let query = supabase
     .from("employees")
@@ -18,9 +19,10 @@ export async function getEmployees({ filterType, filterValue } = {}) {
   }
 
   const { data, error } = await query;
-  if (error) throw error; 
+  if (error) throw error;
   return data;
 }
+
 
 export async function getEmployeeById(id) {
   const { data, error } = await supabase
@@ -32,6 +34,7 @@ export async function getEmployeeById(id) {
   return data;
 }
 
+
 export async function createEmployee(payload) {
   const { data, error } = await supabase
     .from("employees")
@@ -41,6 +44,7 @@ export async function createEmployee(payload) {
   if (error) throw error;
   return data;
 }
+
 
 export async function updateEmployee(id, updates) {
   const { data, error } = await supabase
@@ -53,104 +57,66 @@ export async function updateEmployee(id, updates) {
   return data;
 }
 
-// src/services/employeeApi.js → Your version + 2 improvements
+
 export async function deleteEmployee(id) {
-  const shortId = id.slice(0,8);
-  
+  const shortId = id.slice(0, 8);
+
   try {
-    // 1. Handle known child tables (ignore missing ones)
-    const childTables = ['performance_reviews']; // Add others as you find them
-    
+    const childTables = ["performance_reviews"];
+
     for (const table of childTables) {
-      try {
-        const { error } = await supabase
-          .from(table)
-          .delete()
-          .eq('employee_id', id);
-        
-        if (!error && import.meta.env.DEV) {  // ✅ Only log in dev
-          console.log(`✅ Cleared ${table}`);
-        }
-      } catch (e) {
-        // Table doesn't exist → skip silently
-      }
+      // eslint-disable-next-line no-await-in-loop
+      await supabase.from(table).delete().eq("employee_id", id);
+      // Errors (e.g. table not found) are intentionally ignored here
     }
-    
-    // 2. NULL FKs on employee itself
-    const { error: updateError } = await supabase  // ✅ Capture error
+
+    const { error: nullFkError } = await supabase
       .from("employees")
       .update({ branch_id: null, department_id: null })
       .eq("id", id);
-    
-    if (updateError && import.meta.env.DEV) {
-      console.warn(`⚠️ Update FKs failed:`, updateError.message);
+
+    if (nullFkError && import.meta.env.DEV) {
+      console.warn("⚠️ Update FKs failed:", nullFkError.message);
     }
-    
-    // 3. Delete
-    const { error } = await supabase
+
+    const { error: deleteError } = await supabase
       .from("employees")
       .delete()
       .eq("id", id);
-    
-    if (!error) {
-      if (import.meta.env.DEV) {
-        console.log(`✅ Employee ${shortId} deleted`);
-      }
-      return true;
+
+    if (deleteError) throw deleteError;
+
+    if (import.meta.env.DEV) {
+      console.log(`✅ Employee ${shortId} deleted`);
     }
-    
-    throw error;
+
+    return true;
   } catch (err) {
     console.error(`❌ Delete failed ${shortId}:`, err.message);
     throw err;
   }
 }
 
-// src/services/employeeApi.js
 
-// ✅ 3.1 Get full employee profile (JOIN all 4 tables)
+// ─────────────────────────────────────────────────────────────────────────────
+// 3.1  Get full employee profile (employees + 3 extension tables)
+// ─────────────────────────────────────────────────────────────────────────────
 export async function getEmployeeProfile(id) {
   try {
-    // Fetch all 4 tables in parallel
-    const [
-      { data: emp,        error: empError },
-      { data: compliance, error: compError },
-      { data: banking,    error: bankError },
-      { data: documents,  error: docsError },
-    ] = await Promise.all([
-      supabase
-        .from("employees")
-        .select("*")
-        .eq("id", id)
-        .single(),
-
-      supabase
-        .from("employee_compliance")
-        .select("*")
-        .eq("employee_id", id)
-        .maybeSingle(),
-
-      supabase
-        .from("employee_banking")
-        .select("*")
-        .eq("employee_id", id)
-        .maybeSingle(),
-
-      supabase
-        .from("employee_documents")
-        .select("*")
-        .eq("employee_id", id)
-        .maybeSingle(),
+    const [empResult, compResult, bankResult, docsResult] = await Promise.all([
+      supabase.from("employees").select("*").eq("id", id).single(),
+      supabase.from("employee_compliance").select("*").eq("employee_id", id).maybeSingle(),
+      supabase.from("employee_banking").select("*").eq("employee_id", id).maybeSingle(),
+      supabase.from("employee_documents").select("*").eq("employee_id", id).maybeSingle(),
     ]);
 
-    // Only employee is required, rest are optional
-    if (empError) throw empError;
+    if (empResult.error) throw empResult.error;
 
     return {
-      ...emp,
-      compliance: compliance || {},
-      banking:    banking    || {},
-      documents:  documents  || {},
+      ...empResult.data,
+      compliance: compResult.data  ?? {},
+      banking:    bankResult.data  ?? {},
+      documents:  docsResult.data  ?? {},
     };
   } catch (err) {
     console.error("getEmployeeProfile error:", err.message);
@@ -158,201 +124,270 @@ export async function getEmployeeProfile(id) {
   }
 }
 
-// ✅ 3.2 Create full employee profile (INSERT to all 4 tables)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3.2  Create full employee profile
+//
+//  payload shape:
+//  {
+//    auth:       { email, password },   ← creates Supabase auth user
+//    employee:   { name, email, … },    ← employees table  (NO role column)
+//    profile:    { role },              ← profiles table   (role lives here)
+//    compliance: { … },                 ← optional
+//    banking:    { … },                 ← optional
+//    documents:  { … },                 ← optional
+//  }
+// ─────────────────────────────────────────────────────────────────────────────
 export async function createEmployeeProfile(payload) {
-  const { employee, compliance, banking, documents } = payload;
+  const { auth: authPayload, employee, profile, compliance, banking, documents } = payload;
 
   try {
-    // 1. Insert core employee first (get ID)
+    // Step 1 — Create auth user & upsert profiles row
+    let authUserId = employee.auth_user_id ?? null;
+
+    if (authPayload?.email && authPayload?.password) {
+      const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+        email:         authPayload.email,
+        password:      authPayload.password,
+        email_confirm: true,
+      });
+      if (authError) throw authError;
+
+      authUserId = authData.user.id;
+
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .upsert(
+          {
+            id:                   authUserId,
+            role:                 profile?.role ?? "employee",
+            must_change_password: true,
+            ...(profile ?? {}),
+          },
+          { onConflict: "id" }
+        );
+
+      if (profileError && import.meta.env.DEV) {
+        console.warn("⚠️ profile upsert failed:", profileError.message);
+      }
+    }
+
+    // Step 2 — Build employees payload (strip role if caller included it by mistake)
+    const { role: _role, ...safeEmployee } = employee;
+    void _role; // intentionally unused — stripped to prevent schema error
+
     const { data: emp, error: empError } = await supabase
       .from("employees")
-      .insert(employee)
+      .insert({ ...safeEmployee, ...(authUserId ? { auth_user_id: authUserId } : {}) })
       .select()
       .single();
+
     if (empError) throw empError;
 
     const employee_id = emp.id;
 
-    // 2. Insert extensions in parallel (only if data exists)
-    const extensions = await Promise.all([
-
-      // Compliance
-      compliance ? supabase
-        .from("employee_compliance")
-        .insert({ ...compliance, employee_id })
-        .select().single()
+    // Step 3 — Insert extension rows in parallel
+    const [compResult, bankResult, docsResult] = await Promise.all([
+      compliance
+        ? supabase.from("employee_compliance").insert({ ...compliance, employee_id }).select().single()
         : Promise.resolve({ data: null, error: null }),
-
-      // Banking
-      banking ? supabase
-        .from("employee_banking")
-        .insert({ ...banking, employee_id })
-        .select().single()
+      banking
+        ? supabase.from("employee_banking").insert({ ...banking, employee_id }).select().single()
         : Promise.resolve({ data: null, error: null }),
-
-      // Documents
-      documents ? supabase
-        .from("employee_documents")
-        .insert({ ...documents, employee_id })
-        .select().single()
+      documents
+        ? supabase.from("employee_documents").insert({ ...documents, employee_id }).select().single()
         : Promise.resolve({ data: null, error: null }),
     ]);
 
-    // Check extension errors
-    extensions.forEach(({ error }, i) => {
-      const tables = ["compliance", "banking", "documents"];
-      if (error && import.meta.env.DEV) {
-        console.warn(`⚠️ ${tables[i]} insert failed:`, error.message);
-      }
-    });
-
     if (import.meta.env.DEV) {
-      console.log(`✅ Employee profile created: ${emp.name} (${emp.id.slice(0,8)})`);
+      if (compResult.error) console.warn("⚠️ compliance insert failed:", compResult.error.message);
+      if (bankResult.error) console.warn("⚠️ banking insert failed:",    bankResult.error.message);
+      if (docsResult.error) console.warn("⚠️ documents insert failed:",  docsResult.error.message);
+      console.log(`✅ Employee profile created: ${emp.name} (${emp.id.slice(0, 8)})`);
     }
 
     return {
       ...emp,
-      compliance: extensions[0].data || {},
-      banking:    extensions[1].data || {},
-      documents:  extensions[2].data || {},
+      compliance: compResult.data ?? {},
+      banking:    bankResult.data ?? {},
+      documents:  docsResult.data ?? {},
     };
-
   } catch (err) {
     console.error("createEmployeeProfile error:", err.message);
     throw err;
   }
 }
 
-// ✅ 3.3 Update full employee profile (UPSERT all 4 tables)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3.3  Update full employee profile
+//
+//  payload shape:
+//  {
+//    employee:   { name, email, … },  ← employees table  (NO role column)
+//    profile:    { role },            ← profiles table   (role lives here)
+//    compliance: { … },
+//    banking:    { … },
+//    documents:  { … },
+//  }
+// ─────────────────────────────────────────────────────────────────────────────
 export async function updateEmployeeProfile(id, payload) {
-  const { employee, compliance, banking, documents } = payload;
+  const { employee, profile, compliance, banking, documents } = payload;
 
   try {
     let emp = null;
 
-    // ✅ Only update employees table if payload provided
+    // Update employees table (strip role if accidentally included)
     if (employee && Object.keys(employee).length > 0) {
+      const { role: _role, ...safeEmployee } = employee;
+      void _role; // intentionally unused — stripped to prevent schema error
+
       const { data, error: empError } = await supabase
         .from("employees")
-        .update(employee)
+        .update(safeEmployee)
         .eq("id", id)
         .select()
         .single();
+
       if (empError) throw empError;
       emp = data;
     }
 
-    // UPSERT extensions in parallel (unchanged)
-    const extensions = await Promise.all([
-      compliance ? supabase
-        .from("employee_compliance")
-        .upsert({ ...compliance, employee_id: id }, { onConflict: "employee_id" })
-        .select().single()
-        : Promise.resolve({ data: null, error: null }),
+    // Update profiles table if role (or other profile fields) changed
+    if (profile && Object.keys(profile).length > 0) {
+      const { data: empRow } = await supabase
+        .from("employees")
+        .select("auth_user_id")
+        .eq("id", id)
+        .single();
 
-      banking ? supabase
-        .from("employee_banking")
-        .upsert({ ...banking, employee_id: id }, { onConflict: "employee_id" })
-        .select().single()
-        : Promise.resolve({ data: null, error: null }),
+      if (empRow?.auth_user_id) {
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update(profile)
+          .eq("id", empRow.auth_user_id);
 
-      documents ? supabase
-        .from("employee_documents")
-        .upsert({ ...documents, employee_id: id }, { onConflict: "employee_id" })
-        .select().single()
+        if (profileError && import.meta.env.DEV) {
+          console.warn("⚠️ profile update failed:", profileError.message);
+        }
+      }
+    }
+
+    // Upsert extension tables in parallel
+    const [compResult, bankResult, docsResult] = await Promise.all([
+      compliance
+        ? supabase
+            .from("employee_compliance")
+            .upsert({ ...compliance, employee_id: id }, { onConflict: "employee_id" })
+            .select()
+            .single()
+        : Promise.resolve({ data: null, error: null }),
+      banking
+        ? supabase
+            .from("employee_banking")
+            .upsert({ ...banking, employee_id: id }, { onConflict: "employee_id" })
+            .select()
+            .single()
+        : Promise.resolve({ data: null, error: null }),
+      documents
+        ? supabase
+            .from("employee_documents")
+            .upsert({ ...documents, employee_id: id }, { onConflict: "employee_id" })
+            .select()
+            .single()
         : Promise.resolve({ data: null, error: null }),
     ]);
 
-    extensions.forEach(({ error }, i) => {
-      const tables = ["compliance", "banking", "documents"];
-      if (error && import.meta.env.DEV) {
-        console.warn(`⚠️ ${tables[i]} upsert failed:`, error.message);
-      }
-    });
-
     if (import.meta.env.DEV) {
+      if (compResult.error) console.warn("⚠️ compliance upsert failed:", compResult.error.message);
+      if (bankResult.error) console.warn("⚠️ banking upsert failed:",    bankResult.error.message);
+      if (docsResult.error) console.warn("⚠️ documents upsert failed:",  docsResult.error.message);
       console.log(`✅ Employee profile updated: (${id.slice(0, 8)})`);
     }
 
     return {
-      ...(emp || { id }),
-      compliance: extensions[0].data || {},
-      banking:    extensions[1].data || {},
-      documents:  extensions[2].data || {},
+      ...(emp ?? { id }),
+      compliance: compResult.data ?? {},
+      banking:    bankResult.data ?? {},
+      documents:  docsResult.data ?? {},
     };
-
   } catch (err) {
     console.error("updateEmployeeProfile error:", err.message);
     throw err;
   }
 }
 
-// ✅ 3.4 Upload file to Supabase Storage → return public URL
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3.4  Upload file to Supabase Storage → returns public URL
+// ─────────────────────────────────────────────────────────────────────────────
 export async function uploadFile(bucket, file, employeeId) {
   try {
-    // Unique file path: employeeId/timestamp-filename
     const fileExt  = file.name.split(".").pop();
     const fileName = `${employeeId}/${Date.now()}.${fileExt}`;
 
-    // 1. Upload to bucket
     const { error: uploadError } = await supabase.storage
       .from(bucket)
-      .upload(fileName, file, {
-        cacheControl: "3600",
-        upsert: true, // overwrite if exists
-      });
+      .upload(fileName, file, { cacheControl: "3600", upsert: true });
 
     if (uploadError) throw uploadError;
 
-    // 2. Get public URL
-    const { data } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(fileName);
+    const { data } = supabase.storage.from(bucket).getPublicUrl(fileName);
 
     if (import.meta.env.DEV) {
       console.log(`✅ Uploaded to ${bucket}: ${data.publicUrl}`);
     }
 
     return data.publicUrl;
-
   } catch (err) {
     console.error(`❌ Upload failed (${bucket}):`, err.message);
     throw err;
   }
 }
 
-// ✅ 3.4b Delete file from Supabase Storage
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3.4b  Delete a single file from Supabase Storage
+// ─────────────────────────────────────────────────────────────────────────────
 export async function deleteFile(bucket, fileUrl) {
   try {
-    // Extract file path from URL
     const path = fileUrl.split(`${bucket}/`)[1];
     if (!path) return;
 
-    const { error } = await supabase.storage
-      .from(bucket)
-      .remove([path]);
+    const { error } = await supabase.storage.from(bucket).remove([path]);
 
     if (error && import.meta.env.DEV) {
       console.warn(`⚠️ Delete file failed (${bucket}):`, error.message);
     }
   } catch (err) {
-    console.error(`❌ Delete file error:`, err.message);
+    console.error("❌ Delete file error:", err.message);
   }
 }
 
-// ✅ 3.5 Delete full employee profile (all 4 tables + storage files)
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 3.5  Delete full employee profile
+//      (extension rows + storage files + employee row + auth user)
+// ─────────────────────────────────────────────────────────────────────────────
 export async function deleteEmployeeProfile(id) {
   const shortId = id.slice(0, 8);
 
   try {
-    // 1. Fetch documents row first → get file URLs before deletion
-    const { data: documents } = await supabase
-      .from("employee_documents")
-      .select("photo_url, gov_id_proof, employment_docs, offer_letter, signature_url")
-      .eq("employee_id", id)
-      .maybeSingle();
+    // Fetch data we need before any deletes
+    const [{ data: docsRow }, { data: empRow }] = await Promise.all([
+      supabase
+        .from("employee_documents")
+        .select("photo_url, gov_id_proof, employment_docs, offer_letter, signature_url")
+        .eq("employee_id", id)
+        .maybeSingle(),
+      supabase
+        .from("employees")
+        .select("auth_user_id")
+        .eq("id", id)
+        .single(),
+    ]);
 
-    // 2. Delete all extension table rows in parallel
+    // Delete extension rows in parallel (cascade would handle this too, but explicit is safer)
     const [compResult, bankResult, docsResult] = await Promise.all([
       supabase.from("employee_compliance").delete().eq("employee_id", id),
       supabase.from("employee_banking").delete().eq("employee_id", id),
@@ -365,22 +400,22 @@ export async function deleteEmployeeProfile(id) {
       if (docsResult.error) console.warn("⚠️ documents delete:",  docsResult.error.message);
     }
 
-    // 3. Delete storage files (best-effort, non-blocking)
-    if (documents) {
+    // Delete storage files (best-effort — never blocks the main flow)
+    if (docsRow) {
       const filesToDelete = [
-        { bucket: "employee-photos",     url: documents.photo_url },
-        { bucket: "employee-docs",        url: documents.gov_id_proof },
-        { bucket: "employee-docs",        url: documents.employment_docs },
-        { bucket: "employee-docs",        url: documents.offer_letter },
-        { bucket: "employee-signatures",  url: documents.signature_url },
-      ].filter(f => f.url); // skip nulls/empty
+        { bucket: "employee-photos",     url: docsRow.photo_url },
+        { bucket: "employee-docs",       url: docsRow.gov_id_proof },
+        { bucket: "employee-docs",       url: docsRow.employment_docs },
+        { bucket: "employee-docs",       url: docsRow.offer_letter },
+        { bucket: "employee-signatures", url: docsRow.signature_url },
+      ].filter((f) => f.url);
 
       await Promise.allSettled(
         filesToDelete.map(({ bucket, url }) => deleteFile(bucket, url))
       );
     }
 
-    // 4. NULL FKs then delete core employee
+    // NULL out FKs then delete the core employee row
     await supabase
       .from("employees")
       .update({ branch_id: null, department_id: null })
@@ -393,12 +428,21 @@ export async function deleteEmployeeProfile(id) {
 
     if (deleteError) throw deleteError;
 
+    // Delete the auth user (requires service-role key; silently skipped otherwise)
+    if (empRow?.auth_user_id) {
+      const { error: authDeleteError } = await supabase.auth.admin.deleteUser(
+        empRow.auth_user_id
+      );
+      if (authDeleteError && import.meta.env.DEV) {
+        console.warn("⚠️ auth user delete failed:", authDeleteError.message);
+      }
+    }
+
     if (import.meta.env.DEV) {
       console.log(`✅ Full profile deleted: ${shortId}`);
     }
 
     return true;
-
   } catch (err) {
     console.error(`❌ deleteEmployeeProfile failed (${shortId}):`, err.message);
     throw err;
