@@ -27,7 +27,7 @@ import { MdOutlineShield } from "react-icons/md";
 import { useParams, useNavigate } from "react-router-dom";
 import { useEmployeeProfile } from "@/hooks/useEmployeeProfile";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
-import { useRole } from "@/hooks/useRole";
+// import { useRole } from "@/hooks/useRole";
 
 const Card = ({ children, title, icon }) => (
   <Box
@@ -68,7 +68,7 @@ const Row = ({ label, value }) => (
 export default function EmployeeProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { isHR, isManager, isEmployee, role } = useRole();
+  // const { isHR, isManager, isEmployee, role } = useRole();
 
   const { data, isLoading, isError, error } = useEmployeeProfile(id);
 
