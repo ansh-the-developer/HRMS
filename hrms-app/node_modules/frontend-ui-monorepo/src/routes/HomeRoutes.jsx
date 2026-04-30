@@ -1,5 +1,8 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom"; // ✅ added Routes
+import { Routes, Route, Navigate } from "react-router-dom";
+
+// Role guard
+import RoleRoute from "@/components/RoleRoute";
 
 // Home
 import HomePage from "@/features/home/homePage";
@@ -56,88 +59,338 @@ import CompanyDetailsPage from "@/features/settings/pages/CompanyDetailsPage";
 import PermissionsManagerPage from "@/features/settings/pages/PermissionsManagerPage";
 
 const HomeRoutes = () => (
-  // ✅ Own <Routes> — matches absolute paths independently
-  // ✅ No individual ProtectedRoute needed — AppRoutes wraps all of HomeRoutes
   <Routes>
-    {/* ── Default redirect ──────────────────────── */}
+    {/* Default */}
     <Route index element={<Navigate to="/home" replace />} />
 
-    {/* ── Home ──────────────────────────────────── */}
+    {/* Home - all authenticated roles */}
     <Route path="/home" element={<HomePage />} />
 
-    {/* ── Employee ──────────────────────────────── */}
-    <Route path="/employees" element={<EmployeeListPage />} />
+    {/* Employee - HR + Manager */}
+    <Route
+      path="/employees"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <EmployeeListPage />
+        </RoleRoute>
+      }
+    />
     <Route
       path="/employees/departments"
-      element={<EmployeeDepartmentsPage />}
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <EmployeeDepartmentsPage />
+        </RoleRoute>
+      }
     />
-    <Route path="/employees/branches" element={<EmployeeBranchesPage />} />
+    <Route
+      path="/employees/branches"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <EmployeeBranchesPage />
+        </RoleRoute>
+      }
+    />
     <Route
       path="/employees/designations"
-      element={<EmployeeDesignationsPage />}
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <EmployeeDesignationsPage />
+        </RoleRoute>
+      }
     />
-    <Route path="/employees/statuses" element={<EmployeeStatusesPage />} />
-    <Route path="/employees/types" element={<EmployeeTypesPage />} />
-    <Route path="/employees/export" element={<EmployeeExportPage />} />
-    <Route path="/employees/:id" element={<EmployeeProfilePage />} />
+    <Route
+      path="/employees/statuses"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <EmployeeStatusesPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/employees/types"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <EmployeeTypesPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/employees/export"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <EmployeeExportPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/employees/:id"
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <EmployeeProfilePage />
+        </RoleRoute>
+      }
+    />
 
-    {/* ── Attendance ────────────────────────────── */}
-    <Route path="/attendance" element={<AttendanceDashboardPage />} />
-    <Route path="/attendance/working-days" element={<WorkingDaysPage />} />
+    {/* Attendance - all roles for now */}
+    <Route
+      path="/attendance"
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <AttendanceDashboardPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/attendance/working-days"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <WorkingDaysPage />
+        </RoleRoute>
+      }
+    />
     <Route
       path="/attendance/working-days/edit"
-      element={<EditWorkingDaysPage />}
+      element={
+        <RoleRoute allow={["hr"]}>
+          <EditWorkingDaysPage />
+        </RoleRoute>
+      }
     />
-    <Route path="/attendance/working-hours" element={<WorkingHoursPage />} />
-    <Route path="/attendance/working-rules" element={<WorkingRulesPage />} />
+    <Route
+      path="/attendance/working-hours"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <WorkingHoursPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/attendance/working-rules"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <WorkingRulesPage />
+        </RoleRoute>
+      }
+    />
     <Route
       path="/attendance/working-rules/edit"
-      element={<EditWorkingRulePage />}
+      element={
+        <RoleRoute allow={["hr"]}>
+          <EditWorkingRulePage />
+        </RoleRoute>
+      }
     />
-    <Route path="/attendance/edit" element={<EditAttendancePage />} />
-    <Route path="/attendance/export" element={<AttendanceExportPage />} />
+    <Route
+      path="/attendance/edit"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <EditAttendancePage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/attendance/export"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <AttendanceExportPage />
+        </RoleRoute>
+      }
+    />
 
-    {/* ── Leaves ────────────────────────────────── */}
-    <Route path="/leaves" element={<LeavesDashboardPage />} />
-    <Route path="/leaves/required-form" element={<LeaveRequiredFormPage />} />
-    <Route path="/leaves/request-upload" element={<LeaveRequestUploadPage />} />
-    <Route path="/leaves/submit-status" element={<LeaveSubmitStatusPage />} />
-    <Route path="/leaves/requests" element={<LeaveRequestListPage />} />
-    <Route path="/leaves/requests/:id" element={<LeaveRequestActionPage />} />
-    <Route path="/leaves/rules" element={<LeaveRulesPage />} />
+    {/* Leaves - all can access some, action pages restricted */}
+    <Route
+      path="/leaves"
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <LeavesDashboardPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/leaves/required-form"
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <LeaveRequiredFormPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/leaves/request-upload"
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <LeaveRequestUploadPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/leaves/submit-status"
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <LeaveSubmitStatusPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/leaves/requests"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <LeaveRequestListPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/leaves/requests/:id"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <LeaveRequestActionPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/leaves/rules"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <LeaveRulesPage />
+        </RoleRoute>
+      }
+    />
     <Route
       path="/leaves/rules/approval-flow"
-      element={<LeaveRulesApprovalFlowPage />}
+      element={
+        <RoleRoute allow={["hr"]}>
+          <LeaveRulesApprovalFlowPage />
+        </RoleRoute>
+      }
     />
 
-    {/* ── Performance ───────────────────────────── */}
-    <Route path="/performance" element={<PerformanceDashboardPage />} />
-    <Route path="/performance/history" element={<PerformanceHistoryPage />} />
+    {/* Performance */}
+    <Route
+      path="/performance"
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <PerformanceDashboardPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/performance/history"
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <PerformanceHistoryPage />
+        </RoleRoute>
+      }
+    />
     <Route
       path="/performance/review/:id"
-      element={<PerformanceReviewDetailPage />}
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <PerformanceReviewDetailPage />
+        </RoleRoute>
+      }
     />
-    <Route path="/performance/new" element={<PerformanceNewReviewPage />} />
+    <Route
+      path="/performance/new"
+      element={
+        <RoleRoute allow={["hr", "manager"]}>
+          <PerformanceNewReviewPage />
+        </RoleRoute>
+      }
+    />
 
-    {/* ── Payroll ───────────────────────────────── */}
-    <Route path="/payroll" element={<PayrollDashboardPage />} />
+    {/* Payroll - HR + Employee, NO Manager */}
+    <Route
+      path="/payroll"
+      element={
+        <RoleRoute allow={["hr", "employee"]}>
+          <PayrollDashboardPage />
+        </RoleRoute>
+      }
+    />
     <Route
       path="/payroll/reimbursement"
-      element={<ReimbursementStatusPage />}
+      element={
+        <RoleRoute allow={["hr", "employee"]}>
+          <ReimbursementStatusPage />
+        </RoleRoute>
+      }
     />
-    <Route path="/payroll/structure" element={<SalaryStructurePage />} />
-    <Route path="/payroll/payslips" element={<PayrollSlipsPage />} />
-    <Route path="/payroll/record" element={<RecordPaymentPage />} />
-    <Route path="/payroll/pending" element={<PendingPaymentsPage />} />
-    <Route path="/payroll/overview" element={<PayrollOverviewPage />} />
+    <Route
+      path="/payroll/structure"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <SalaryStructurePage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/payroll/payslips"
+      element={
+        <RoleRoute allow={["hr", "employee"]}>
+          <PayrollSlipsPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/payroll/record"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <RecordPaymentPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/payroll/pending"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <PendingPaymentsPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/payroll/overview"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <PayrollOverviewPage />
+        </RoleRoute>
+      }
+    />
 
-    {/* ── Settings ──────────────────────────────── */}
-    <Route path="/settings" element={<SettingsDashboardPage />} />
-    <Route path="/settings/users/new" element={<UserManagementPage />} />
-    <Route path="/settings/company" element={<CompanyDetailsPage />} />
-    <Route path="/settings/permissions" element={<PermissionsManagerPage />} />
+    {/* Settings - HR only */}
+    <Route
+      path="/settings"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <SettingsDashboardPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/settings/users/new"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <UserManagementPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/settings/company"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <CompanyDetailsPage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/settings/permissions"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <PermissionsManagerPage />
+        </RoleRoute>
+      }
+    />
 
-    {/* ── Unknown protected path → home ─────────── */}
+    {/* Unknown protected path */}
     <Route path="*" element={<Navigate to="/home" replace />} />
   </Routes>
 );

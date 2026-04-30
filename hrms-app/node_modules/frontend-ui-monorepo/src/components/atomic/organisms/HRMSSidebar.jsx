@@ -20,15 +20,51 @@ import {
   FiChevronRight,
 } from "react-icons/fi";
 import Logo from "./../atoms/Logo";
+import { useRole } from "@/hooks/useRole";
 
 const navItems = [
-  { label: "Home", icon: FiHome, path: "/home" },
-  { label: "Employee", icon: FiUsers, path: "/employees" },
-  { label: "Attendance", icon: FiClock, path: "/attendance" },
-  { label: "Leaves", icon: FiClipboard, path: "/leaves" },
-  { label: "Performance", icon: FiTrendingUp, path: "/performance" },
-  { label: "Payroll", icon: FiDollarSign, path: "/payroll" },
-  { label: "Settings", icon: FiSettings, path: "/settings" },
+  {
+    label: "Home",
+    icon: FiHome,
+    path: "/home",
+    roles: ["hr", "manager", "employee"],
+  },
+  {
+    label: "Employee",
+    icon: FiUsers,
+    path: "/employees",
+    roles: ["hr", "manager"],
+  },
+  {
+    label: "Attendance",
+    icon: FiClock,
+    path: "/attendance",
+    roles: ["hr", "manager", "employee"],
+  },
+  {
+    label: "Leaves",
+    icon: FiClipboard,
+    path: "/leaves",
+    roles: ["hr", "manager", "employee"],
+  },
+  {
+    label: "Performance",
+    icon: FiTrendingUp,
+    path: "/performance",
+    roles: ["hr", "manager", "employee"],
+  },
+  {
+    label: "Payroll",
+    icon: FiDollarSign,
+    path: "/payroll",
+    roles: ["hr", "employee"],
+  },
+  {
+    label: "Settings",
+    icon: FiSettings,
+    path: "/settings",
+    roles: ["hr"],
+  },
 ];
 
 const HRMSSidebar = ({
@@ -37,6 +73,7 @@ const HRMSSidebar = ({
   onToggleCollapse,
 }) => {
   const location = useLocation();
+  const { role, isLoading } = useRole();
 
   const SIDEBAR_BG = "#307DC717";
   const SIDEBAR_BORDER = "#307DC730";
@@ -44,6 +81,8 @@ const HRMSSidebar = ({
   const iconColor = useColorModeValue("gray.600", "gray.300");
 
   const sidebarWidth = isCollapsed ? "80px" : "260px";
+
+  const visibleNavItems = navItems.filter((item) => item.roles.includes(role));
 
   return (
     <Box
@@ -102,31 +141,30 @@ const HRMSSidebar = ({
 
       {/* Navigation */}
       <VStack align="stretch" spacing={3}>
-        {navItems.map((item) => {
-          const isActive = location.pathname.startsWith(item.path);
+        {!isLoading &&
+          visibleNavItems.map((item) => {
+            const isActive = location.pathname.startsWith(item.path);
 
-          return (
-            <NavLink key={item.path} to={item.path} onClick={onItemClick}>
-              <Flex
-                align="center"
-                gap={isCollapsed ? 0 : 3}
-                justify={isCollapsed ? "center" : "flex-start"}
-                px={isCollapsed ? 0 : 4}
-                py={3}
-                borderRadius={isCollapsed ? "xl" : "0 12px 12px 0"}
-                bg={isActive ? bgActive : "transparent"}
-                color={isActive ? "purple.600" : "gray.700"}
-                fontWeight={isActive ? "semibold" : "medium"}
-                _hover={{ bg: "#307DC72E" }}
-              >
-                <Icon as={item.icon} boxSize={5} color={iconColor} />
-                {!isCollapsed && (
-                  <Text fontSize="md">{item.label}</Text>
-                )}
-              </Flex>
-            </NavLink>
-          );
-        })}
+            return (
+              <NavLink key={item.path} to={item.path} onClick={onItemClick}>
+                <Flex
+                  align="center"
+                  gap={isCollapsed ? 0 : 3}
+                  justify={isCollapsed ? "center" : "flex-start"}
+                  px={isCollapsed ? 0 : 4}
+                  py={3}
+                  borderRadius={isCollapsed ? "xl" : "0 12px 12px 0"}
+                  bg={isActive ? bgActive : "transparent"}
+                  color={isActive ? "purple.600" : "gray.700"}
+                  fontWeight={isActive ? "semibold" : "medium"}
+                  _hover={{ bg: "#307DC72E" }}
+                >
+                  <Icon as={item.icon} boxSize={5} color={iconColor} />
+                  {!isCollapsed && <Text fontSize="md">{item.label}</Text>}
+                </Flex>
+              </NavLink>
+            );
+          })}
       </VStack>
     </Box>
   );
