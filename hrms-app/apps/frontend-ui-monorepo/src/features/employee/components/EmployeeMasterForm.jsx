@@ -30,6 +30,7 @@ import {
   updateEmployeeProfile,
   uploadFile,
 } from "@/services/employeeApi";
+import { useRole } from "@/hooks/useRole";
 
 // ─────────────────────────────────────────────────────────
 // Sub-components
@@ -218,6 +219,7 @@ const INITIAL_FILES = {
 const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
   const toast = useToast();
   const queryClient = useQueryClient();
+  const { isHR } = useRole();
 
   const [form, setForm] = useState(INITIAL_FORM);
   const [ui, setUi] = useState(INITIAL_UI);
@@ -228,7 +230,6 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
 
   const isEditing = !!employee;
 
-  // ── helpers ──────────────────────────────────────────
   const setF = (field) => (e) =>
     setForm((p) => ({ ...p, [field]: e.target.value }));
   const setU = (field) => (e) =>
@@ -244,7 +245,6 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
     setSignPreview("");
   };
 
-  // ── populate form when modal opens ───────────────────
   useEffect(() => {
     if (!isOpen) return;
 
@@ -292,10 +292,8 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
     }
   }, [employee, isOpen]);
 
-  // ── photo preview — clean object URL on change ───────
   useEffect(() => {
     if (!files.photo_url) {
-      // no new file selected — show the existing remote URL (or nothing)
       setPhotoPreview(employee?.documents?.photo_url || "");
       return;
     }
@@ -306,7 +304,6 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
     return () => URL.revokeObjectURL(url);
   }, [files.photo_url]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── signature preview — same pattern ─────────────────
   useEffect(() => {
     if (!files.signature_url) {
       setSignPreview(employee?.documents?.signature_url || "");
@@ -319,8 +316,18 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
     return () => URL.revokeObjectURL(url);
   }, [files.signature_url]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── submit ────────────────────────────────────────────
   const handleSubmit = async () => {
+    if (!isHR) {
+      toast({
+        title: "Access denied",
+        description: "Only HR can create or edit employee records.",
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+      return;
+    }
+
     if (!form.name.trim()) {
       toast({
         title: "Full name is required",
@@ -329,6 +336,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
       });
       return;
     }
+
     if (!form.email.trim()) {
       toast({
         title: "Official email is required",
@@ -337,6 +345,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
       });
       return;
     }
+
     if (!isEditing && !ui.temp_password.trim()) {
       toast({
         title: "Temporary password is required",
@@ -347,6 +356,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
     }
 
     setIsPending(true);
+
     try {
       const employeePayload = {
         name: form.name.trim(),
@@ -362,7 +372,6 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
         emp_code: ui.emp_id || null,
         personal_number: ui.personal_number || null,
         present_address: ui.present_address || null,
-        role: ui.role || "employee",
       };
 
       const compliancePayload = {
@@ -404,14 +413,15 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               temp_password: ui.temp_password,
               role: ui.role,
             },
-          },
+          }
         );
 
         if (error) throw error;
 
         const authUserId = data?.user_id;
-        if (!authUserId)
+        if (!authUserId) {
           throw new Error("No user_id returned from create-employee-user");
+        }
 
         savedEmployee = await createEmployeeProfile({
           employee: { ...employeePayload, auth_user_id: authUserId },
@@ -423,7 +433,6 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
       const empId = savedEmployee?.id;
       if (!empId) throw new Error("Employee record did not return an id");
 
-      // ── file uploads (only if new files were picked) ──
       const govUrl = files.gov_id_proof
         ? await uploadFile("employee-docs", files.gov_id_proof, empId)
         : employee?.documents?.gov_id_proof || null;
@@ -460,7 +469,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
 
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       onSuccess?.();
-      onClose();
+      handleClose();
     } catch (err) {
       toast({
         title: "Error saving record",
@@ -480,9 +489,10 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
     onClose();
   };
 
-  // ─────────────────────────────────────────────────────
-  // Render
-  // ─────────────────────────────────────────────────────
+  if (!isHR) {
+    return null;
+  }
+
   return (
     <Modal
       isOpen={isOpen}
@@ -516,12 +526,12 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
             Compliance & Financial Management
           </Text>
         </ModalHeader>
+
         <ModalCloseButton top={5} right={6} />
         <Divider borderColor="gray.100" />
 
         <ModalBody px={8} py={6} overflowY="auto">
           <VStack spacing={8} align="stretch">
-            {/* ── PERSONAL IDENTITY (KYC) ── */}
             <Box>
               <SectionHeader title="Personal Identity (KYC)" />
               <Grid
@@ -537,6 +547,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     placeholder="John Doe"
                   />
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>DOB</FieldLabel>
                   <Input
@@ -546,6 +557,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     onChange={setF("birthdate")}
                   />
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>Marital Status</FieldLabel>
                   <Select
@@ -559,6 +571,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     <option>Widowed</option>
                   </Select>
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>Personal Number</FieldLabel>
                   <Input
@@ -568,6 +581,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     placeholder="+91 99999 00000"
                   />
                 </GridItem>
+
                 <GridItem colSpan={{ base: 1, md: 2 }}>
                   <FieldLabel>Present Address</FieldLabel>
                   <Input
@@ -580,7 +594,6 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               </Grid>
             </Box>
 
-            {/* ── CORPORATE IDENTITY ── */}
             <Box>
               <SectionHeader title="Corporate Identity" />
               <Grid
@@ -597,6 +610,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     placeholder="john@company.com"
                   />
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>EMP Type</FieldLabel>
                   <Select
@@ -611,6 +625,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     <option>Freelancer</option>
                   </Select>
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>Role</FieldLabel>
                   <Select {...iStyle} value={ui.role} onChange={setU("role")}>
@@ -619,6 +634,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     <option value="employee">Employee</option>
                   </Select>
                 </GridItem>
+
                 {!isEditing && (
                   <GridItem>
                     <FieldLabel>Temporary Password</FieldLabel>
@@ -631,6 +647,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     />
                   </GridItem>
                 )}
+
                 <GridItem>
                   <FieldLabel>Department</FieldLabel>
                   <Input
@@ -640,6 +657,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     placeholder="e.g. Engineering"
                   />
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>Designation</FieldLabel>
                   <Input
@@ -649,6 +667,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     placeholder="e.g. Developer"
                   />
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>Location</FieldLabel>
                   <Input
@@ -658,6 +677,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     placeholder="e.g. Delhi"
                   />
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>EMP ID</FieldLabel>
                   <Input
@@ -667,6 +687,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     placeholder="e.g. CA-1005"
                   />
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>Monthly CTC (₹)</FieldLabel>
                   <Input
@@ -677,6 +698,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     placeholder="e.g. 50000"
                   />
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>Blood Group</FieldLabel>
                   <Select
@@ -688,10 +710,11 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(
                       (bg) => (
                         <option key={bg}>{bg}</option>
-                      ),
+                      )
                     )}
                   </Select>
                 </GridItem>
+
                 <GridItem>
                   <FieldLabel>Emergency Contact</FieldLabel>
                   <Input
@@ -704,7 +727,6 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               </Grid>
             </Box>
 
-            {/* ── STATUTORY & COMPLIANCE ── */}
             <Box>
               <SectionHeader title="Statutory & Compliance" />
               <Grid
@@ -753,6 +775,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                   >
                     Primary Salary Account
                   </Text>
+
                   <VStack spacing={3}>
                     <Input
                       {...iStyle}
@@ -777,6 +800,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     </Grid>
                   </VStack>
                 </Box>
+
                 <Box
                   border="1px solid"
                   borderColor="gray.200"
@@ -793,6 +817,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                   >
                     Secondary (Reimbursements)
                   </Text>
+
                   <VStack spacing={3}>
                     <Input
                       {...iStyle}
@@ -820,7 +845,6 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               </Grid>
             </Box>
 
-            {/* ── VERIFICATION VAULT ── */}
             <Box bg="#182140" borderRadius="2xl" p={6}>
               <HStack spacing={3} mb={5}>
                 <MdOutlineShield size={22} color="#60A5FA" />
@@ -845,6 +869,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     (employee?.documents?.gov_id_proof ? "Uploaded ✓" : null)
                   }
                 />
+
                 <UploadBox
                   label="Employment Dossier"
                   hint="Click to upload • PDF recommended"
@@ -856,6 +881,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                     (employee?.documents?.employment_docs ? "Uploaded ✓" : null)
                   }
                 />
+
                 <UploadBox
                   label="Employee Photo"
                   hint="Click to upload • WEBP or JPG recommended"
@@ -865,6 +891,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
                   fileName={files.photo_url?.name}
                   previewUrl={photoPreview}
                 />
+
                 <UploadBox
                   label="Signature"
                   hint="Click to upload • PNG recommended"
@@ -920,6 +947,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
             >
               Discard Changes
             </Button>
+
             <HRMSButton
               onClick={handleSubmit}
               isLoading={isPending}
