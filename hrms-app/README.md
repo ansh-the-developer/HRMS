@@ -3378,3 +3378,248 @@ Database (snuqlfgzzxaemxfyklvv.supabase.co)
 ```
 
 ///////////////////////////////////////////////////////////////////
+
+---------14-05-2026--------------
+
+Phase 6 (Steps 1–3) — RBAC foundation completed. Added useRole and RoleRoute, wired route-level access control in HomeRoutes, filtered sidebar navigation by role, restricted employee list actions for non-HR users, and updated EmployeeProfilePage to support HR full view, manager limited view, and employee self-view logic.
+
+
+
+hrms-app/                                              ✅ TURBO MONOREPO
+├── netlify.toml                                       ✅ Deploy config (ROOT)
+├── package.json                                       ✅ Turbo orchestrator
+├── turbo.json                                         ✅ Build pipeline
+│
+├── apps/
+│   └── frontend-ui-monorepo/                          ✅ VITE 5.4.8 + CHAKRA v2 + RQ v5
+│       ├── public/
+│       │   ├── favicon.ico
+│       │   └── vite.svg
+│       │
+│       ├── src/
+│       │   │
+│       │   ├── lib/                                   ✅ Core utils
+│       │   │   ├── supabaseClient.js                  ✅ Supabase client (URL + ANON_KEY)
+│       │   │   ├── queryClient.js                     ✅ React Query v5 + DevTools
+│       │   │   └── totpUtils.js                       ✅ Native Web Crypto TOTP (RFC 6238)
+│       │   │
+│       │   ├── contexts/                              ✅ Split for Vite Fast Refresh fix
+│       │   │   ├── AuthContext.js                     ✅ createContext({}) only
+│       │   │   ├── AuthProvider.jsx                   ✅ session / user / isLoading
+│       │   │   │                                          isAuthenticated = !!session
+│       │   │   └── CalendarContext.jsx                ✅ Birthday ↔ Calendar sync
+│       │   │
+│       │   ├── hooks/                                 ✅ React custom hooks
+│       │   │   ├── index.js                           ✅ Barrel export
+│       │   │   ├── useAuth.js                         ✅ Full Supabase auth hook
+│       │   │   │                                          signIn / signOut (scope:local)
+│       │   │   │                                          forgotPassword / updatePassword
+│       │   │   │                                          enrollMFA / challengeMFA
+│       │   │   │                                          verifyMFA / getMFALevel
+│       │   │   │                                          getMFAFactors / listMFAFactors
+│       │   │   ├── useEmployees.js                    ✅ List + CRUD ops
+│       │   │   ├── useEmployeeProfile.js              ✅ Full profile fetch
+│       │   │   ├── useHome.js                         ✅ Dashboard data
+│       │   │   ├── useLeaves.js                       ✅ Leave requests
+│       │   │   ├── usePerformance.js                  ✅ Reviews data
+│       │   │   └── useRole.js                         ✅ NEW (Phase 6)
+│       │   │                                               reads profiles.role via Supabase
+│       │   │                                               returns role / isHR / isManager
+│       │   │                                               isEmployee / isLoading
+│       │   │
+│       │   ├── services/                              ✅ Supabase API layer + RQ hooks
+│       │   │   ├── employeeApi.js                     ✅ Full CRUD + file ops
+│       │   │   │                                          createEmployeeProfile()
+│       │   │   │                                          updateEmployeeProfile()
+│       │   │   │                                          uploadFile()
+│       │   │   ├── homeApi.js                         ✅ Notices + Birthdays
+│       │   │   ├── leaveApi.js                        ✅ Leave endpoints
+│       │   │   ├── performanceApi.js                  ✅ Review endpoints
+│       │   │   ├── profileApi.js                      ✅ getProfile / updateProfile
+│       │   │   └── useProfile.js                      ✅ profile / isLoading / error
+│       │   │                                               updateProfile / isUpdating / refetch
+│       │   │
+│       │   ├── components/
+│       │   │   ├── ProtectedRoute.jsx                 ✅ isLoading → Spinner
+│       │   │   │                                          isAuthenticated → children | /login
+│       │   │   │                                          named + default export
+│       │   │   │
+│       │   │   ├── RoleRoute.jsx                      ✅ NEW (Phase 6)
+│       │   │   │                                          allow={["hr","manager",...]}
+│       │   │   │                                          isLoading → Spinner
+│       │   │   │                                          unauthorized → Navigate /home
+│       │   │   │
+│       │   │   └── atomic/                            ✅ Atomic Design System
+│       │   │       ├── atoms/
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSButton.jsx
+│       │   │       │   ├── HRMSInput.jsx
+│       │   │       │   ├── Logo.jsx
+│       │   │       │   ├── SectionTitle.jsx
+│       │   │       │   ├── SidebarToggleButton.jsx
+│       │   │       │   └── StatusDot.jsx
+│       │   │       │
+│       │   │       ├── molecules/
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSCard.jsx
+│       │   │       │   ├── InfoRow.jsx
+│       │   │       │   ├── LegendItem.jsx
+│       │   │       │   ├── LogoutButton.jsx
+│       │   │       │   ├── EmployeeConfigItem.jsx
+│       │   │       │   ├── DepartmentListItem.jsx
+│       │   │       │   ├── EmployeeTableRow.jsx
+│       │   │       │   └── BirthdayListItem.jsx
+│       │   │       │
+│       │   │       ├── organisms/
+│       │   │       │   ├── HRMSSidebar.jsx            ✅ UPDATED (Phase 6)
+│       │   │       │   │                                  useRole() filters nav by role
+│       │   │       │   │                                  HR → all 7 items
+│       │   │       │   │                                  Manager → no Payroll, no Settings
+│       │   │       │   │                                  Employee → Home / Attendance / Leaves
+│       │   │       │   │                                               Performance / Payroll only
+│       │   │       │   ├── TopBar.jsx
+│       │   │       │   ├── UserProfileMenu.jsx
+│       │   │       │   ├── NoticeBoardCard.jsx
+│       │   │       │   ├── HolidaysCard.jsx
+│       │   │       │   ├── CompanyEventsCard.jsx
+│       │   │       │   ├── BirthdayTrackerCard.jsx
+│       │   │       │   ├── CalendarCard.jsx
+│       │   │       │   ├── EmployeeTable.jsx          ✅ UPDATED (Phase 6)
+│       │   │       │   │                                  isReadOnly prop support
+│       │   │       │   │                                  Modify/Delete cols hidden for
+│       │   │       │   │                                  non-HR roles
+│       │   │       │   │                                  DeleteEmployeeModal guarded
+│       │   │       │   ├── EmployeeConfigCard.jsx     ⚠️ DEPRECATED
+│       │   │       │   └── AttendanceConfigCard.jsx
+│       │   │       │
+│       │   │       └── templates/
+│       │   │           └── DashboardLayout.jsx
+│       │   │
+│       │   ├── features/
+│       │   │   │
+│       │   │   ├── auth/
+│       │   │   │   └── pages/
+│       │   │   │       ├── LoginPage.jsx
+│       │   │   │       ├── ChangePasswordPage.jsx
+│       │   │   │       ├── MFAEnrollPage.jsx
+│       │   │   │       ├── TwoFactorPage.jsx
+│       │   │   │       ├── ForgotPasswordPage.jsx
+│       │   │   │       ├── ResetPasswordPage.jsx
+│       │   │   │       ├── VerifyEmailPage.jsx
+│       │   │   │       └── PasswordChangedPage.jsx
+│       │   │   │
+│       │   │   ├── home/
+│       │   │   │   └── pages/
+│       │   │   │       └── HomePage.jsx
+│       │   │   │
+│       │   │   ├── employee/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── EmployeeMasterForm.jsx     ✅ Create/Edit modal (Phase 4/5)
+│       │   │   │   │   │                                  ⚠️ Edge Fn 401 pending (Phase 6)
+│       │   │   │   │   ├── EmployeeProfilePage.jsx    ✅ UPDATED (Phase 6 Step 3)
+│       │   │   │   │   │                                  HR → full profile view
+│       │   │   │   │   │                                  Manager → limited view-only
+│       │   │   │   │   │                                  Employee → self-view logic ready
+│       │   │   │   │   │                                  sensitive sections restricted
+│       │   │   │   │   └── DeleteEmployeeModal.jsx
+│       │   │   │   │
+│       │   │   │   └── pages/
+│       │   │   │       ├── EmployeeListPage.jsx       ✅ UPDATED (Phase 6 Step 2)
+│       │   │   │       │                                  HR only → Add New Record button
+│       │   │   │       │                                  HR only → edit/delete actions
+│       │   │   │       │                                  Manager → view-only badge shown
+│       │   │   │       │                                  isReadOnly passed to EmployeeTable
+│       │   │   │       ├── EmployeeDepartmentsPage.jsx
+│       │   │   │       ├── EmployeeBranchesPage.jsx
+│       │   │   │       ├── EmployeeDesignationsPage.jsx
+│       │   │   │       ├── EmployeeStatusesPage.jsx
+│       │   │   │       ├── EmployeeTypesPage.jsx
+│       │   │   │       └── EmployeeExportPage.jsx
+│       │   │   │
+│       │   │   ├── attendance/
+│       │   │   │   ├── pages/
+│       │   │   │   │   ├── AttendanceDashboardPage.jsx
+│       │   │   │   │   ├── WorkingDaysPage.jsx
+│       │   │   │   │   ├── WorkingHoursPage.jsx
+│       │   │   │   │   ├── WorkingRulesPage.jsx
+│       │   │   │   │   ├── EditWorkingRulePage.jsx
+│       │   │   │   │   ├── EditAttendancePage.jsx
+│       │   │   │   │   ├── EditWorkingDaysPage.jsx
+│       │   │   │   │   └── AttendanceExportPage.jsx
+│       │   │   │   └── constants/
+│       │   │   │       └── attendanceMockData.js
+│       │   │   │
+│       │   │   ├── leaves/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── LeaveRequestForm.jsx
+│       │   │   │   │   └── LeaveUploadOverlay.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── LeavesDashboardPage.jsx
+│       │   │   │       ├── LeaveRequiredFormPage.jsx
+│       │   │   │       ├── LeaveRequestUploadPage.jsx
+│       │   │   │       ├── LeaveSubmitStatusPage.jsx
+│       │   │   │       ├── LeaveRequestListPage.jsx
+│       │   │   │       ├── LeaveRequestActionPage.jsx
+│       │   │   │       ├── LeaveRulesPage.jsx
+│       │   │   │       └── LeaveRulesApprovalFlowPage.jsx
+│       │   │   │
+│       │   │   ├── performance/
+│       │   │   │   └── pages/
+│       │   │   │       ├── PerformanceDashboardPage.jsx
+│       │   │   │       ├── PerformanceHistoryPage.jsx
+│       │   │   │       ├── PerformanceReviewDetailPage.jsx
+│       │   │   │       └── PerformanceNewReviewPage.jsx
+│       │   │   │
+│       │   │   ├── payroll/
+│       │   │   │   ├── constants/
+│       │   │   │   │   └── payrollMockData.js
+│       │   │   │   └── pages/
+│       │   │   │       ├── PayrollDashboardPage.jsx
+│       │   │   │       ├── PendingPaymentsPage.jsx
+│       │   │   │       ├── RecordPaymentPage.jsx
+│       │   │   │       ├── SalaryStructurePage.jsx
+│       │   │   │       ├── ReimbursementStatusPage.jsx
+│       │   │   │       ├── PayrollSlipsPage.jsx
+│       │   │   │       └── PayrollOverviewPage.jsx
+│       │   │   │
+│       │   │   └── settings/
+│       │   │       └── pages/
+│       │   │           ├── SettingsDashboardPage.jsx
+│       │   │           ├── UserManagementPage.jsx
+│       │   │           ├── CompanyDetailsPage.jsx
+│       │   │           └── PermissionsManagerPage.jsx
+│       │   │
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx                      ✅ Auth + protected split
+│       │   │   ├── AuthRoutes.jsx                     ✅ All 8 auth pages
+│       │   │   └── HomeRoutes.jsx                     ✅ UPDATED (Phase 6 Step 1)
+│       │   │                                               every route wrapped in RoleRoute
+│       │   │                                               HR / Manager / Employee access
+│       │   │                                               defined per route via allow={[]}
+│       │   │                                               Settings → HR only
+│       │   │                                               Payroll admin → HR only
+│       │   │                                               Employee config → HR + Manager
+│       │   │
+│       │   ├── assets/
+│       │   │   └── loginPagePic.jpg
+│       │   │
+│       │   ├── App.jsx                                 ✅ Provider stack
+│       │   └── main.jsx                                ✅ BrowserRouter lives here ONLY
+│       │
+│       ├── supabase/
+│       │   └── functions/
+│       │       └── create-employee-user/
+│       │           ├── index.ts                        ⚠️ 401 PENDING FIX (Phase 6)
+│       │           └── config.toml                     ⚠️ PENDING — verify_jwt = false
+│       │
+│       ├── .env.local                                  ✅ VITE_SUPABASE_URL
+│       │                                                  VITE_SUPABASE_ANON_KEY
+│       ├── package.json
+│       ├── vite.config.js
+│       └── tailwind.config.js
+│
+├── packages/
+│   ├── ui/                                            ⏳ Shared components (future)
+│   └── shared/                                        ⏳ Types + utils (future)
+│
+└── README.md                                          ✅ Updated through Phase 6 Step 3
