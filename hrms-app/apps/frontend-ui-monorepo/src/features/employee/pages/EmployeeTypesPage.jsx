@@ -1,16 +1,18 @@
 // src/features/employee/pages/EmployeeTypesPage.jsx
 import { useState } from "react";
-import { Box, Heading, Text, Input, SimpleGrid } from "@chakra-ui/react";
+import { Box, Heading, Text, SimpleGrid } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 import DepartmentListItem from "@/components/atomic/molecules/DepartmentListItem";
-
 import { EMPLOYEE_FILTER_TYPES } from "@shared/employeeFilters";
+import HRMSInput from "./../../../components/atomic/atoms/HRMSInput";
+import { useRole } from "@/hooks/useRole";
 
 const EmployeeTypesPage = () => {
   const navigate = useNavigate();
+  const { isHR } = useRole();
 
   const [typeName, setTypeName] = useState("");
   const [typeList, setTypeList] = useState([
@@ -23,9 +25,8 @@ const EmployeeTypesPage = () => {
   const [editingName, setEditingName] = useState(null);
   const [tempName, setTempName] = useState("");
 
-  /* ---------------- Handlers ---------------- */
-
   const handleAddType = () => {
+    if (!isHR) return;
     const value = typeName.trim();
     if (!value) return;
 
@@ -34,18 +35,18 @@ const EmployeeTypesPage = () => {
   };
 
   const handleDeleteType = (name) => {
+    if (!isHR) return;
     if (!window.confirm(`Delete employee type "${name}"?`)) return;
     setTypeList((prev) => prev.filter((t) => t.name !== name));
   };
 
   const handleSaveEdit = () => {
+    if (!isHR) return;
     const value = tempName.trim();
     if (!value) return;
 
     setTypeList((prev) =>
-      prev.map((t) =>
-        t.name === editingName ? { ...t, name: value } : t
-      )
+      prev.map((t) => (t.name === editingName ? { ...t, name: value } : t))
     );
 
     setEditingName(null);
@@ -61,38 +62,42 @@ const EmployeeTypesPage = () => {
     });
   };
 
-  /* ---------------- UI ---------------- */
-
   return (
     <DashboardLayout>
       <Box px={{ base: 4, md: 8 }} py={6}>
         <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={10}>
-          {/* Left section */}
           <Box>
             <Heading size="md" mb={4}>
               Employee Types
             </Heading>
 
-            <Box maxW="420px">
-              <Input
-                placeholder="Employee Type"
-                h="56px"
-                value={typeName}
-                onChange={(e) => setTypeName(e.target.value)}
-              />
-              <Box mt={4} display="flex" justifyContent="center">
-                <HRMSButton w="200px" h="50px" onClick={handleAddType}>
-                  Add
-                </HRMSButton>
+            {isHR && (
+              <Box maxW="420px">
+                <HRMSInput
+                  placeholder="Employee Type"
+                  h="56px"
+                  value={typeName}
+                  onChange={(e) => setTypeName(e.target.value)}
+                />
+                <Box mt={4} display="flex" justifyContent="center">
+                  <HRMSButton w="200px" h="50px" onClick={handleAddType}>
+                    Add
+                  </HRMSButton>
+                </Box>
               </Box>
-            </Box>
+            )}
 
             <Text fontSize="xs" color="gray.500" mt={3}>
               Define how employees are categorized for payroll and contracts.
             </Text>
+
+            {!isHR && (
+              <Text fontSize="sm" color="gray.500" mt={3}>
+                You have view-only access. Only HR can add, edit, or delete employee types.
+              </Text>
+            )}
           </Box>
 
-          {/* Right section */}
           <Box
             bg="white"
             borderRadius="lg"
@@ -105,24 +110,27 @@ const EmployeeTypesPage = () => {
                 key={t.name}
                 name={t.name}
                 onView={() => handleViewType(t.name)}
-                onEdit={() => {
-                  setEditingName(t.name);
-                  setTempName(t.name);
-                }}
-                onDelete={() => handleDeleteType(t.name)}
+                onEdit={
+                  isHR
+                    ? () => {
+                        setEditingName(t.name);
+                        setTempName(t.name);
+                      }
+                    : undefined
+                }
+                onDelete={isHR ? () => handleDeleteType(t.name) : undefined}
               />
             ))}
           </Box>
         </SimpleGrid>
 
-        {/* Inline edit */}
-        {editingName && (
+        {isHR && editingName && (
           <Box mt={10}>
             <Text fontWeight="semibold" mb={2}>
               Rename Employee Type
             </Text>
             <Box maxW="420px">
-              <Input
+              <HRMSInput
                 h="56px"
                 value={tempName}
                 onChange={(e) => setTempName(e.target.value)}
