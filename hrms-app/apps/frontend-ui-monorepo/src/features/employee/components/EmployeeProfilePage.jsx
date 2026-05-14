@@ -24,10 +24,11 @@ import {
   FiFileText,
 } from "react-icons/fi";
 import { MdOutlineShield } from "react-icons/md";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useEmployeeProfile } from "@/hooks/useEmployeeProfile";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
-// import { useRole } from "@/hooks/useRole";
+import { useRole } from "@/hooks/useRole";
+import { useAuth } from "@/hooks/useAuth";
 
 const Card = ({ children, title, icon }) => (
   <Box
@@ -56,7 +57,12 @@ const Row = ({ label, value }) => (
     borderBottom="1px solid"
     borderColor="gray.100"
   >
-    <Text fontSize="xs" color="gray.500" textTransform="uppercase" letterSpacing="wider">
+    <Text
+      fontSize="xs"
+      color="gray.500"
+      textTransform="uppercase"
+      letterSpacing="wider"
+    >
       {label}
     </Text>
     <Text fontSize="sm" color="gray.800" textAlign="right" maxW="60%">
@@ -68,7 +74,8 @@ const Row = ({ label, value }) => (
 export default function EmployeeProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  // const { isHR, isManager, isEmployee, role } = useRole();
+  const { isHR, isManager, isEmployee } = useRole();
+  const { user } = useAuth();
 
   const { data, isLoading, isError, error } = useEmployeeProfile(id);
 
@@ -96,11 +103,23 @@ export default function EmployeeProfilePage() {
   }
 
   const employee = data || {};
+  const isOwnProfile =
+    !!user?.id &&
+    !!employee?.auth_user_id &&
+    String(user.id) === String(employee.auth_user_id);
+
+  const canViewProfile = isHR || isManager || (isEmployee && isOwnProfile);
+  const canViewSensitiveSections = isHR || isOwnProfile;
+  const canOpenDocuments = isHR || isOwnProfile;
+
+  if (!canViewProfile) {
+    return <Navigate to="/employees" replace />;
+  }
 
   return (
     <DashboardLayout>
       <Box px={{ base: 4, md: 8 }} py={6} bg="gray.50" minH="100vh">
-        <Flex justify="space-between" align="center" mb={6}>
+        <Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={3}>
           <Button
             leftIcon={<FiArrowLeft />}
             variant="ghost"
@@ -110,17 +129,57 @@ export default function EmployeeProfilePage() {
           >
             Back to Employees
           </Button>
-          <Badge
-            colorScheme="purple"
-            px={3}
-            py={1}
-            borderRadius="full"
-            fontSize="xs"
-            fontWeight="bold"
-          >
-            Employee Profile
-          </Badge>
+
+          <HStack spacing={2} wrap="wrap">
+            {isHR && (
+              <Badge
+                colorScheme="purple"
+                px={3}
+                py={1}
+                borderRadius="full"
+                fontSize="xs"
+                fontWeight="bold"
+              >
+                HR Access
+              </Badge>
+            )}
+
+            {isManager && !isHR && (
+              <Badge
+                colorScheme="blue"
+                px={3}
+                py={1}
+                borderRadius="full"
+                fontSize="xs"
+                fontWeight="bold"
+              >
+                Manager View
+              </Badge>
+            )}
+
+            {isEmployee && isOwnProfile && !isHR && (
+              <Badge
+                colorScheme="green"
+                px={3}
+                py={1}
+                borderRadius="full"
+                fontSize="xs"
+                fontWeight="bold"
+              >
+                My Profile
+              </Badge>
+            )}
+          </HStack>
         </Flex>
+
+        {!isHR && (
+          <Alert status="info" borderRadius="xl" mb={6}>
+            <AlertIcon />
+            {isManager
+              ? "You have view-only access to this employee profile."
+              : "You can only view your own employee profile."}
+          </Alert>
+        )}
 
         <Box
           bg="white"
@@ -141,7 +200,7 @@ export default function EmployeeProfilePage() {
               <Heading size="lg" color="gray.900">
                 {employee.name || "Unnamed Employee"}
               </Heading>
-              <HStack spacing={1} mt={1} mb={3}>
+              <HStack spacing={1} mt={1} mb={3} wrap="wrap">
                 <Badge colorScheme="purple" variant="subtle" fontSize="xs">
                   {employee.designation || "—"}
                 </Badge>
@@ -191,52 +250,108 @@ export default function EmployeeProfilePage() {
             <Row
               label="Monthly CTC"
               value={
-                employee.monthly_ctc
+                canViewSensitiveSections && employee.monthly_ctc
                   ? `₹${Number(employee.monthly_ctc).toLocaleString("en-IN")}`
-                  : ""
+                  : canViewSensitiveSections
+                    ? "—"
+                    : "Restricted"
               }
             />
           </Card>
 
           <Card title="Statutory & Compliance" icon={<MdOutlineShield color="#7C3AED" />}>
-            <Row label="EPFO UAN" value={employee.compliance?.epfo_uan} />
-            <Row label="PRAN" value={employee.compliance?.pran} />
-            <Row label="ESIC IP" value={employee.compliance?.esic_ip} />
-            <Row label="PAN" value={employee.compliance?.pan} />
-            <Row label="E-SHRAM UAN" value={employee.compliance?.e_shram_uan} />
+            <Row
+              label="EPFO UAN"
+              value={
+                canViewSensitiveSections
+                  ? employee.compliance?.epfo_uan
+                  : "Restricted"
+              }
+            />
+            <Row
+              label="PRAN"
+              value={
+                canViewSensitiveSections ? employee.compliance?.pran : "Restricted"
+              }
+            />
+            <Row
+              label="ESIC IP"
+              value={
+                canViewSensitiveSections
+                  ? employee.compliance?.esic_ip
+                  : "Restricted"
+              }
+            />
+            <Row
+              label="PAN"
+              value={
+                canViewSensitiveSections ? employee.compliance?.pan : "Restricted"
+              }
+            />
+            <Row
+              label="E-SHRAM UAN"
+              value={
+                canViewSensitiveSections
+                  ? employee.compliance?.e_shram_uan
+                  : "Restricted"
+              }
+            />
           </Card>
 
           <Card title="Banking Details" icon={<MdOutlineShield color="#7C3AED" />}>
-            <Text
-              fontSize="xs"
-              fontWeight="bold"
-              color="purple.500"
-              textTransform="uppercase"
-              letterSpacing="wider"
-              mb={2}
-            >
-              Primary Salary Account
-            </Text>
-            <Row label="Bank Name" value={employee.banking?.primary_bank?.bank_name} />
-            <Row label="Account Number" value={employee.banking?.primary_bank?.account_number} />
-            <Row label="IFSC" value={employee.banking?.primary_bank?.ifsc_code} />
-            <Divider my={4} />
-            <Text
-              fontSize="xs"
-              fontWeight="bold"
-              color="gray.500"
-              textTransform="uppercase"
-              letterSpacing="wider"
-              mb={2}
-            >
-              Secondary (Reimbursements)
-            </Text>
-            <Row label="Bank Name" value={employee.banking?.secondary_bank?.bank_name} />
-            <Row
-              label="Account Number"
-              value={employee.banking?.secondary_bank?.account_number}
-            />
-            <Row label="IFSC" value={employee.banking?.secondary_bank?.ifsc_code} />
+            {canViewSensitiveSections ? (
+              <>
+                <Text
+                  fontSize="xs"
+                  fontWeight="bold"
+                  color="purple.500"
+                  textTransform="uppercase"
+                  letterSpacing="wider"
+                  mb={2}
+                >
+                  Primary Salary Account
+                </Text>
+                <Row
+                  label="Bank Name"
+                  value={employee.banking?.primary_bank?.bank_name}
+                />
+                <Row
+                  label="Account Number"
+                  value={employee.banking?.primary_bank?.account_number}
+                />
+                <Row
+                  label="IFSC"
+                  value={employee.banking?.primary_bank?.ifsc_code}
+                />
+                <Divider my={4} />
+                <Text
+                  fontSize="xs"
+                  fontWeight="bold"
+                  color="gray.500"
+                  textTransform="uppercase"
+                  letterSpacing="wider"
+                  mb={2}
+                >
+                  Secondary (Reimbursements)
+                </Text>
+                <Row
+                  label="Bank Name"
+                  value={employee.banking?.secondary_bank?.bank_name}
+                />
+                <Row
+                  label="Account Number"
+                  value={employee.banking?.secondary_bank?.account_number}
+                />
+                <Row
+                  label="IFSC"
+                  value={employee.banking?.secondary_bank?.ifsc_code}
+                />
+              </>
+            ) : (
+              <Text fontSize="sm" color="gray.500">
+                Banking details are restricted to HR and the employee who owns this profile.
+              </Text>
+            )}
           </Card>
 
           <Box
@@ -254,129 +369,136 @@ export default function EmployeeProfilePage() {
               </Text>
             </HStack>
 
-            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-              <VStack align="start" spacing={4}>
-                {employee.documents?.photo_url ? (
-                  <Box>
-                    <Text
-                      fontSize="xs"
-                      color="whiteAlpha.600"
-                      textTransform="uppercase"
-                      letterSpacing="wider"
-                      mb={2}
-                    >
-                      Employee Photo
-                    </Text>
-                    <Box
-                      as="img"
-                      src={employee.documents.photo_url}
-                      alt="Employee"
-                      h="120px"
-                      w="120px"
-                      objectFit="cover"
-                      borderRadius="xl"
-                    />
-                  </Box>
-                ) : (
-                  <Text fontSize="sm" color="whiteAlpha.400">
-                    No photo uploaded
-                  </Text>
-                )}
-
-                {employee.documents?.signature_url ? (
-                  <Box>
-                    <Text
-                      fontSize="xs"
-                      color="whiteAlpha.600"
-                      textTransform="uppercase"
-                      letterSpacing="wider"
-                      mb={2}
-                    >
-                      Signature
-                    </Text>
-                    <Box
-                      as="img"
-                      src={employee.documents.signature_url}
-                      alt="Signature"
-                      h="60px"
-                      w="180px"
-                      objectFit="contain"
-                      borderRadius="lg"
-                      bg="whiteAlpha.100"
-                      p={2}
-                    />
-                  </Box>
-                ) : (
-                  <Text fontSize="sm" color="whiteAlpha.400">
-                    No signature uploaded
-                  </Text>
-                )}
-              </VStack>
-
-              <Box>
-                <Text
-                  fontSize="xs"
-                  color="whiteAlpha.600"
-                  textTransform="uppercase"
-                  letterSpacing="wider"
-                  mb={3}
-                >
-                  Documents
-                </Text>
-                <VStack align="stretch" spacing={0}>
-                  <HStack
-                    justify="space-between"
-                    py={3}
-                    borderBottom="1px solid"
-                    borderColor="whiteAlpha.100"
-                  >
-                    <Text fontSize="sm" color="whiteAlpha.800">
-                      Government Docs
-                    </Text>
-                    {employee.documents?.gov_id_proof ? (
-                      <Link
-                        href={employee.documents.gov_id_proof}
-                        isExternal
-                        color="blue.300"
-                        fontSize="sm"
-                        fontWeight="semibold"
+            {canViewSensitiveSections ? (
+              <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+                <VStack align="start" spacing={4}>
+                  {employee.documents?.photo_url ? (
+                    <Box>
+                      <Text
+                        fontSize="xs"
+                        color="whiteAlpha.600"
+                        textTransform="uppercase"
+                        letterSpacing="wider"
+                        mb={2}
                       >
-                        Open ↗
-                      </Link>
-                    ) : (
-                      <Text fontSize="sm" color="whiteAlpha.300">
-                        Not uploaded
+                        Employee Photo
                       </Text>
-                    )}
-                  </HStack>
-                  <HStack
-                    justify="space-between"
-                    py={3}
-                    borderBottom="1px solid"
-                    borderColor="whiteAlpha.100"
-                  >
-                    <Text fontSize="sm" color="whiteAlpha.800">
-                      Employment Dossier
+                      <Box
+                        as="img"
+                        src={employee.documents.photo_url}
+                        alt="Employee"
+                        h="120px"
+                        w="120px"
+                        objectFit="cover"
+                        borderRadius="xl"
+                      />
+                    </Box>
+                  ) : (
+                    <Text fontSize="sm" color="whiteAlpha.400">
+                      No photo uploaded
                     </Text>
-                    {employee.documents?.employment_docs ? (
-                      <Link
-                        href={employee.documents.employment_docs}
-                        isExternal
-                        color="blue.300"
-                        fontSize="sm"
-                        fontWeight="semibold"
+                  )}
+
+                  {employee.documents?.signature_url ? (
+                    <Box>
+                      <Text
+                        fontSize="xs"
+                        color="whiteAlpha.600"
+                        textTransform="uppercase"
+                        letterSpacing="wider"
+                        mb={2}
                       >
-                        Open ↗
-                      </Link>
-                    ) : (
-                      <Text fontSize="sm" color="whiteAlpha.300">
-                        Not uploaded
+                        Signature
                       </Text>
-                    )}
-                  </HStack>
+                      <Box
+                        as="img"
+                        src={employee.documents.signature_url}
+                        alt="Signature"
+                        h="60px"
+                        w="180px"
+                        objectFit="contain"
+                        borderRadius="lg"
+                        bg="whiteAlpha.100"
+                        p={2}
+                      />
+                    </Box>
+                  ) : (
+                    <Text fontSize="sm" color="whiteAlpha.400">
+                      No signature uploaded
+                    </Text>
+                  )}
                 </VStack>
-              </Box>
-            </SimpleGrid>
+
+                <Box>
+                  <Text
+                    fontSize="xs"
+                    color="whiteAlpha.600"
+                    textTransform="uppercase"
+                    letterSpacing="wider"
+                    mb={3}
+                  >
+                    Documents
+                  </Text>
+                  <VStack align="stretch" spacing={0}>
+                    <HStack
+                      justify="space-between"
+                      py={3}
+                      borderBottom="1px solid"
+                      borderColor="whiteAlpha.100"
+                    >
+                      <Text fontSize="sm" color="whiteAlpha.800">
+                        Government Docs
+                      </Text>
+                      {employee.documents?.gov_id_proof && canOpenDocuments ? (
+                        <Link
+                          href={employee.documents.gov_id_proof}
+                          isExternal
+                          color="blue.300"
+                          fontSize="sm"
+                          fontWeight="semibold"
+                        >
+                          Open ↗
+                        </Link>
+                      ) : (
+                        <Text fontSize="sm" color="whiteAlpha.300">
+                          Not available
+                        </Text>
+                      )}
+                    </HStack>
+
+                    <HStack
+                      justify="space-between"
+                      py={3}
+                      borderBottom="1px solid"
+                      borderColor="whiteAlpha.100"
+                    >
+                      <Text fontSize="sm" color="whiteAlpha.800">
+                        Employment Dossier
+                      </Text>
+                      {employee.documents?.employment_docs && canOpenDocuments ? (
+                        <Link
+                          href={employee.documents.employment_docs}
+                          isExternal
+                          color="blue.300"
+                          fontSize="sm"
+                          fontWeight="semibold"
+                        >
+                          Open ↗
+                        </Link>
+                      ) : (
+                        <Text fontSize="sm" color="whiteAlpha.300">
+                          Not available
+                        </Text>
+                      )}
+                    </HStack>
+                  </VStack>
+                </Box>
+              </SimpleGrid>
+            ) : (
+              <Text fontSize="sm" color="whiteAlpha.700">
+                Verification documents are restricted to HR and the employee who owns this profile.
+              </Text>
+            )}
           </Box>
         </SimpleGrid>
       </Box>

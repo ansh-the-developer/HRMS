@@ -3377,3 +3377,4 @@ Database (snuqlfgzzxaemxfyklvv.supabase.co)
         └── trg_prevent_unauthorized_profile_role_change  ✅ BEFORE UPDATE on profiles
 ```
 
+///////////////////////////////////////////////////////////////////
