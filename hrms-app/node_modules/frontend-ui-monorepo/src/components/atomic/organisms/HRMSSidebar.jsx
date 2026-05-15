@@ -18,11 +18,13 @@ import {
   FiSettings,
   FiChevronLeft,
   FiChevronRight,
+  FiUser,
 } from "react-icons/fi";
 import Logo from "./../atoms/Logo";
 import { useRole } from "@/hooks/useRole";
+import { useAuth } from "@/hooks/useAuth";
 
-const navItems = [
+const baseNavItems = [
   {
     label: "Home",
     icon: FiHome,
@@ -74,6 +76,7 @@ const HRMSSidebar = ({
 }) => {
   const location = useLocation();
   const { role, isLoading } = useRole();
+  const { user } = useAuth();
 
   const SIDEBAR_BG = "#307DC717";
   const SIDEBAR_BORDER = "#307DC730";
@@ -82,7 +85,29 @@ const HRMSSidebar = ({
 
   const sidebarWidth = isCollapsed ? "80px" : "260px";
 
+  const navItems = [
+    ...baseNavItems,
+    ...(role === "employee" && user?.id
+      ? [
+          {
+            label: "My Profile",
+            icon: FiUser,
+            path: `/employees/${user.id}`,
+            roles: ["employee"],
+            exact: true,
+          },
+        ]
+      : []),
+  ];
+
   const visibleNavItems = navItems.filter((item) => item.roles.includes(role));
+
+  const isItemActive = (itemPath, exact = false) => {
+    if (exact) {
+      return location.pathname === itemPath;
+    }
+    return location.pathname === itemPath || location.pathname.startsWith(`${itemPath}/`);
+  };
 
   return (
     <Box
@@ -100,7 +125,6 @@ const HRMSSidebar = ({
       overflowY="auto"
       zIndex={1000}
     >
-      {/* Logo + collapse toggle */}
       <Box
         mb={10}
         display="flex"
@@ -139,11 +163,10 @@ const HRMSSidebar = ({
         />
       </Box>
 
-      {/* Navigation */}
       <VStack align="stretch" spacing={3}>
         {!isLoading &&
           visibleNavItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.path);
+            const isActive = isItemActive(item.path, item.exact);
 
             return (
               <NavLink key={item.path} to={item.path} onClick={onItemClick}>
@@ -159,7 +182,7 @@ const HRMSSidebar = ({
                   fontWeight={isActive ? "semibold" : "medium"}
                   _hover={{ bg: "#307DC72E" }}
                 >
-                  <Icon as={item.icon} boxSize={5} color={iconColor} />
+                  <Icon as={item.icon} boxSize={5} color={isActive ? "purple.600" : iconColor} />
                   {!isCollapsed && <Text fontSize="md">{item.label}</Text>}
                 </Flex>
               </NavLink>
