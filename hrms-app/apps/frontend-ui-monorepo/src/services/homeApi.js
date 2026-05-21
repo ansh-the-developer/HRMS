@@ -1,7 +1,10 @@
+
 // src/services/homeApi.js
 import { supabase } from "@/lib/supabaseClient";
 
+
 /* ---------- NOTICES (Notice Board) ---------- */
+
 
 export async function getNotices() {
   const { data, error } = await supabase
@@ -25,7 +28,31 @@ export async function createNotice(payload) {
   return data;
 }
 
+export async function updateNotice(id, updates) {
+  const { data, error } = await supabase
+    .from("notices")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .maybeSingle();   // ← was .single()
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteNotice(id) {
+  const { error } = await supabase
+    .from("notices")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw error;
+  return { success: true };
+}
+
+
 /* ---------- HOLIDAYS ---------- */
+
 
 export async function getHolidays() {
   const { data, error } = await supabase
@@ -48,7 +75,31 @@ export async function createHoliday(payload) {
   return data;
 }
 
+export async function updateHoliday(id, updates) {
+  const { data, error } = await supabase
+    .from("holidays")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .maybeSingle();          // ← same fix
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteHoliday(id) {
+  const { error } = await supabase
+    .from("holidays")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw error;
+  return { success: true };
+}
+
+
 /* ---------- COMPANY EVENTS ---------- */
+
 
 export async function getEvents() {
   const { data, error } = await supabase
@@ -71,9 +122,32 @@ export async function createEvent(payload) {
   return data;
 }
 
+export async function updateEvent(id, updates) {
+  const { data, error } = await supabase
+    .from("events")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .maybeSingle();          // ← same fix
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteEvent(id) {
+  const { error } = await supabase
+    .from("events")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw error;
+  return { success: true };
+}
+
+
 /* ---------- BIRTHDAYS + EMPLOYEE LINK ---------- */
 
-// Get birthdays for a specific date (YYYY-MM-DD), with employee info if linked
+
 export async function getBirthdaysByDate(date) {
   const { data, error } = await supabase
     .from("birthdays")
