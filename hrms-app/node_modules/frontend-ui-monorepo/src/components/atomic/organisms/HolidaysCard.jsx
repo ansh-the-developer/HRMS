@@ -24,8 +24,13 @@ import InfoRow from "@/components/atomic/molecules/InfoRow";
 import LegendItem from "@/components/atomic/molecules/LegendItem";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { getHolidays, createHoliday } from "@/services/homeApi";
-import { supabase } from "@/lib/supabaseClient";
+import {
+  getHolidays,
+  createHoliday,
+  updateHoliday,
+  deleteHoliday,
+} from "@/services/homeApi";
+import { useRole } from "@/hooks/useRole";
 
 const HolidaysCard = () => {
   const toast = useToast();
@@ -35,6 +40,7 @@ const HolidaysCard = () => {
   const [date, setDate] = useState("");
   const [name, setName] = useState("");
   const [type, setType] = useState("Public");
+  const { isHR, isLoading: isRoleLoading } = useRole();
 
   const { data: holidays = [], isLoading } = useQuery({
     queryKey: ["holidays"],
@@ -44,20 +50,13 @@ const HolidaysCard = () => {
   const saveMutation = useMutation({
     mutationFn: async (payload) => {
       if (payload.id) {
-        const { data, error } = await supabase
-          .from("holidays")
-          .update({
-            name: payload.name,
-            date: payload.date,
-            type: payload.type,
-          })
-          .eq("id", payload.id)
-          .select()
-          .single();
-        if (error) throw error;
-        return data;
+        return updateHoliday(payload.id, {
+          name: payload.name,
+          date: payload.date,
+          type: payload.type,
+        });
       }
-      return await createHoliday({
+      return createHoliday({
         name: payload.name,
         date: payload.date,
         type: payload.type,
@@ -86,13 +85,7 @@ const HolidaysCard = () => {
   });
 
   const deleteMutation = useMutation({
-    mutationFn: async (id) => {
-      const { error } = await supabase
-        .from("holidays")
-        .delete()
-        .eq("id", id);
-      if (error) throw error;
-    },
+    mutationFn: (id) => deleteHoliday(id),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["holidays"] });
       toast({
@@ -114,12 +107,14 @@ const HolidaysCard = () => {
   });
 
   const openCreateModal = () => {
+    if (!isHR) return;
     resetForm();
     setEditingHoliday(null);
     onOpen();
   };
 
   const openEditModal = (holiday) => {
+    if (!isHR) return;
     setEditingHoliday(holiday);
     setName(holiday.name || "");
     setDate(holiday.date || "");
@@ -136,6 +131,8 @@ const HolidaysCard = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!isHR) return;
+
     if (!name || !date) {
       toast({
         title: "Please fill name and date",
@@ -154,11 +151,12 @@ const HolidaysCard = () => {
   };
 
   const handleDelete = (holiday) => {
+    if (!isHR) return;
     if (!window.confirm(`Delete holiday "${holiday.name}"?`)) return;
     deleteMutation.mutate(holiday.id);
   };
 
-  if (isLoading) {
+  if (isLoading || isRoleLoading) {
     return (
       <HRMSCard>
         <SectionTitle>Holidays</SectionTitle>
@@ -179,9 +177,11 @@ const HolidaysCard = () => {
       <HRMSCard>
         <Flex justify="space-between" align="center" mb={4}>
           <SectionTitle>Holidays</SectionTitle>
-          <HRMSButton withPlusIcon onClick={openCreateModal}>
-            Add New Holiday
-          </HRMSButton>
+          {isHR && (
+            <HRMSButton withPlusIcon onClick={openCreateModal}>
+              Add New Holiday
+            </HRMSButton>
+          )}
         </Flex>
 
         <Box mb={4}>
@@ -190,9 +190,11 @@ const HolidaysCard = () => {
               <Text fontSize="sm" color="gray.500">
                 No holidays yet
               </Text>
-              <Text fontSize="xs" color="gray.400" mt={1}>
-                Add your first holiday above
-              </Text>
+              {isHR && (
+                <Text fontSize="xs" color="gray.400" mt={1}>
+                  Add your first holiday above
+                </Text>
+              )}
             </Box>
           ) : (
             <VStack align="stretch" spacing={2}>
@@ -209,26 +211,28 @@ const HolidaysCard = () => {
                     right={holiday.name}
                     status={holiday.type?.toLowerCase() || "upcoming"}
                   />
-                  {/* ✅ Text buttons instead of IconButtons */}
-                  <VStack spacing={1} align="flex-end" flexShrink={0}>
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      colorScheme="blue"
-                      onClick={() => openEditModal(holiday)}
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      size="xs"
-                      variant="ghost"
-                      colorScheme="red"
-                      onClick={() => handleDelete(holiday)}
-                      isLoading={deleteMutation.isPending}
-                    >
-                      Delete
-                    </Button>
-                  </VStack>
+
+                  {isHR && (
+                    <VStack spacing={1} align="flex-end" flexShrink={0}>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        colorScheme="blue"
+                        onClick={() => openEditModal(holiday)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        colorScheme="red"
+                        onClick={() => handleDelete(holiday)}
+                        isLoading={deleteMutation.isPending}
+                      >
+                        Delete
+                      </Button>
+                    </VStack>
+                  )}
                 </Flex>
               ))}
             </VStack>
@@ -242,65 +246,67 @@ const HolidaysCard = () => {
         </HStack>
       </HRMSCard>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="md">
-        <form onSubmit={handleSubmit}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>
-              {editingHoliday ? "Edit Holiday" : "Add New Holiday"}
-            </ModalHeader>
-            <ModalBody>
-              <VStack spacing={4}>
-                <Input
-                  placeholder="Holiday name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+      {isHR && (
+        <Modal isOpen={isOpen} onClose={onClose} size="md">
+          <form onSubmit={handleSubmit}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>
+                {editingHoliday ? "Edit Holiday" : "Add New Holiday"}
+              </ModalHeader>
+              <ModalBody>
+                <VStack spacing={4}>
+                  <Input
+                    placeholder="Holiday name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    size="sm"
+                    required
+                  />
+                  <Input
+                    type="date"
+                    placeholder="Select date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    size="sm"
+                    required
+                  />
+                  <Select
+                    value={type}
+                    onChange={(e) => setType(e.target.value)}
+                    size="sm"
+                  >
+                    <option value="Public">Public Holiday</option>
+                    <option value="Company">Company Holiday</option>
+                    <option value="Optional">Optional Holiday</option>
+                  </Select>
+                </VStack>
+              </ModalBody>
+              <ModalFooter>
+                <Button
                   size="sm"
-                  required
-                />
-                <Input
-                  type="date"
-                  placeholder="Select date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  size="sm"
-                  required
-                />
-                <Select
-                  value={type}
-                  onChange={(e) => setType(e.target.value)}
-                  size="sm"
+                  mr={3}
+                  onClick={() => {
+                    onClose();
+                    resetForm();
+                  }}
+                  variant="ghost"
                 >
-                  <option value="Public">Public Holiday</option>
-                  <option value="Company">Company Holiday</option>
-                  <option value="Optional">Optional Holiday</option>
-                </Select>
-              </VStack>
-            </ModalBody>
-            <ModalFooter>
-              <Button
-                size="sm"
-                mr={3}
-                onClick={() => {
-                  onClose();
-                  resetForm();
-                }}
-                variant="ghost"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                colorScheme="blue"
-                isLoading={saveMutation.isPending}
-              >
-                {editingHoliday ? "Save changes" : "Add Holiday"}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  colorScheme="blue"
+                  isLoading={saveMutation.isPending}
+                >
+                  {editingHoliday ? "Save changes" : "Add Holiday"}
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </form>
+        </Modal>
+      )}
     </>
   );
 };

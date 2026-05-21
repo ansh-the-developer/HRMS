@@ -12,8 +12,8 @@ import LegendItem from "@/components/atomic/molecules/LegendItem";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
+import { useRole } from "@/hooks/useRole";
 
-// ─── Helpers ──────────────────────────────────────────
 const getStatus = (dateStr) => {
   return new Date(dateStr) >= new Date() ? "upcoming" : "past";
 };
@@ -25,7 +25,6 @@ const formatDate = (dateStr) => {
   });
 };
 
-// ─── API ──────────────────────────────────────────────
 const getEvents = async () => {
   const { data, error } = await supabase
     .from("events")
@@ -44,6 +43,7 @@ const CompanyEventsCard = () => {
   const [date, setDate] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
+  const { isHR, isLoading: isRoleLoading } = useRole();
 
   const { data: events = [], isLoading } = useQuery({
     queryKey: ["events"],
@@ -53,7 +53,6 @@ const CompanyEventsCard = () => {
   const saveMutation = useMutation({
     mutationFn: async (payload) => {
       if (payload.id) {
-        // ✅ FIX: removed .select().single() → avoids 406
         const { error } = await supabase
           .from("events")
           .update({
@@ -65,7 +64,6 @@ const CompanyEventsCard = () => {
           .eq("id", payload.id);
         if (error) throw error;
       } else {
-        // ✅ insert still uses .select().single() — safe for inserts
         const { data, error } = await supabase
           .from("events")
           .insert({
@@ -87,21 +85,24 @@ const CompanyEventsCard = () => {
       onClose();
     },
     onError: (error) => {
-      toast({ title: "Failed to save", description: error.message, status: "error", duration: 5000, isClosable: true });
+      toast({
+        title: "Failed to save",
+        description: error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+      });
     },
   });
 
   const deleteMutation = useMutation({
     mutationFn: async (id) => {
-      // ✅ FIX: added .select() so supabase returns actual rows affected
-      // If RLS is blocking, this will now return an error instead of silent success
       const { error, data } = await supabase
         .from("events")
         .delete()
         .eq("id", id)
         .select();
       if (error) throw error;
-      // ✅ FIX: if RLS silently blocks → data is empty array → throw manually
       if (!data || data.length === 0) {
         throw new Error("Delete failed: row not found or permission denied.");
       }
@@ -121,9 +122,14 @@ const CompanyEventsCard = () => {
     },
   });
 
-  const openCreateModal = () => { resetForm(); onOpen(); };
+  const openCreateModal = () => {
+    if (!isHR) return;
+    resetForm();
+    onOpen();
+  };
 
   const openEditModal = (event) => {
+    if (!isHR) return;
     setEditingEvent(event);
     setTitle(event.title || "");
     setDate(event.date ? event.date.slice(0, 10) : "");
@@ -142,10 +148,13 @@ const CompanyEventsCard = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!isHR) return;
+
     if (!title || !date) {
       toast({ title: "Please fill title and date", status: "warning", duration: 3000 });
       return;
     }
+
     saveMutation.mutate({
       id: editingEvent?.id,
       title,
@@ -156,11 +165,12 @@ const CompanyEventsCard = () => {
   };
 
   const handleDelete = (event) => {
+    if (!isHR) return;
     if (!window.confirm(`Delete "${event.title}"?`)) return;
     deleteMutation.mutate(event.id);
   };
 
-  if (isLoading) {
+  if (isLoading || isRoleLoading) {
     return (
       <HRMSCard>
         <SectionTitle>Company Events</SectionTitle>
@@ -177,16 +187,22 @@ const CompanyEventsCard = () => {
       <HRMSCard>
         <Flex justify="space-between" align="center" mb={4}>
           <SectionTitle>Company Events</SectionTitle>
-          <HRMSButton withPlusIcon onClick={openCreateModal}>
-            Add an Event
-          </HRMSButton>
+          {isHR && (
+            <HRMSButton withPlusIcon onClick={openCreateModal}>
+              Add an Event
+            </HRMSButton>
+          )}
         </Flex>
 
         <Box mb={4}>
           {events.length === 0 ? (
             <VStack align="start" py={8} spacing={2}>
               <Text fontSize="sm" color="gray.500">No events yet</Text>
-              <Text fontSize="xs" color="gray.400">Click Add an Event to create one</Text>
+              {isHR && (
+                <Text fontSize="xs" color="gray.400">
+                  Click Add an Event to create one
+                </Text>
+              )}
             </VStack>
           ) : (
             <VStack align="stretch" spacing={0}>
@@ -199,17 +215,28 @@ const CompanyEventsCard = () => {
                       status={getStatus(e.date)}
                     />
                   </Box>
-                  <HStack spacing={1} flexShrink={0}>
-                    <Button size="xs" variant="ghost" colorScheme="blue"
-                      onClick={() => openEditModal(e)}>
-                      Edit
-                    </Button>
-                    <Button size="xs" variant="ghost" colorScheme="red"
-                      onClick={() => handleDelete(e)}
-                      isLoading={deleteMutation.isPending}>
-                      Delete
-                    </Button>
-                  </HStack>
+
+                  {isHR && (
+                    <HStack spacing={1} flexShrink={0}>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        colorScheme="blue"
+                        onClick={() => openEditModal(e)}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="xs"
+                        variant="ghost"
+                        colorScheme="red"
+                        onClick={() => handleDelete(e)}
+                        isLoading={deleteMutation.isPending}
+                      >
+                        Delete
+                      </Button>
+                    </HStack>
+                  )}
                 </Flex>
               ))}
             </VStack>
@@ -222,52 +249,68 @@ const CompanyEventsCard = () => {
         </HStack>
       </HRMSCard>
 
-      <Modal isOpen={isOpen} onClose={onClose} size="md">
-        <form onSubmit={handleSubmit}>
-          <ModalOverlay />
-          <ModalContent>
-            <ModalHeader>{editingEvent ? "Edit Event" : "Add New Event"}</ModalHeader>
-            <ModalBody>
-              <VStack spacing={4}>
-                <Input
-                  placeholder="Event title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  size="sm" required
-                />
-                <Input
-                  type="date"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  size="sm" required
-                />
-                <Input
-                  placeholder="Location (optional)"
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
+      {isHR && (
+        <Modal isOpen={isOpen} onClose={onClose} size="md">
+          <form onSubmit={handleSubmit}>
+            <ModalOverlay />
+            <ModalContent>
+              <ModalHeader>{editingEvent ? "Edit Event" : "Add New Event"}</ModalHeader>
+              <ModalBody>
+                <VStack spacing={4}>
+                  <Input
+                    placeholder="Event title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    size="sm"
+                    required
+                  />
+                  <Input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    size="sm"
+                    required
+                  />
+                  <Input
+                    placeholder="Location (optional)"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                    size="sm"
+                  />
+                  <Textarea
+                    placeholder="Description (optional)"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    size="sm"
+                    rows={3}
+                  />
+                </VStack>
+              </ModalBody>
+              <ModalFooter>
+                <Button
                   size="sm"
-                />
-                <Textarea
-                  placeholder="Description (optional)"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  size="sm" rows={3}
-                />
-              </VStack>
-            </ModalBody>
-            <ModalFooter>
-              <Button size="sm" mr={3} variant="ghost"
-                onClick={() => { onClose(); resetForm(); }}>
-                Cancel
-              </Button>
-              <Button type="submit" size="sm" colorScheme="blue"
-                isLoading={saveMutation.isPending}>
-                {editingEvent ? "Save changes" : "Add Event"}
-              </Button>
-            </ModalFooter>
-          </ModalContent>
-        </form>
-      </Modal>
+                  mr={3}
+                  variant="ghost"
+                  onClick={() => {
+                    onClose();
+                    resetForm();
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  colorScheme="blue"
+                  isLoading={saveMutation.isPending}
+                >
+                  {editingEvent ? "Save changes" : "Add Event"}
+                </Button>
+              </ModalFooter>
+            </ModalContent>
+          </form>
+        </Modal>
+      )}
     </>
   );
 };

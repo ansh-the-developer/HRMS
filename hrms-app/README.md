@@ -4163,3 +4163,9 @@ hrms-app/                                                     ✅ TURBO MONOREPO
 
 /////////////////////////////////////////
 /////////////////////////////////////////
+
+Bug 3,4,5 fixes :
+HR-only controls were added to the Notice, Holiday, and Company Events cards so managers/employees can no longer see Add/Edit/Delete/Unpin actions. The UI now follows the existing useRole() RBAC pattern, and the underlying notice/holiday/event save and delete flows continue to use the centralized home API logic.
+
+No new file was added for these fixes — they were all updates to existing files only: NoticeBoardCard.jsx, HolidaysCard.jsx, CompanyEventsCard.jsx, and the already-existing useRole.js hook.
+
