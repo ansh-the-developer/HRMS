@@ -3900,3 +3900,266 @@ Phase 6 Status: COMPLETE
 
 /////////////////////////////////////////////
 /////////////////////////////////////////////
+
+Bug 1 & 2 — Notice / Holiday / Event Edit & Delete (Fixed May 21, 2026)
+
+The UPDATE and DELETE RLS policies on notices, holidays, and events tables were scoped to to anon, but Supabase Auth sets role: authenticated in the JWT after login — so all write operations silently matched 0 rows and returned a false success toast. Fixed by dropping the old policies and recreating them as to authenticated. Additionally, updateNotice(), updateHoliday(), and updateEvent() in homeApi.js used .single() which throws a 406 on RETURNING edge cases — replaced with .maybeSingle(). NoticeBoardCard.jsx was also calling Supabase directly inside the component instead of delegating to homeApi.js, which was refactored. All three tables — notices, holidays, and events — now support full HR create, edit, and delete correctly.
+
+hrms-app/                                                     ✅ TURBO MONOREPO
+├── netlify.toml                                              ✅ Deploy config (ROOT)
+├── package.json                                              ✅ Turbo orchestrator
+├── turbo.json                                                ✅ Build pipeline
+│
+├── apps/
+│   └── frontend-ui-monorepo/                                 ✅ VITE 5.4.8 + CHAKRA v2 + RQ v5
+│       ├── public/
+│       │   ├── favicon.ico
+│       │   └── vite.svg
+│       │
+│       ├── src/
+│       │   │
+│       │   ├── lib/                                          ✅ Core utils
+│       │   │   ├── supabaseClient.js                         ✅ Supabase client (URL + ANON_KEY)
+│       │   │   ├── queryClient.js                            ✅ React Query v5 config
+│       │   │   └── totpUtils.js                              ✅ Native Web Crypto TOTP (RFC 6238)
+│       │   │
+│       │   ├── contexts/                                     ✅ Split for Vite Fast Refresh fix
+│       │   │   ├── AuthContext.js                            ✅ createContext({}) only
+│       │   │   ├── AuthProvider.jsx                          ✅ session / user / isLoading
+│       │   │   │                                                 isAuthenticated = !!session
+│       │   │   └── CalendarContext.jsx                       ✅ Birthday ↔ Calendar sync
+│       │   │
+│       │   ├── hooks/                                        ✅ React custom hooks
+│       │   │   ├── index.js                                  ✅ Barrel export
+│       │   │   ├── useAuth.js                                ✅ Full Supabase auth hook
+│       │   │   │                                                 signIn / signOut (scope:local)
+│       │   │   │                                                 forgotPassword / updatePassword
+│       │   │   │                                                 enrollMFA / challengeMFA
+│       │   │   │                                                 verifyMFA / getMFALevel
+│       │   │   │                                                 getMFAFactors / listMFAFactors
+│       │   │   ├── useEmployees.js                           ✅ List + CRUD ops
+│       │   │   ├── useEmployeeProfile.js                     ✅ Full profile fetch (4 tables)
+│       │   │   ├── useHome.js                                ✅ Dashboard data hook
+│       │   │   ├── useLeaves.js                              ✅ Leave requests
+│       │   │   ├── usePerformance.js                         ✅ Reviews data
+│       │   │   └── useRole.js                                ✅ Reads profiles.role via Supabase
+│       │   │                                                     returns: role / isHR / isManager
+│       │   │                                                     isEmployee / isLoading
+│       │   │
+│       │   ├── services/                                     ✅ Supabase API layer
+│       │   │   ├── employeeApi.js                            ✅ Full CRUD + file ops
+│       │   │   │                                                 getEmployees / getEmployeeById
+│       │   │   │                                                 createEmployee / updateEmployee
+│       │   │   │                                                 deleteEmployee (cascade)
+│       │   │   │                                                 getEmployeeProfile
+│       │   │   │                                                 createEmployeeProfile
+│       │   │   │                                                 updateEmployeeProfile (400 fix)
+│       │   │   │                                                 uploadFile / deleteFile
+│       │   │   │                                                 deleteEmployeeProfile
+│       │   │   ├── homeApi.js                                ✅ UPDATED — Bug 1 & 2 fixed
+│       │   │   │                                                 getNotices / createNotice
+│       │   │   │                                                 updateNotice ← .maybeSingle()
+│       │   │   │                                                 deleteNotice
+│       │   │   │                                                 getHolidays / createHoliday
+│       │   │   │                                                 updateHoliday ← .maybeSingle()
+│       │   │   │                                                 deleteHoliday
+│       │   │   │                                                 getEvents / createEvent
+│       │   │   │                                                 updateEvent ← .maybeSingle()
+│       │   │   │                                                 deleteEvent
+│       │   │   │                                                 getBirthdaysByDate / createBirthday
+│       │   │   ├── leaveApi.js                               ✅ Leave endpoints
+│       │   │   ├── performanceApi.js                         ✅ Review endpoints
+│       │   │   ├── profileApi.js                             ✅ getProfile / updateProfile
+│       │   │   └── useProfile.js                             ✅ profile / isLoading / error
+│       │   │                                                     updateProfile / isUpdating / refetch
+│       │   │
+│       │   ├── components/
+│       │   │   ├── ProtectedRoute.jsx                        ✅ isLoading → Spinner
+│       │   │   │                                                 isAuthenticated → children | /login
+│       │   │   │                                                 named + default export
+│       │   │   │
+│       │   │   ├── RoleRoute.jsx                             ✅ allow={["hr","manager",...]}
+│       │   │   │                                                 isLoading → Spinner
+│       │   │   │                                                 unauthorized → Navigate /home
+│       │   │   │
+│       │   │   └── atomic/                                   ✅ Atomic Design System
+│       │   │       ├── atoms/
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSButton.jsx
+│       │   │       │   ├── HRMSInput.jsx
+│       │   │       │   ├── Logo.jsx
+│       │   │       │   ├── SectionTitle.jsx
+│       │   │       │   ├── SidebarToggleButton.jsx
+│       │   │       │   └── StatusDot.jsx
+│       │   │       │
+│       │   │       ├── molecules/
+│       │   │       │   ├── index.js
+│       │   │       │   ├── HRMSCard.jsx
+│       │   │       │   ├── InfoRow.jsx
+│       │   │       │   ├── LegendItem.jsx
+│       │   │       │   ├── LogoutButton.jsx
+│       │   │       │   ├── EmployeeConfigItem.jsx
+│       │   │       │   ├── DepartmentListItem.jsx
+│       │   │       │   ├── EmployeeTableRow.jsx
+│       │   │       │   └── BirthdayListItem.jsx
+│       │   │       │
+│       │   │       ├── organisms/
+│       │   │       │   ├── HRMSSidebar.jsx                   ✅ useRole() filters nav by role
+│       │   │       │   │                                         HR → all 7 nav items
+│       │   │       │   │                                         Manager → no Payroll, no Settings
+│       │   │       │   │                                         Employee → Home / Attendance
+│       │   │       │   │                                                     Leaves / Performance
+│       │   │       │   │                                                     Payroll (own) only
+│       │   │       │   ├── TopBar.jsx
+│       │   │       │   ├── UserProfileMenu.jsx
+│       │   │       │   ├── NoticeBoardCard.jsx                ✅ UPDATED — Bug 1 fixed
+│       │   │       │   │                                         mutations delegate to homeApi.js
+│       │   │       │   │                                         no inline supabase calls
+│       │   │       │   │                                         ⏳ Bug 3: role-based UI pending
+│       │   │       │   ├── HolidaysCard.jsx                  ⏳ Bug 4: role-based UI pending
+│       │   │       │   ├── CompanyEventsCard.jsx              ⏳ Bug 5: role-based UI pending
+│       │   │       │   ├── BirthdayTrackerCard.jsx            ✅ React Query + month/day sync
+│       │   │       │   ├── CalendarCard.jsx                   ⏳ Bug 6: birthday icon fix pending
+│       │   │       │   ├── EmployeeTable.jsx                  ✅ isReadOnly prop support
+│       │   │       │   │                                         Modify/Delete cols hidden for
+│       │   │       │   │                                         non-HR roles
+│       │   │       │   │                                         DeleteEmployeeModal guarded
+│       │   │       │   ├── EmployeeConfigCard.jsx             ⚠️  DEPRECATED
+│       │   │       │   └── AttendanceConfigCard.jsx
+│       │   │       │
+│       │   │       └── templates/
+│       │   │           └── DashboardLayout.jsx
+│       │   │
+│       │   ├── features/
+│       │   │   │
+│       │   │   ├── auth/
+│       │   │   │   └── pages/
+│       │   │   │       ├── LoginPage.jsx
+│       │   │   │       ├── ChangePasswordPage.jsx
+│       │   │   │       ├── MFAEnrollPage.jsx
+│       │   │   │       ├── TwoFactorPage.jsx
+│       │   │   │       ├── ForgotPasswordPage.jsx
+│       │   │   │       ├── ResetPasswordPage.jsx
+│       │   │   │       ├── VerifyEmailPage.jsx
+│       │   │   │       └── PasswordChangedPage.jsx
+│       │   │   │
+│       │   │   ├── home/
+│       │   │   │   └── pages/
+│       │   │   │       └── HomePage.jsx
+│       │   │   │
+│       │   │   ├── employee/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── EmployeeMasterForm.jsx             ✅ Create/Edit modal
+│       │   │   │   │   │                                         4 sections: KYC / Corporate
+│       │   │   │   │   │                                         Compliance / Verification Vault
+│       │   │   │   │   │                                         File uploads + DB prefill
+│       │   │   │   │   │                                         Edge Function 401 fixed
+│       │   │   │   │   ├── EmployeeProfilePage.jsx            ✅ HR → full profile view
+│       │   │   │   │   │                                         Manager → limited view-only
+│       │   │   │   │   │                                         Employee → self-view ready
+│       │   │   │   │   │                                         Sensitive sections restricted
+│       │   │   │   │   └── DeleteEmployeeModal.jsx
+│       │   │   │   │
+│       │   │   │   └── pages/
+│       │   │   │       ├── EmployeeListPage.jsx               ✅ HR only → Add New Record
+│       │   │   │       │                                         HR only → edit/delete actions
+│       │   │   │       │                                         Manager → view-only badge
+│       │   │   │       │                                         isReadOnly → EmployeeTable
+│       │   │   │       ├── EmployeeDepartmentsPage.jsx
+│       │   │   │       ├── EmployeeBranchesPage.jsx
+│       │   │   │       ├── EmployeeDesignationsPage.jsx
+│       │   │   │       ├── EmployeeStatusesPage.jsx
+│       │   │   │       ├── EmployeeTypesPage.jsx
+│       │   │   │       └── EmployeeExportPage.jsx
+│       │   │   │
+│       │   │   ├── attendance/
+│       │   │   │   ├── pages/
+│       │   │   │   │   ├── AttendanceDashboardPage.jsx
+│       │   │   │   │   ├── WorkingDaysPage.jsx
+│       │   │   │   │   ├── WorkingHoursPage.jsx
+│       │   │   │   │   ├── WorkingRulesPage.jsx
+│       │   │   │   │   ├── EditWorkingRulePage.jsx
+│       │   │   │   │   ├── EditAttendancePage.jsx
+│       │   │   │   │   ├── EditWorkingDaysPage.jsx
+│       │   │   │   │   └── AttendanceExportPage.jsx
+│       │   │   │   └── constants/
+│       │   │   │       └── attendanceMockData.js
+│       │   │   │
+│       │   │   ├── leaves/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── LeaveRequestForm.jsx
+│       │   │   │   │   └── LeaveUploadOverlay.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── LeavesDashboardPage.jsx
+│       │   │   │       ├── LeaveRequiredFormPage.jsx
+│       │   │   │       ├── LeaveRequestUploadPage.jsx
+│       │   │   │       ├── LeaveSubmitStatusPage.jsx
+│       │   │   │       ├── LeaveRequestListPage.jsx
+│       │   │   │       ├── LeaveRequestActionPage.jsx
+│       │   │   │       ├── LeaveRulesPage.jsx
+│       │   │   │       └── LeaveRulesApprovalFlowPage.jsx
+│       │   │   │
+│       │   │   ├── performance/
+│       │   │   │   └── pages/
+│       │   │   │       ├── PerformanceDashboardPage.jsx
+│       │   │   │       ├── PerformanceHistoryPage.jsx
+│       │   │   │       ├── PerformanceReviewDetailPage.jsx
+│       │   │   │       └── PerformanceNewReviewPage.jsx
+│       │   │   │
+│       │   │   ├── payroll/
+│       │   │   │   ├── constants/
+│       │   │   │   │   └── payrollMockData.js
+│       │   │   │   └── pages/
+│       │   │   │       ├── PayrollDashboardPage.jsx
+│       │   │   │       ├── PendingPaymentsPage.jsx
+│       │   │   │       ├── RecordPaymentPage.jsx
+│       │   │   │       ├── SalaryStructurePage.jsx
+│       │   │   │       ├── ReimbursementStatusPage.jsx
+│       │   │   │       ├── PayrollSlipsPage.jsx
+│       │   │   │       └── PayrollOverviewPage.jsx
+│       │   │   │
+│       │   │   └── settings/
+│       │   │       └── pages/
+│       │   │           ├── SettingsDashboardPage.jsx
+│       │   │           ├── UserManagementPage.jsx
+│       │   │           ├── CompanyDetailsPage.jsx
+│       │   │           └── PermissionsManagerPage.jsx
+│       │   │
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx                              ✅ Auth + protected split
+│       │   │   ├── AuthRoutes.jsx                             ✅ All 8 auth pages
+│       │   │   └── HomeRoutes.jsx                             ✅ Every route in RoleRoute
+│       │   │                                                      Settings → HR only
+│       │   │                                                      Payroll admin → HR only
+│       │   │                                                      Employee config → HR + Manager
+│       │   │
+│       │   ├── assets/
+│       │   │   └── loginPagePic.jpg
+│       │   │
+│       │   ├── App.jsx                                        ✅ Provider stack (clean)
+│       │   └── main.jsx                                       ✅ BrowserRouter lives here ONLY
+│       │                                                          Single QueryClient entry point
+│       │
+│       ├── supabase/
+│       │   └── functions/
+│       │       └── create-employee-user/
+│       │           ├── index.ts                               ✅ Edge Function (401 fixed)
+│       │           └── config.toml                            ✅ verify_jwt configured
+│       │
+│       ├── .env.local                                         ✅ VITE_SUPABASE_URL
+│       │                                                          VITE_SUPABASE_ANON_KEY
+│       ├── package.json                                       ✅ vite 5.4.8, react-icons,
+│       │                                                          @tanstack/react-query v5
+│       ├── vite.config.js                                     ✅ Chakra aliases, HMR overlay off
+│       └── tailwind.config.js
+│
+├── packages/
+│   ├── ui/                                                    ⏳ Shared components (future)
+│   └── shared/                                                ⏳ Types + utils (future)
+│
+└── README.md
+
+
+
+/////////////////////////////////////////
+/////////////////////////////////////////
