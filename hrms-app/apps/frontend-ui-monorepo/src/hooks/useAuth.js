@@ -4,7 +4,6 @@ import { supabase } from "@/lib/supabaseClient";
 export const useAuth = () => {
   const { user, session, isLoading, isAuthenticated } = useAuthContext();
 
-  // ── Core Auth ───────────────────────────────────────
   const signIn = async (email, password) => {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
@@ -28,19 +27,16 @@ export const useAuth = () => {
     if (error) throw error;
   };
 
-  // ── MFA ─────────────────────────────────────────────
   const enrollMFA = async () => {
     const { data, error } = await supabase.auth.mfa.enroll({ factorType: "totp" });
     if (error) throw error;
     return data;
-    // returns: { id, totp: { qr_code, secret } }
   };
 
   const challengeMFA = async (factorId) => {
     const { data, error } = await supabase.auth.mfa.challenge({ factorId });
     if (error) throw error;
     return data;
-    // returns: { id } ← this is challengeId
   };
 
   const verifyMFA = async (factorId, challengeId, code) => {
@@ -57,29 +53,24 @@ export const useAuth = () => {
     const { data, error } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
     if (error) throw error;
     return data;
-    // returns: { currentLevel: 'aal1'|'aal2', nextLevel: 'aal1'|'aal2' }
   };
 
   const listMFAFactors = async () => {
     const { data, error } = await supabase.auth.mfa.listFactors();
     if (error) throw error;
     return data;
-    // returns: { totp: [{ id, friendly_name, factor_type, status }] }
   };
 
   return {
-    // state
     user,
     session,
     isLoading,
     isAuthenticated,
-    // core auth
     signIn,
     signOut,
     forgotPassword,
-    resetPassword: forgotPassword, // alias
+    resetPassword: forgotPassword,
     updatePassword,
-    // mfa
     enrollMFA,
     challengeMFA,
     verifyMFA,

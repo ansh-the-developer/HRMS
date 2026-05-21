@@ -45,12 +45,10 @@ const LoginPage = () => {
       let profile = null;
       try {
         profile = await getProfile(user.id);
-        console.log("✅ profile fetched:", profile);
       } catch (err) {
         console.warn("⚠️ no profile row found:", err.message);
       }
 
-      console.log("🔍 must_change_password:", profile?.must_change_password);
 
       // 3️⃣ No profile OR first-login flag → force password change
       if (!profile || profile.must_change_password) {
