@@ -37,7 +37,11 @@ const getAvatarColors = (name = "") => {
   return AVATAR_COLORS[idx];
 };
 
-const getEmpId = (id = "") => `#${id.slice(0, 8).toUpperCase()}`;
+const getFormattedEmpId = (emp) => {
+  const code = emp.emp_code || emp.id?.slice(0, 8);
+  if (!code) return "—";
+  return code.startsWith("#") ? code : `#${code}`;
+};
 
 const ColHeader = ({ children }) => (
   <Th
@@ -93,11 +97,11 @@ const EmployeeTable = ({
             <Thead>
               <Tr borderBottom="1px solid" borderColor="gray.100">
                 <ColHeader>EMP ID</ColHeader>
+                <ColHeader>Nickname</ColHeader>
                 <ColHeader>Official Identity</ColHeader>
                 <ColHeader>Department</ColHeader>
-                <ColHeader>Type</ColHeader>
-                {!isReadOnly && <ColHeader>Modify</ColHeader>}
-                {!isReadOnly && <ColHeader>Delete</ColHeader>}
+                <ColHeader>Location</ColHeader>
+                {!isReadOnly && <ColHeader>Actions</ColHeader>}
               </Tr>
             </Thead>
 
@@ -105,7 +109,7 @@ const EmployeeTable = ({
               {employees.length === 0 ? (
                 <Tr>
                   <Td
-                    colSpan={isReadOnly ? 4 : 6}
+                    colSpan={isReadOnly ? 5 : 6}
                     py={16}
                     textAlign="center"
                     borderColor="transparent"
@@ -137,7 +141,18 @@ const EmployeeTable = ({
                           fontWeight="medium"
                           fontFamily="mono"
                         >
-                          {getEmpId(emp.id)}
+                          {getFormattedEmpId(emp)}
+                        </Text>
+                      </Td>
+
+                      {/* Nickname */}
+                      <Td py={4} borderColor="gray.50">
+                        <Text
+                          fontSize="sm"
+                          color="gray.600"
+                          fontStyle={emp.nickname ? "italic" : "normal"}
+                        >
+                          {emp.nickname || "—"}
                         </Text>
                       </Td>
 
@@ -175,57 +190,37 @@ const EmployeeTable = ({
                         </Text>
                       </Td>
 
-                      {/* Designation badge */}
+                      {/* Location */}
                       <Td py={4} borderColor="gray.50">
-                        <Badge
-                          fontSize="2xs"
-                          fontWeight="bold"
-                          letterSpacing="wider"
-                          textTransform="uppercase"
-                          colorScheme="purple"
-                          variant="subtle"
-                          borderRadius="full"
-                          px={3}
-                          py={1}
-                        >
-                          {emp.designation || "—"}
-                        </Badge>
+                        <Text fontSize="sm" color="gray.600">
+                          {emp.work_location || "—"}
+                        </Text>
                       </Td>
 
+                      {/* Actions */}
                       {!isReadOnly && (
                         <Td py={4} borderColor="gray.50">
-                          <Button
-                            size="sm"
-                            variant="ghost"
-                            leftIcon={<FiEdit2 size={13} />}
-                            color="orange.400"
-                            fontWeight="semibold"
-                            fontSize="sm"
-                            _hover={{ bg: "orange.50" }}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onEdit?.(emp);
-                            }}
-                          >
-                            Modify File
-                          </Button>
-                        </Td>
-                      )}
-
-                      {!isReadOnly && (
-                        <Td py={4} borderColor="gray.50">
-                          <IconButton
-                            icon={<FiTrash2 size={15} />}
-                            size="sm"
-                            variant="ghost"
-                            color="red.400"
-                            _hover={{ bg: "red.50" }}
-                            aria-label="Delete employee"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteTarget(emp);
-                            }}
-                          />
+                          <HStack spacing={2} onClick={(e) => e.stopPropagation()}>
+                            <IconButton
+                              icon={<FiEdit2 size={13} />}
+                              size="sm"
+                              variant="ghost"
+                              color="orange.400"
+                              _hover={{ bg: "orange.50" }}
+                              aria-label="Edit employee"
+                              onClick={() => onEdit?.(emp)}
+                            />
+                            <IconButton
+                              icon={<FiTrash2 size={13} />}
+                              size="sm"
+                              bg="red.50"
+                              color="red.500"
+                              _hover={{ bg: "red.100" }}
+                              borderRadius="full"
+                              aria-label="Delete employee"
+                              onClick={() => setDeleteTarget(emp)}
+                            />
+                          </HStack>
                         </Td>
                       )}
                     </Tr>

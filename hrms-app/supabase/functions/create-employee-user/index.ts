@@ -42,6 +42,9 @@ Deno.serve(async (req) => {
 
     const normalizedRole = String(role).toLowerCase();
 
+    let userId = null;
+    let userWasCreated = false;
+
     // ── 1. Create auth user ──────────────────────────
     const { data: createdUser, error: createUserError } =
       await supabaseAdmin.auth.admin.createUser({
@@ -50,28 +53,53 @@ Deno.serve(async (req) => {
         email_confirm: true,
       });
 
-    if (createUserError || !createdUser?.user) {
-      return new Response(
-        JSON.stringify({ error: createUserError?.message || "Failed to create auth user" }),
-        { status: 400, headers: corsHeaders }
-      );
+    if (createUserError) {
+      const errMsg = createUserError.message || "";
+      if (
+        errMsg.toLowerCase().includes("already registered") ||
+        errMsg.toLowerCase().includes("already exists") ||
+        errMsg.toLowerCase().includes("already_exists")
+      ) {
+        // Find existing user by email
+        const { data: listData, error: listError } = await supabaseAdmin.auth.admin.listUsers({
+          perPage: 1000,
+        });
+        if (!listError && listData?.users) {
+          const existingUser = listData.users.find(
+            (u) => u.email?.toLowerCase() === email.toLowerCase()
+          );
+          if (existingUser) {
+            userId = existingUser.id;
+          }
+        }
+      }
+
+      if (!userId) {
+        return new Response(
+          JSON.stringify({ error: createUserError.message || "Failed to create auth user" }),
+          { status: 400, headers: corsHeaders }
+        );
+      }
+    } else {
+      userId = createdUser.user.id;
+      userWasCreated = true;
     }
 
-    const userId = createdUser.user.id;
-
-    // ── 2. Insert into profiles ──────────────────────
+    // ── 2. Upsert into profiles ──────────────────────
     const { error: profileError } = await supabaseAdmin
       .from("profiles")
-      .insert({
+      .upsert({
         id: userId,
         full_name,
         role: normalizedRole,
         must_change_password: true,
-      });
+      }, { onConflict: "id" });
 
     if (profileError) {
-      // Rollback: delete auth user if profile insert fails
-      await supabaseAdmin.auth.admin.deleteUser(userId);
+      // Rollback: delete auth user ONLY if we just created them in this request
+      if (userWasCreated) {
+        await supabaseAdmin.auth.admin.deleteUser(userId);
+      }
       return new Response(
         JSON.stringify({ error: profileError.message }),
         { status: 400, headers: corsHeaders }
