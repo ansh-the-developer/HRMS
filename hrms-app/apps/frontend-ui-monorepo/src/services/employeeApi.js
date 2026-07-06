@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabaseClient";
 export async function getEmployees({ filterType, filterValue } = {}) {
   let query = supabase
     .from("employees")
-    .select("id, name, email, department, designation, birthdate, department_id, branch_id")
+    .select("id, name, email, department, designation, birthdate, department_id, branch_id, work_location, emp_code, nickname")
     .order("name", { ascending: true });
 
   if (filterType === "department" && filterValue) {
@@ -27,7 +27,7 @@ export async function getEmployees({ filterType, filterValue } = {}) {
 export async function getEmployeeById(id) {
   const { data, error } = await supabase
     .from("employees")
-    .select("id, name, email, department, designation, birthdate, department_id, branch_id")
+    .select("id, name, email, department, designation, birthdate, department_id, branch_id, work_location, emp_code, nickname")
     .eq("id", id)
     .single();
   if (error) throw error;
