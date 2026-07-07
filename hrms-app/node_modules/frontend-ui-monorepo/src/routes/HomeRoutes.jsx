@@ -58,6 +58,10 @@ import UserManagementPage from "@/features/settings/pages/UserManagementPage";
 import CompanyDetailsPage from "@/features/settings/pages/CompanyDetailsPage";
 import PermissionsManagerPage from "@/features/settings/pages/PermissionsManagerPage";
 
+// Complaint Center & Pro Gates
+import ComplaintCenterPage from "@/features/home/ComplaintCenterPage";
+import ProFeatureGatePage from "@/features/home/ProFeatureGatePage";
+
 const HomeRoutes = () => (
   <Routes>
     {/* Default */}
@@ -386,6 +390,33 @@ const HomeRoutes = () => (
       element={
         <RoleRoute allow={["hr"]}>
           <PermissionsManagerPage />
+        </RoleRoute>
+      }
+    />
+    {/* Complaint Center - accessible by all */}
+    <Route
+      path="/complaints"
+      element={
+        <RoleRoute allow={["hr", "manager", "employee"]}>
+          <ComplaintCenterPage />
+        </RoleRoute>
+      }
+    />
+
+    {/* Gated Pro Features */}
+    <Route
+      path="/employees/documents"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <ProFeatureGatePage />
+        </RoleRoute>
+      }
+    />
+    <Route
+      path="/activity-logs"
+      element={
+        <RoleRoute allow={["hr"]}>
+          <ProFeatureGatePage />
         </RoleRoute>
       }
     />

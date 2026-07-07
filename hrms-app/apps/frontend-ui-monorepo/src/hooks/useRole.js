@@ -5,16 +5,25 @@ import { useProfile } from "@/services/useProfile";
 export function useRole() {
   const { profile, isLoading, error } = useProfile();
 
-  const role = profile?.role ?? "employee";
+  const originalRole = profile?.role ?? "employee";
+
+  // Check if there is a local storage override for role perspective
+  const switchedView = typeof window !== "undefined" ? localStorage.getItem("hrms_switched_view") : null;
+  const isSwitched = switchedView === "employee" && (originalRole === "hr" || originalRole === "manager");
+  const role = isSwitched ? "employee" : originalRole;
 
   return useMemo(
     () => ({
       role,
+      originalRole,
+      isSwitched,
       isLoading,
       error,
       isHR: role === "hr",
       isManager: role === "manager",
       isEmployee: role === "employee",
+      isOriginalHR: originalRole === "hr",
+      isOriginalManager: originalRole === "manager",
 
       canViewEmployees: ["hr", "manager"].includes(role),
       canEditEmployees: role === "hr",
@@ -31,7 +40,7 @@ export function useRole() {
       canViewPerformance: ["hr", "manager", "employee"].includes(role),
       canManagePerformance: ["hr", "manager"].includes(role),
     }),
-    [role, isLoading, error]
+    [role, originalRole, isSwitched, isLoading, error]
   );
 }
 
