@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // ✅ Import this
+import { useNavigate } from "react-router-dom";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import {
   Box,
@@ -11,13 +11,94 @@ import {
   VStack,
   HStack,
   Divider,
+  useToast,
+  Spinner,
 } from "@chakra-ui/react";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
 import LeaveRequestForm from "../components/LeaveRequestForm";
+import { useRole } from "@/hooks/useRole";
+import { useAuth } from "@/hooks/useAuth";
+import { useCreateLeaveRequest } from "@/hooks/useLeaves";
+import { uploadLeaveDocument } from "@/services/leaveApi";
+import { supabase } from "@/lib/supabaseClient";
 
 const LeavesDashboardPage = () => {
   const [isRequesting, setIsRequesting] = useState(false);
-  const navigate = useNavigate(); // ✅ Initialize hook
+  const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const toast = useToast();
+  const { role, originalRole } = useRole();
+  const { user } = useAuth();
+  const isEmployeeMode = role === "employee";
+
+  const createLeaveMutation = useCreateLeaveRequest();
+
+  const handleRequestSubmit = async (formData) => {
+    if (submitting) return;
+
+    const fromDate = formData.get("from_date");
+    const toDate   = formData.get("to_date");
+
+    // Validate required date fields
+    if (!fromDate || !toDate) {
+      toast({ title: "Please select both start and end dates.", status: "warning", duration: 3000 });
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      // Resolve employee record ID directly at submit time — avoids race conditions
+      const { data: empRow, error: empErr } = await supabase
+        .from("employees")
+        .select("id")
+        .eq("auth_user_id", user.id)
+        .maybeSingle();
+
+      if (empErr) throw empErr;
+      if (!empRow?.id) {
+        toast({ title: "No employee profile linked to your account. Please contact HR.", status: "error", duration: 5000 });
+        return;
+      }
+
+      const file = formData.get("document");
+      let documentUrl = null;
+      if (file) {
+        documentUrl = await uploadLeaveDocument(file);
+      }
+
+      await createLeaveMutation.mutateAsync({
+        employee_id:  empRow.id,
+        type:         formData.get("leave_type"),
+        start_date:   fromDate,
+        end_date:     toDate,
+        reason:       formData.get("reason") || null,
+        status:       "Pending",
+        document_url: documentUrl,
+      });
+
+      toast({
+        title: "Leave Requested",
+        description: "Your leave application has been submitted successfully.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+      setIsRequesting(false);
+    } catch (err) {
+      toast({
+        title: "Request Failed",
+        description: err.message,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   return (
     <DashboardLayout pageTitle="Leaves">
@@ -52,10 +133,14 @@ const LeavesDashboardPage = () => {
 
           {/* 2. MIDDLE CARD: Toggle between Summary AND Form */}
           <Box bg="white" p={6} borderRadius="lg" shadow="sm" borderWidth="1px">
-            {isRequesting ? (
+            {submitting ? (
+              <Flex align="center" justify="center" h="full" minH="200px">
+                <Spinner color="purple.500" size="lg" />
+              </Flex>
+            ) : isRequesting ? (
               <LeaveRequestForm 
                 onCancel={() => setIsRequesting(false)} 
-                onSubmit={() => setIsRequesting(false)}
+                onSubmit={handleRequestSubmit}
               />
             ) : (
               <VStack spacing={4} align="stretch" h="full">
@@ -120,44 +205,52 @@ const LeavesDashboardPage = () => {
               </Box>
               <HRMSButton 
                 colorScheme="blue" 
-                onClick={() => navigate('/leaves/submit-status')} // ✅ FIXED
+                onClick={() => navigate('/leaves/submit-status')}
               >
                 Check
               </HRMSButton>
             </Flex>
+            
+            {!isEmployeeMode && (
+              <>
+                <Divider />
 
-            <Divider />
+                {/* Approve Leaves */}
+                <Flex justify="space-between" align="center">
+                  <Box>
+                    <Text fontSize="md" fontWeight="semibold">Approve Leaves</Text>
+                    <Text fontSize="sm" color="gray.500">Check requests and approve leaves</Text>
+                  </Box>
+                  <HRMSButton 
+                    colorScheme="blue" 
+                    onClick={() => navigate('/leaves/requests')}
+                  >
+                    Check
+                  </HRMSButton>
+                </Flex>
+              </>
+            )}
 
-            {/* Approve Leaves */}
-            <Flex justify="space-between" align="center">
-              <Box>
-                <Text fontSize="md" fontWeight="semibold">Approve Leaves</Text>
-                <Text fontSize="sm" color="gray.500">Check requests and approve leaves</Text>
-              </Box>
-              <HRMSButton 
-                colorScheme="blue" 
-                onClick={() => navigate('/leaves/requests')} // ✅ FIXED
-              >
-                Check
-              </HRMSButton>
-            </Flex>
+            {role === "hr" && (
+              <>
+                <Divider />
 
-            <Divider />
-
-            {/* Define Rules */}
-            <Flex justify="space-between" align="center">
-              <Box>
-                <Text fontSize="md" fontWeight="semibold">Define Rules</Text>
-                <Text fontSize="sm" color="gray.400">Notice Period Before Leave, Approval Flow and more</Text>
-              </Box>
-              <HRMSButton 
-                variant="outline" 
-                colorScheme="blue" 
-                onClick={() => navigate('/leaves/rules')} // ✅ FIXED
-              >
-                Edit
-              </HRMSButton>
-            </Flex>
+                {/* Define Rules */}
+                <Flex justify="space-between" align="center">
+                  <Box>
+                    <Text fontSize="md" fontWeight="semibold">Define Rules</Text>
+                    <Text fontSize="sm" color="gray.400">Notice Period Before Leave, Approval Flow and more</Text>
+                  </Box>
+                  <HRMSButton 
+                    variant="outline" 
+                    colorScheme="blue" 
+                    onClick={() => navigate('/leaves/rules')}
+                  >
+                    Edit
+                  </HRMSButton>
+                </Flex>
+              </>
+            )}
           </VStack>
         </Box>
       </VStack>

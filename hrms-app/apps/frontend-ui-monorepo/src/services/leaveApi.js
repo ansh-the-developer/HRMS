@@ -66,4 +66,23 @@ export async function updateLeaveStatus(id, status) {
   return data;
 }
 
+export async function uploadLeaveDocument(file) {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("leaves")
+    .upload(filePath, file);
+
+  if (uploadError) throw uploadError;
+
+  const { data: urlData } = supabase.storage
+    .from("leaves")
+    .getPublicUrl(filePath);
+
+  return urlData.publicUrl;
+}
+
+
 

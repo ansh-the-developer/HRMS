@@ -46,6 +46,10 @@ import HRMSCard from "@/components/atomic/molecules/HRMSCard";
 import HRMSTable from "@/components/atomic/molecules/HRMSTable";
 import AttendanceTable from "../components/organisms/AttendanceTable";
 import AttendanceStatusBadge from "../components/molecules/AttendanceStatusBadge";
+import { useRole } from "@/hooks/useRole";
+import { useAuth } from "@/hooks/useAuth";
+import { useEmployeeProfile } from "@/hooks/useEmployeeProfile";
+import EmployeeAttendanceDashboard from "./EmployeeAttendanceDashboard";
 import { getEmployees } from "@/services/employeeApi";
 import {
   getAttendanceForDate,
@@ -200,10 +204,19 @@ const AttendanceDashboardPage = () => {
   const toast = useToast();
   const fileInputRef = useRef(null);
 
+  const { role, originalRole } = useRole();
+  const { user } = useAuth();
+  const isEmployeeMode = role === "employee";
+  const shouldFetchProfile = isEmployeeMode && originalRole === "employee";
+  const { data: empProfile, isLoading: loadingProfile } = useEmployeeProfile(shouldFetchProfile ? user?.id : null);
+
   // Core Data States
   const [dbEmployees, setDbEmployees] = useState([]);
   const [attendanceLogs, setAttendanceLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // isPageLoading must be after loading useState to avoid TDZ
+  const isPageLoading = loading || (shouldFetchProfile && loadingProfile);
 
   // Global filters
   const [selectedDate, setSelectedDate] = useState("2026-07-06");
@@ -261,6 +274,12 @@ const AttendanceDashboardPage = () => {
   useEffect(() => {
     loadData();
   }, [selectedDate]);
+
+  useEffect(() => {
+    if (isEmployeeMode && empProfile) {
+      setSelectedEmployeeForLogs(empProfile);
+    }
+  }, [isEmployeeMode, empProfile]);
 
   // Fetch selected employee's log entries for the viewed month/year range
   const loadEmployeeMonthLogs = async () => {
@@ -960,9 +979,14 @@ const AttendanceDashboardPage = () => {
       ? "blue.400"
       : "gray.400";
 
+  // ── Employee & Manager (employee-view) → dedicated personal attendance page
+  if (isEmployeeMode) {
+    return <EmployeeAttendanceDashboard />;
+  }
+
   return (
     <DashboardLayout>
-      {loading && dbEmployees.length === 0 ? (
+      {isPageLoading ? (
         <Center minH="400px">
           <Spinner size="xl" thickness="4px" color="#6366F1" />
         </Center>
@@ -972,18 +996,20 @@ const AttendanceDashboardPage = () => {
           {/* HEADER BAR AND NAVIGATION */}
           <Flex direction="column" gap={2}>
             {/* Back Button */}
-            <Button
-              variant="link"
-              leftIcon={<FiArrowLeft />}
-              color="#6366F1"
-              fontSize="sm"
-              fontWeight="700"
-              onClick={() => setSelectedEmployeeForLogs(null)}
-              w="fit-content"
-              _hover={{ textDecoration: "none", opacity: 0.8 }}
-            >
-              Back to Attendance Board
-            </Button>
+            {!isEmployeeMode && (
+              <Button
+                variant="link"
+                leftIcon={<FiArrowLeft />}
+                color="#6366F1"
+                fontSize="sm"
+                fontWeight="700"
+                onClick={() => setSelectedEmployeeForLogs(null)}
+                w="fit-content"
+                _hover={{ textDecoration: "none", opacity: 0.8 }}
+              >
+                Back to Attendance Board
+              </Button>
+            )}
 
             <Flex
               direction={{ base: "column", xl: "row" }}

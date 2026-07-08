@@ -121,3 +121,22 @@ export async function deleteEmployeeAttendanceForRange(employeeId, startDate, en
   }
   return data;
 }
+
+/**
+ * Fetches attendance records for a specific employee within a date range.
+ */
+export async function getAttendanceForEmployee(employeeId, startDate, endDate) {
+  const { data, error } = await supabase
+    .from("attendance")
+    .select("*")
+    .eq("employee_id", employeeId)
+    .gte("date", startDate)
+    .lte("date", endDate)
+    .order("date", { ascending: false });
+
+  if (error) {
+    console.error("Error fetching employee attendance:", error.message);
+    throw error;
+  }
+  return data || [];
+}

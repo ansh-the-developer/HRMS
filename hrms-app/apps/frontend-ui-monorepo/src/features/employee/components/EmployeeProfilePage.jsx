@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Flex,
@@ -15,6 +15,11 @@ import {
   Spinner,
   Alert,
   AlertIcon,
+  FormControl,
+  FormLabel,
+  Input,
+  Select,
+  useToast,
 } from "@chakra-ui/react";
 import {
   FiArrowLeft,
@@ -26,6 +31,7 @@ import {
 import { MdOutlineShield } from "react-icons/md";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useEmployeeProfile } from "@/hooks/useEmployeeProfile";
+import { useUpdateEmployee } from "@/hooks/useEmployees";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import { useRole } from "@/hooks/useRole";
 import { useAuth } from "@/hooks/useAuth";
@@ -74,10 +80,60 @@ const Row = ({ label, value }) => (
 export default function EmployeeProfilePage() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const toast = useToast();
+  
   const { isHR, isManager, isEmployee } = useRole();
   const { user } = useAuth();
-
+  
   const { data, isLoading, isError, error } = useEmployeeProfile(id);
+  const updateMutation = useUpdateEmployee();
+
+  // Edit Mode toggle
+  const [isEditing, setIsEditing] = useState(false);
+
+  // Form Fields State
+  const [name, setName] = useState("");
+  const [birthdate, setBirthdate] = useState("");
+  const [maritalStatus, setMaritalStatus] = useState("");
+  const [personalNumber, setPersonalNumber] = useState("");
+  const [presentAddress, setPresentAddress] = useState("");
+  const [bloodGroup, setBloodGroup] = useState("");
+  const [emergencyContact, setEmergencyContact] = useState("");
+
+  const [department, setDepartment] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [employeeType, setEmployeeType] = useState("");
+  const [empCode, setEmpCode] = useState("");
+  const [workLocation, setWorkLocation] = useState("");
+  const [monthlyCtc, setMonthlyCtc] = useState("");
+
+  const [bankName, setBankName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
+  const [ifscCode, setIfscCode] = useState("");
+
+  // Sync state variables once data loads from database
+  useEffect(() => {
+    if (data) {
+      setName(data.name || "");
+      setBirthdate(data.birthdate || "");
+      setMaritalStatus(data.marital_status || "");
+      setPersonalNumber(data.personal_number || "");
+      setPresentAddress(data.present_address || "");
+      setBloodGroup(data.blood_group || "");
+      setEmergencyContact(data.emergency_contact || "");
+      
+      setDepartment(data.department || "");
+      setDesignation(data.designation || "");
+      setEmployeeType(data.employee_type || "");
+      setEmpCode(data.emp_code || "");
+      setWorkLocation(data.work_location || "");
+      setMonthlyCtc(data.monthly_ctc || "");
+
+      setBankName(data.banking?.primary_bank?.bank_name || "");
+      setAccountNumber(data.banking?.primary_bank?.account_number || "");
+      setIfscCode(data.banking?.primary_bank?.ifsc_code || "");
+    }
+  }, [data]);
 
   if (isLoading) {
     return (
@@ -113,61 +169,136 @@ export default function EmployeeProfilePage() {
   const canOpenDocuments = isHR || isOwnProfile;
 
   if (!canViewProfile) {
-    return <Navigate to="/employees" replace />;
+    return <Navigate to="/home" replace />;
   }
+
+  const handleSave = async () => {
+    try {
+      const bankingPayload = {
+        ...employee.banking,
+        primary_bank: {
+          bank_name: bankName,
+          account_number: accountNumber,
+          ifsc_code: ifscCode,
+        }
+      };
+
+      const updates = {
+        name,
+        birthdate,
+        marital_status: maritalStatus,
+        personal_number: personalNumber,
+        present_address: presentAddress,
+        blood_group: bloodGroup,
+        emergency_contact: emergencyContact,
+        banking: bankingPayload,
+      };
+
+      // HR can edit corporate fields
+      if (isHR) {
+        updates.department = department;
+        updates.designation = designation;
+        updates.employee_type = employeeType;
+        updates.emp_code = empCode;
+        updates.work_location = workLocation;
+        updates.monthly_ctc = monthlyCtc ? parseFloat(monthlyCtc) : null;
+      }
+
+      await updateMutation.mutateAsync({ id: employee.id, updates });
+      setIsEditing(false);
+      toast({
+        title: "Profile Updated",
+        description: "Your changes have been saved successfully.",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+        position: "top-right",
+      });
+    } catch (err) {
+      toast({
+        title: "Update Failed",
+        description: err.message,
+        status: "error",
+        duration: 4000,
+        isClosable: true,
+      });
+    }
+  };
 
   return (
     <DashboardLayout>
       <Box px={{ base: 4, md: 8 }} py={6} bg="gray.50" minH="100vh">
         <Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={3}>
-          <Button
-            leftIcon={<FiArrowLeft />}
-            variant="ghost"
-            color="gray.600"
-            fontWeight="medium"
-            onClick={() => navigate("/employees")}
-          >
-            Back to Employees
-          </Button>
+          {/* Back button only for HR/Manager looking at list */}
+          {!isEmployee ? (
+            <Button
+              leftIcon={<FiArrowLeft />}
+              variant="ghost"
+              color="gray.600"
+              fontWeight="medium"
+              onClick={() => navigate("/employees")}
+            >
+              Back to Employees
+            </Button>
+          ) : (
+            <Box />
+          )}
 
-          <HStack spacing={2} wrap="wrap">
+          <HStack spacing={3} wrap="wrap">
             {isHR && (
-              <Badge
-                colorScheme="purple"
-                px={3}
-                py={1}
-                borderRadius="full"
-                fontSize="xs"
-                fontWeight="bold"
-              >
+              <Badge colorScheme="purple" px={3} py={1} borderRadius="full" fontSize="xs" fontWeight="bold">
                 HR Access
               </Badge>
             )}
 
             {isManager && !isHR && (
-              <Badge
-                colorScheme="blue"
-                px={3}
-                py={1}
-                borderRadius="full"
-                fontSize="xs"
-                fontWeight="bold"
-              >
+              <Badge colorScheme="blue" px={3} py={1} borderRadius="full" fontSize="xs" fontWeight="bold">
                 Manager View
               </Badge>
             )}
 
             {isEmployee && isOwnProfile && !isHR && (
-              <Badge
-                colorScheme="green"
-                px={3}
-                py={1}
-                borderRadius="full"
-                fontSize="xs"
-                fontWeight="bold"
-              >
+              <Badge colorScheme="green" px={3} py={1} borderRadius="full" fontSize="xs" fontWeight="bold">
                 My Profile
               </Badge>
+            )}
+
+            {/* Edit action buttons under RBAC */}
+            {(isHR || isOwnProfile) && (
+              <HStack spacing={2}>
+                {isEditing ? (
+                  <>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      colorScheme="gray"
+                      onClick={() => setIsEditing(false)}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      size="sm"
+                      bg="purple.500"
+                      color="white"
+                      _hover={{ bg: "purple.600" }}
+                      onClick={handleSave}
+                      isLoading={updateMutation.isPending}
+                    >
+                      Save Changes
+                    </Button>
+                  </>
+                ) : (
+                  <Button
+                    size="sm"
+                    bg="purple.500"
+                    color="white"
+                    _hover={{ bg: "purple.600" }}
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Edit Profile
+                  </Button>
+                )}
+              </HStack>
             )}
           </HStack>
         </Flex>
@@ -177,7 +308,7 @@ export default function EmployeeProfilePage() {
             <AlertIcon />
             {isManager
               ? "You have view-only access to this employee profile."
-              : "You can only view your own employee profile."}
+              : "You can only view your own employee profile. Some official fields are read-only."}
           </Alert>
         )}
 
@@ -193,22 +324,22 @@ export default function EmployeeProfilePage() {
           <Flex align="center" gap={5} wrap="wrap">
             <Avatar
               size="xl"
-              name={employee.name}
+              name={name || employee.name}
               src={employee.documents?.photo_url || ""}
             />
             <Box flex="1">
               <Heading size="lg" color="gray.900">
-                {employee.name || "Unnamed Employee"}
+                {name || employee.name || "Unnamed Employee"}
               </Heading>
               <HStack spacing={1} mt={1} mb={3} wrap="wrap">
                 <Badge colorScheme="purple" variant="subtle" fontSize="xs">
-                  {employee.designation || "—"}
+                  {designation || employee.designation || "—"}
                 </Badge>
                 <Badge colorScheme="gray" variant="subtle" fontSize="xs">
-                  {employee.department || "—"}
+                  {department || employee.department || "—"}
                 </Badge>
                 <Badge colorScheme="blue" variant="subtle" fontSize="xs">
-                  {employee.employee_type || "—"}
+                  {employeeType || employee.employee_type || "—"}
                 </Badge>
               </HStack>
               <HStack spacing={5} wrap="wrap">
@@ -218,11 +349,11 @@ export default function EmployeeProfilePage() {
                 </HStack>
                 <HStack spacing={1} color="gray.500">
                   <FiPhone size={13} />
-                  <Text fontSize="sm">{employee.personal_number || "—"}</Text>
+                  <Text fontSize="sm">{personalNumber || employee.personal_number || "—"}</Text>
                 </HStack>
                 <HStack spacing={1} color="gray.500">
                   <FiMapPin size={13} />
-                  <Text fontSize="sm">{employee.work_location || "—"}</Text>
+                  <Text fontSize="sm">{workLocation || employee.work_location || "—"}</Text>
                 </HStack>
               </HStack>
             </Box>
@@ -230,123 +361,174 @@ export default function EmployeeProfilePage() {
         </Box>
 
         <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6}>
+          {/* Card 1: Personal KYC */}
           <Card title="Personal Identity (KYC)" icon={<FiFileText color="#7C3AED" />}>
-            <Row label="Full Name" value={employee.name} />
-            <Row label="DOB" value={employee.birthdate} />
-            <Row label="Marital Status" value={employee.marital_status} />
-            <Row label="Personal Number" value={employee.personal_number} />
-            <Row label="Present Address" value={employee.present_address} />
-            <Row label="Blood Group" value={employee.blood_group} />
-            <Row label="Emergency Contact" value={employee.emergency_contact} />
+            {isEditing ? (
+              <VStack spacing={4} align="stretch">
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Full Name</FormLabel>
+                  <Input size="sm" borderRadius="md" value={name} onChange={(e) => setName(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">DOB</FormLabel>
+                  <Input size="sm" type="date" borderRadius="md" value={birthdate} onChange={(e) => setBirthdate(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Marital Status</FormLabel>
+                  <Select size="sm" borderRadius="md" value={maritalStatus} onChange={(e) => setMaritalStatus(e.target.value)}>
+                    <option value="">—</option>
+                    <option value="Single">Single</option>
+                    <option value="Married">Married</option>
+                    <option value="Divorced">Divorced</option>
+                  </Select>
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Personal Number</FormLabel>
+                  <Input size="sm" borderRadius="md" value={personalNumber} onChange={(e) => setPersonalNumber(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Present Address</FormLabel>
+                  <Input size="sm" borderRadius="md" value={presentAddress} onChange={(e) => setPresentAddress(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Blood Group</FormLabel>
+                  <Input size="sm" borderRadius="md" value={bloodGroup} onChange={(e) => setBloodGroup(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Emergency Contact</FormLabel>
+                  <Input size="sm" borderRadius="md" value={emergencyContact} onChange={(e) => setEmergencyContact(e.target.value)} />
+                </FormControl>
+              </VStack>
+            ) : (
+              <>
+                <Row label="Full Name" value={employee.name} />
+                <Row label="DOB" value={employee.birthdate} />
+                <Row label="Marital Status" value={employee.marital_status} />
+                <Row label="Personal Number" value={employee.personal_number} />
+                <Row label="Present Address" value={employee.present_address} />
+                <Row label="Blood Group" value={employee.blood_group} />
+                <Row label="Emergency Contact" value={employee.emergency_contact} />
+              </>
+            )}
           </Card>
 
+          {/* Card 2: Corporate Identity */}
           <Card title="Corporate Identity" icon={<FiFileText color="#7C3AED" />}>
-            <Row label="Official Email" value={employee.email} />
-            <Row label="Department" value={employee.department} />
-            <Row label="Designation" value={employee.designation} />
-            <Row label="EMP Type" value={employee.employee_type} />
-            <Row label="EMP ID" value={employee.emp_code} />
-            <Row label="Location" value={employee.work_location} />
-            <Row
-              label="Monthly CTC"
-              value={
-                canViewSensitiveSections && employee.monthly_ctc
-                  ? `₹${Number(employee.monthly_ctc).toLocaleString("en-IN")}`
-                  : canViewSensitiveSections
-                    ? "—"
-                    : "Restricted"
-              }
-            />
+            {isEditing && isHR ? (
+              <VStack spacing={4} align="stretch">
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Official Email</FormLabel>
+                  <Input size="sm" borderRadius="md" value={employee.email || ""} isDisabled />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Department</FormLabel>
+                  <Input size="sm" borderRadius="md" value={department} onChange={(e) => setDepartment(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Designation</FormLabel>
+                  <Input size="sm" borderRadius="md" value={designation} onChange={(e) => setDesignation(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">EMP Type</FormLabel>
+                  <Input size="sm" borderRadius="md" value={employeeType} onChange={(e) => setEmployeeType(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">EMP ID</FormLabel>
+                  <Input size="sm" borderRadius="md" value={empCode} onChange={(e) => setEmpCode(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Location</FormLabel>
+                  <Input size="sm" borderRadius="md" value={workLocation} onChange={(e) => setWorkLocation(e.target.value)} />
+                </FormControl>
+                <FormControl>
+                  <FormLabel fontSize="xs" fontWeight="bold">Monthly CTC</FormLabel>
+                  <Input size="sm" borderRadius="md" type="number" value={monthlyCtc} onChange={(e) => setMonthlyCtc(e.target.value)} />
+                </FormControl>
+              </VStack>
+            ) : (
+              <>
+                <Row label="Official Email" value={employee.email} />
+                <Row label="Department" value={employee.department} />
+                <Row label="Designation" value={employee.designation} />
+                <Row label="EMP Type" value={employee.employee_type} />
+                <Row label="EMP ID" value={employee.emp_code} />
+                <Row label="Location" value={employee.work_location} />
+                <Row
+                  label="Monthly CTC"
+                  value={
+                    canViewSensitiveSections && employee.monthly_ctc
+                      ? `₹${Number(employee.monthly_ctc).toLocaleString("en-IN")}`
+                      : canViewSensitiveSections
+                        ? "—"
+                        : "Restricted"
+                  }
+                />
+              </>
+            )}
           </Card>
 
+          {/* Card 3: Statutory & Compliance */}
           <Card title="Statutory & Compliance" icon={<MdOutlineShield color="#7C3AED" />}>
             <Row
               label="EPFO UAN"
-              value={
-                canViewSensitiveSections
-                  ? employee.compliance?.epfo_uan
-                  : "Restricted"
-              }
+              value={canViewSensitiveSections ? employee.compliance?.epfo_uan : "Restricted"}
             />
             <Row
               label="PRAN"
-              value={
-                canViewSensitiveSections ? employee.compliance?.pran : "Restricted"
-              }
+              value={canViewSensitiveSections ? employee.compliance?.pran : "Restricted"}
             />
             <Row
               label="ESIC IP"
-              value={
-                canViewSensitiveSections
-                  ? employee.compliance?.esic_ip
-                  : "Restricted"
-              }
+              value={canViewSensitiveSections ? employee.compliance?.esic_ip : "Restricted"}
             />
             <Row
               label="PAN"
-              value={
-                canViewSensitiveSections ? employee.compliance?.pan : "Restricted"
-              }
+              value={canViewSensitiveSections ? employee.compliance?.pan : "Restricted"}
             />
             <Row
               label="E-SHRAM UAN"
-              value={
-                canViewSensitiveSections
-                  ? employee.compliance?.e_shram_uan
-                  : "Restricted"
-              }
+              value={canViewSensitiveSections ? employee.compliance?.e_shram_uan : "Restricted"}
             />
           </Card>
 
+          {/* Card 4: Banking Details */}
           <Card title="Banking Details" icon={<MdOutlineShield color="#7C3AED" />}>
             {canViewSensitiveSections ? (
-              <>
-                <Text
-                  fontSize="xs"
-                  fontWeight="bold"
-                  color="purple.500"
-                  textTransform="uppercase"
-                  letterSpacing="wider"
-                  mb={2}
-                >
-                  Primary Salary Account
-                </Text>
-                <Row
-                  label="Bank Name"
-                  value={employee.banking?.primary_bank?.bank_name}
-                />
-                <Row
-                  label="Account Number"
-                  value={employee.banking?.primary_bank?.account_number}
-                />
-                <Row
-                  label="IFSC"
-                  value={employee.banking?.primary_bank?.ifsc_code}
-                />
-                <Divider my={4} />
-                <Text
-                  fontSize="xs"
-                  fontWeight="bold"
-                  color="gray.500"
-                  textTransform="uppercase"
-                  letterSpacing="wider"
-                  mb={2}
-                >
-                  Secondary (Reimbursements)
-                </Text>
-                <Row
-                  label="Bank Name"
-                  value={employee.banking?.secondary_bank?.bank_name}
-                />
-                <Row
-                  label="Account Number"
-                  value={employee.banking?.secondary_bank?.account_number}
-                />
-                <Row
-                  label="IFSC"
-                  value={employee.banking?.secondary_bank?.ifsc_code}
-                />
-              </>
+              isEditing ? (
+                <VStack spacing={4} align="stretch">
+                  <Text fontSize="xs" fontWeight="bold" color="purple.500" textTransform="uppercase" letterSpacing="wider">
+                    Primary Salary Account
+                  </Text>
+                  <FormControl>
+                    <FormLabel fontSize="xs" fontWeight="bold">Bank Name</FormLabel>
+                    <Input size="sm" borderRadius="md" value={bankName} onChange={(e) => setBankName(e.target.value)} />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel fontSize="xs" fontWeight="bold">Account Number</FormLabel>
+                    <Input size="sm" borderRadius="md" value={accountNumber} onChange={(e) => setAccountNumber(e.target.value)} />
+                  </FormControl>
+                  <FormControl>
+                    <FormLabel fontSize="xs" fontWeight="bold">IFSC</FormLabel>
+                    <Input size="sm" borderRadius="md" value={ifscCode} onChange={(e) => setIfscCode(e.target.value)} />
+                  </FormControl>
+                </VStack>
+              ) : (
+                <>
+                  <Text fontSize="xs" fontWeight="bold" color="purple.500" textTransform="uppercase" letterSpacing="wider" mb={2}>
+                    Primary Salary Account
+                  </Text>
+                  <Row label="Bank Name" value={employee.banking?.primary_bank?.bank_name} />
+                  <Row label="Account Number" value={employee.banking?.primary_bank?.account_number} />
+                  <Row label="IFSC" value={employee.banking?.primary_bank?.ifsc_code} />
+                  <Divider my={4} />
+                  <Text fontSize="xs" fontWeight="bold" color="gray.500" textTransform="uppercase" letterSpacing="wider" mb={2}>
+                    Secondary (Reimbursements)
+                  </Text>
+                  <Row label="Bank Name" value={employee.banking?.secondary_bank?.bank_name} />
+                  <Row label="Account Number" value={employee.banking?.secondary_bank?.account_number} />
+                  <Row label="IFSC" value={employee.banking?.secondary_bank?.ifsc_code} />
+                </>
+              )
             ) : (
               <Text fontSize="sm" color="gray.500">
                 Banking details are restricted to HR and the employee who owns this profile.
@@ -354,6 +536,7 @@ export default function EmployeeProfilePage() {
             )}
           </Card>
 
+          {/* Verification Vault */}
           <Box
             bg="#182140"
             borderRadius="2xl"
@@ -374,13 +557,7 @@ export default function EmployeeProfilePage() {
                 <VStack align="start" spacing={4}>
                   {employee.documents?.photo_url ? (
                     <Box>
-                      <Text
-                        fontSize="xs"
-                        color="whiteAlpha.600"
-                        textTransform="uppercase"
-                        letterSpacing="wider"
-                        mb={2}
-                      >
+                      <Text fontSize="xs" color="whiteAlpha.600" textTransform="uppercase" letterSpacing="wider" mb={2}>
                         Employee Photo
                       </Text>
                       <Box
@@ -401,13 +578,7 @@ export default function EmployeeProfilePage() {
 
                   {employee.documents?.signature_url ? (
                     <Box>
-                      <Text
-                        fontSize="xs"
-                        color="whiteAlpha.600"
-                        textTransform="uppercase"
-                        letterSpacing="wider"
-                        mb={2}
-                      >
+                      <Text fontSize="xs" color="whiteAlpha.600" textTransform="uppercase" letterSpacing="wider" mb={2}>
                         Signature
                       </Text>
                       <Box
@@ -430,22 +601,11 @@ export default function EmployeeProfilePage() {
                 </VStack>
 
                 <Box>
-                  <Text
-                    fontSize="xs"
-                    color="whiteAlpha.600"
-                    textTransform="uppercase"
-                    letterSpacing="wider"
-                    mb={3}
-                  >
+                  <Text fontSize="xs" color="whiteAlpha.600" textTransform="uppercase" letterSpacing="wider" mb={3}>
                     Documents
                   </Text>
                   <VStack align="stretch" spacing={0}>
-                    <HStack
-                      justify="space-between"
-                      py={3}
-                      borderBottom="1px solid"
-                      borderColor="whiteAlpha.100"
-                    >
+                    <HStack justify="space-between" py={3} borderBottom="1px solid" borderColor="whiteAlpha.100">
                       <Text fontSize="sm" color="whiteAlpha.800">
                         Government Docs
                       </Text>
@@ -466,12 +626,7 @@ export default function EmployeeProfilePage() {
                       )}
                     </HStack>
 
-                    <HStack
-                      justify="space-between"
-                      py={3}
-                      borderBottom="1px solid"
-                      borderColor="whiteAlpha.100"
-                    >
+                    <HStack justify="space-between" py={3} borderBottom="1px solid" borderColor="whiteAlpha.100">
                       <Text fontSize="sm" color="whiteAlpha.800">
                         Employment Dossier
                       </Text>

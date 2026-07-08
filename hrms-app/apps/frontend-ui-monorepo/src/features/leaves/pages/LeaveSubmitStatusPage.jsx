@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import {
   Box,
@@ -8,59 +8,85 @@ import {
   HStack,
   Circle,
   Divider,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Badge,
+  Spinner,
+  Button,
+  Icon,
+  Link,
+  Card,
+  CardBody,
+  Heading,
 } from "@chakra-ui/react";
+import { FiArrowLeft, FiPaperclip, FiInfo } from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
+import { useRole } from "@/hooks/useRole";
+import { useAuth } from "@/hooks/useAuth";
+import { useEmployeeProfile } from "@/hooks/useEmployeeProfile";
+import { useLeaveRequests } from "@/hooks/useLeaves";
 
 // Custom Step Component
 const StatusStep = ({ label, status, isLast }) => {
-  // Status: 'completed', 'current', 'pending'
-  
-  let bg = "purple.50";
+  // Status: 'completed', 'current', 'pending', 'failed'
+  let bg = "gray.100";
   let icon = null;
-  let labelColor = "gray.400"; // Default pending text color
+  let labelColor = "gray.400";
 
   if (status === "completed") {
     bg = "purple.100";
     labelColor = "purple.500";
     icon = (
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M20 6L9 17L4 12" stroke="#4A90E2" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M20 6L9 17L4 12" stroke="#6366F1" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"/>
       </svg>
     );
   } else if (status === "current") {
-    bg = "purple.100"; // Active step background
-    labelColor = "purple.500";
-  } else {
-    // pending
-    bg = "gray.100"; // Gray circle for future steps
+    bg = "purple.500";
+    labelColor = "purple.600";
+    icon = <Box w="8px" h="8px" borderRadius="full" bg="white" />;
+  } else if (status === "failed") {
+    bg = "red.100";
+    labelColor = "red.500";
+    icon = (
+      <Text fontSize="xs" fontWeight="bold" color="red.500">
+        ✕
+      </Text>
+    );
   }
 
   return (
     <Flex align="center" flex="1">
-      <VStack spacing={4}>
+      <VStack spacing={2} align="center" w="100%">
         <Circle 
-          size="60px" 
+          size="40px" 
           bg={bg} 
           display="flex" 
           alignItems="center" 
           justifyContent="center"
           position="relative"
           zIndex={2}
+          border={status === "current" ? "2px solid" : "none"}
+          borderColor="purple.200"
         >
           {icon}
         </Circle>
-        <Text fontSize="xs" fontWeight="medium" color={labelColor}>
+        <Text fontSize="10px" fontWeight="700" color={labelColor} textAlign="center" maxW="80px">
           {label}
         </Text>
       </VStack>
       
-      {/* Connector Line (if not last) */}
       {!isLast && (
         <Box 
           flex="1" 
-          h="1px" 
-          bg="gray.300" 
-          mt="-24px" // Align line with circle center
-          mx="-10px" // Slight overlap to connect seamlessly
+          h="2px" 
+          bg={status === "completed" ? "purple.300" : "gray.200"}
+          mt="-20px" 
+          mx="-15px" 
           position="relative"
           zIndex={1}
         />
@@ -70,50 +96,272 @@ const StatusStep = ({ label, status, isLast }) => {
 };
 
 const LeaveSubmitStatusPage = () => {
-  // Mock Data: Current status is 'Submitted'
-  const steps = [
-    { label: "Submitted", status: "completed" },
-    { label: "Approval 01", status: "pending" },
-    { label: "Approval 02", status: "pending" },
-    { label: "Approval 03", status: "pending" },
-    { label: "Approval 04", status: "pending" },
-    { label: "Verdict", status: "pending" },
-  ];
+  const navigate = useNavigate();
+  const { role, originalRole } = useRole();
+  const { user } = useAuth();
+  const isEmployeeMode = role === "employee";
+  const shouldFetchProfile = isEmployeeMode && originalRole === "employee";
+
+  const { data: empProfile, isLoading: loadingProfile } = useEmployeeProfile(shouldFetchProfile ? user?.id : null);
+  const { data: leaveRequests, isLoading: loadingLeaves } = useLeaveRequests();
+  
+  const [selectedRequest, setSelectedRequest] = useState(null);
+
+  // Filter requests for the current employee
+  const myRequests = leaveRequests?.filter((r) => {
+    // If admin/HR, they can view all, but for employees restrict to their profile ID
+    if (isEmployeeMode) {
+      return r.employee_id === empProfile?.id;
+    }
+    return true;
+  }) || [];
+
+  // Automatically select the first request as default once loaded
+  useEffect(() => {
+    if (myRequests.length > 0 && !selectedRequest) {
+      setSelectedRequest(myRequests[0]);
+    }
+  }, [myRequests, selectedRequest]);
+
+  const isLoading = loadingProfile || loadingLeaves;
+
+  // Build the approval stepper steps dynamically based on request status
+  const getSteps = (status) => {
+    if (status === "Approved") {
+      return [
+        { label: "Submitted", status: "completed" },
+        { label: "Level 1 Approval", status: "completed" },
+        { label: "Level 2 Approval", status: "completed" },
+        { label: "Approved", status: "completed" },
+      ];
+    } else if (status === "Rejected") {
+      return [
+        { label: "Submitted", status: "completed" },
+        { label: "Review", status: "completed" },
+        { label: "Verdict", status: "failed" },
+      ];
+    } else {
+      // Pending
+      return [
+        { label: "Submitted", status: "completed" },
+        { label: "Level 1 Approval", status: "current" },
+        { label: "Level 2 Approval", status: "pending" },
+        { label: "Verdict", status: "pending" },
+      ];
+    }
+  };
+
+  const formatDate = (dateStr) => {
+    if (!dateStr) return "—";
+    const d = new Date(dateStr);
+    return d.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+  };
 
   return (
-    <DashboardLayout pageTitle="Leave Approval Status">
-      <Box 
-        bg="white" 
-        p={10} 
-        borderRadius="xl" 
-        shadow="sm" 
-        borderWidth="1px" 
-        minH="400px" // Give it height to look spacious like screenshot
-      >
-        <VStack align="stretch" spacing={2} mb={16}>
-          <Text fontSize="lg" fontWeight="bold" color="gray.800">
-            Leave Approval Status
-          </Text>
-          <Text fontSize="sm" color="gray.500">
-            Check status of your leave request
-          </Text>
-        </VStack>
+    <DashboardLayout pageTitle="Leave Request History">
+      <VStack spacing={6} align="stretch" w="100%">
+        {/* Back navigation */}
+        <Button
+          variant="ghost"
+          leftIcon={<FiArrowLeft />}
+          color="gray.600"
+          w="fit-content"
+          onClick={() => navigate("/leaves")}
+          _hover={{ bg: "gray.100" }}
+        >
+          Back to Leaves
+        </Button>
 
-        {/* Timeline Container */}
-        <Box px={4}>
-          <HStack spacing={0} align="flex-start" w="full">
-            {steps.map((step, index) => (
-              <StatusStep
-                key={index}
-                label={step.label}
-                status={step.status}
-                isLast={index === steps.length - 1}
-              />
-            ))}
-          </HStack>
-        </Box>
+        {isLoading ? (
+          <Flex minH="300px" justify="center" align="center">
+            <Spinner size="lg" color="purple.500" />
+          </Flex>
+        ) : (
+          <Flex direction={{ base: "column", xl: "row" }} gap={6} align="stretch">
+            {/* Left Box: History Table */}
+            <Box bg="white" p={6} borderRadius="2xl" shadow="sm" borderWidth="1px" flex="1.5">
+              <VStack align="stretch" spacing={4}>
+                <Heading size="sm" color="gray.800">
+                  Request Logs
+                </Heading>
+                {myRequests.length === 0 ? (
+                  <Flex py={10} justify="center" align="center" direction="column" gap={2}>
+                    <Icon as={FiInfo} color="gray.300" boxSize={8} />
+                    <Text color="gray.400" fontSize="sm">
+                      No leave requests found.
+                    </Text>
+                  </Flex>
+                ) : (
+                  <Box overflowX="auto">
+                    <Table variant="simple" size="sm">
+                      <Thead bg="gray.50">
+                        <Tr>
+                          <Th color="gray.500" fontSize="10px">Leave Duration</Th>
+                          <Th color="gray.500" fontSize="10px">Type</Th>
+                          <Th color="gray.500" fontSize="10px">Reason</Th>
+                          <Th color="gray.500" fontSize="10px">Status</Th>
+                          <Th color="gray.500" fontSize="10px">Doc</Th>
+                          <Th color="gray.500" fontSize="10px" textAlign="right">Action</Th>
+                        </Tr>
+                      </Thead>
+                      <Tbody>
+                        {myRequests.map((req) => {
+                          const isSelected = selectedRequest?.id === req.id;
+                          return (
+                            <Tr 
+                              key={req.id} 
+                              bg={isSelected ? "purple.50" : "transparent"} 
+                              _hover={{ bg: "gray.50", cursor: "pointer" }}
+                              onClick={() => setSelectedRequest(req)}
+                            >
+                              <Td py={3} fontWeight="600" color="gray.700" fontSize="xs">
+                                {formatDate(req.start_date)} – {formatDate(req.end_date)}
+                              </Td>
+                              <Td py={3} fontSize="xs">
+                                <Badge colorScheme={req.type === "Sick" ? "red" : "blue"} variant="subtle" borderRadius="md" px={2} py={0.5}>
+                                  {req.type}
+                                </Badge>
+                              </Td>
+                              <Td py={3} color="gray.600" fontSize="xs" maxW="200px" isTruncated>
+                                {req.reason || "—"}
+                              </Td>
+                              <Td py={3}>
+                                <Badge
+                                  colorScheme={
+                                    req.status === "Approved"
+                                      ? "green"
+                                      : req.status === "Rejected"
+                                      ? "red"
+                                      : "yellow"
+                                  }
+                                  px={2.5}
+                                  py={0.5}
+                                  borderRadius="md"
+                                  fontSize="10px"
+                                  fontWeight="bold"
+                                >
+                                  {req.status}
+                                </Badge>
+                              </Td>
+                              <Td py={3}>
+                                {req.document_url ? (
+                                  <Link href={req.document_url} isExternal>
+                                    <Icon as={FiPaperclip} color="purple.500" />
+                                  </Link>
+                                ) : (
+                                  "—"
+                                )}
+                              </Td>
+                              <Td py={3} textAlign="right">
+                                <Button 
+                                  size="xs" 
+                                  colorScheme="purple" 
+                                  variant={isSelected ? "solid" : "outline"}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedRequest(req);
+                                  }}
+                                >
+                                  Track
+                                </Button>
+                              </Td>
+                            </Tr>
+                          );
+                        })}
+                      </Tbody>
+                    </Table>
+                  </Box>
+                )}
+              </VStack>
+            </Box>
 
-      </Box>
+            {/* Right Box: Timeline Details Panel */}
+            <Box bg="white" p={6} borderRadius="2xl" shadow="sm" borderWidth="1px" flex="1">
+              {selectedRequest ? (
+                <VStack align="stretch" spacing={6}>
+                  <Box pb={4} borderBottom="1px solid" borderColor="gray.100">
+                    <Text fontSize="xs" fontWeight="800" color="purple.500" letterSpacing="wider" mb={1}>
+                      SELECTED REQUEST STATUS
+                    </Text>
+                    <Heading size="md" color="gray.800">
+                      {selectedRequest.type} Leave
+                    </Heading>
+                    <Text fontSize="xs" color="gray.400" mt={1}>
+                      Period: {formatDate(selectedRequest.start_date)} to {formatDate(selectedRequest.end_date)}
+                    </Text>
+                  </Box>
+
+                  {/* Visual Timeline Stepper */}
+                  <Box py={4}>
+                    <Text fontSize="xs" fontWeight="bold" color="gray.500" mb={4}>
+                      Approval Timeline
+                    </Text>
+                    <HStack spacing={0} justify="space-between" align="flex-start">
+                      {getSteps(selectedRequest.status).map((step, idx, arr) => (
+                        <StatusStep
+                          key={idx}
+                          label={step.label}
+                          status={step.status}
+                          isLast={idx === arr.length - 1}
+                        />
+                      ))}
+                    </HStack>
+                  </Box>
+
+                  {/* Summary Block */}
+                  <Card variant="unstyled" bg="gray.50" borderRadius="xl">
+                    <CardBody p={4}>
+                      <VStack align="stretch" spacing={3}>
+                        <Box>
+                          <Text fontSize="9px" fontWeight="800" color="gray.400" textTransform="uppercase">
+                            Submission Date
+                          </Text>
+                          <Text fontSize="xs" fontWeight="700" color="gray.700">
+                            {selectedRequest.created_at ? formatDate(selectedRequest.created_at) : "—"}
+                          </Text>
+                        </Box>
+                        <Box>
+                          <Text fontSize="9px" fontWeight="800" color="gray.400" textTransform="uppercase">
+                            Reason / Statement
+                          </Text>
+                          <Text fontSize="xs" color="gray.600">
+                            {selectedRequest.reason || "No statement provided."}
+                          </Text>
+                        </Box>
+                        {selectedRequest.document_url && (
+                          <Box>
+                            <Text fontSize="9px" fontWeight="800" color="gray.400" textTransform="uppercase" mb={1}>
+                              Supporting Evidence
+                            </Text>
+                            <Button
+                              as={Link}
+                              href={selectedRequest.document_url}
+                              isExternal
+                              size="xs"
+                              colorScheme="purple"
+                              leftIcon={<FiPaperclip />}
+                              variant="outline"
+                            >
+                              Download Evidence Document
+                            </Button>
+                          </Box>
+                        )}
+                      </VStack>
+                    </CardBody>
+                  </Card>
+                </VStack>
+              ) : (
+                <Flex h="full" minH="300px" justify="center" align="center" direction="column" gap={2}>
+                  <Icon as={FiInfo} color="gray.300" boxSize={10} />
+                  <Text color="gray.400" fontSize="sm" textAlign="center">
+                    Select a request from the list to view its approval stepper timeline.
+                  </Text>
+                </Flex>
+              )}
+            </Box>
+          </Flex>
+        )}
+      </VStack>
     </DashboardLayout>
   );
 };

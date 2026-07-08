@@ -121,7 +121,8 @@ export async function getEmployeeProfile(id) {
 
     if (empResult.error) throw empResult.error;
     if (!empResult.data) {
-      throw new Error("Employee profile not found");
+      // No employee record — return null gracefully (HR/Manager users may not have one)
+      return null;
     }
 
     const employeeId = empResult.data.id;
@@ -155,7 +156,7 @@ export async function getEmployeeProfile(id) {
       documents: docsResult.data ?? {},
     };
   } catch (err) {
-    console.error("getEmployeeProfile error:", err.message);
+    console.warn("getEmployeeProfile warning:", err.message);
     throw err;
   }
 }

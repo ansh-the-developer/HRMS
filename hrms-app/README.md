@@ -5060,3 +5060,365 @@ hrms-app/                                                     ✅ TURBO MONOREPO
 └── README.md
 ```
 
+
+---
+
+---
+
+## 📅 08-07-2026 — Phase 2: Beekend HRMS Feature Port & Production Hardening
+
+---
+
+### 🎯 Overview
+
+This session ported key business features from the **Beekend HRMS** prototype into **Happy HRMS**, strictly respecting Happy HRMS's existing architecture (Atomic Design, React Query, Supabase, RBAC, Turbo monorepo). No Beekend architecture, folder structure, or component library was copied — only business logic and UX patterns were adapted.
+
+---
+
+### ✅ Features Implemented
+
+#### 1. 💰 Payroll / Salary Management Module
+
+Ported the complete Payroll module from Beekend HRMS into Happy HRMS's existing `features/payroll/` structure.
+
+- **`PayrollOverviewPage.jsx`** — Main payroll run page for HR. Allows generating payroll for a selected month, auto-calculating gross, deductions (TDS, PF, ESI), net pay, and inserting `payslips` records via a `payroll_runs` trigger.
+- **`SalaryStructurePage.jsx`** — HR view to set and edit `monthly_ctc`, allowances, and deduction overrides per employee. Persists to `salary_structures` table.
+- **`PayrollSlipsPage.jsx`** — Employee view for downloading/viewing their own payslips. HR can look up any employee's payslip history.
+- **`PayrollDashboardPage.jsx`** — Overview dashboard with payroll run history, total payout stats, and quick-access cards.
+- **`PayrollReimbursementPage.jsx`** — Reimbursement claim submission for employees; HR approval interface.
+- **Database**: Uses `payroll_runs`, `payslips`, `salary_structures` tables in Supabase.
+- **Bug fixed**: Payroll generation error (`operator does not exist: date ~~ unknown`) — fixed date range query to use `.gte()` / `.lte()` instead of `.like()`.
+- **Bug fixed**: `FormControl is not defined` — missing import added to `PayrollOverviewPage.jsx`.
+- **Route access**: Added `"manager"` to allowed roles for `/payroll`, `/payroll/payslips`, and `/payroll/reimbursement` in `HomeRoutes.jsx`.
+
+---
+
+#### 2. 🗓️ Attendance — Rename & Role-Split
+
+- **Renamed** all "Schedule Management" labels to **"Attendance"** across `HRMSSidebar.jsx`, page titles, and breadcrumbs.
+- **HR/Manager view**: Unchanged full admin dashboard with CSV import/export, date picker, bulk edit, off-day marking, and per-employee log drilldown.
+- **Employee & Manager (Employee View)**: New dedicated `EmployeeAttendanceDashboard.jsx` that:
+  - Looks up employee record via `auth_user_id` in `employees` table
+  - Shows a gradient header banner with name, designation, and today's check-in/out status
+  - Displays 4 stat cards: Present, Absent, On Leave, Off Days (for selected month)
+  - Month-navigable log table: Date, Day, Check-In, Check-Out, Hours Worked, Status badge
+  - Today's row highlighted in purple; weekends in gray; future dates at reduced opacity
+  - Graceful empty state if no employee record is linked (no infinite spinner)
+- **New API**: `getAttendanceForEmployee(employeeId, startDate, endDate)` in `attendanceApi.js`
+- **Bug fixed**: `Cannot access 'loading' before initialization` — moved `isPageLoading` below `useState` declarations (TDZ fix).
+
+---
+
+#### 3. 🌿 Employee / Manager Leave Module
+
+Built the full employee-facing leave experience in `features/leaves/`.
+
+- **`LeavesDashboardPage.jsx`**:
+  - Calendar display, leave summary (allotted / available), upcoming approved leaves
+  - "Request Leave" toggles inline `LeaveRequestForm` with file attachment support
+  - Submission persists to `leave_requests` table; document uploaded to Supabase Storage (`leaves` bucket)
+  - HR/Manager actions hidden in employee view
+
+- **`LeaveSubmitStatusPage.jsx`** — Leave history & status tracker:
+  - Fetches leave requests for the logged-in employee
+  - Stepper timeline cards: Submitted → Under Review → Approved/Rejected
+
+- **`leaveApi.js`**: Added `uploadLeaveDocument(file)` Supabase Storage helper.
+
+- **Database migration** (`20260708172232_expand_leave_and_complaints.sql`):
+  - Added `document_url TEXT` to `leave_requests`
+  - Created `public.complaints` table with `case_id` (UNIQUE), `subject`, `description`, `status`, timestamps
+  - Created `leaves` storage bucket (public) with RLS policies
+
+---
+
+#### 4. 📢 Persistent Anonymous Complaint Center
+
+Rebuilt `ComplaintCenterPage.jsx` from local mock state to a fully Supabase-backed anonymous system.
+
+- **Employee view**: Submit complaint → auto-generated `CASE-XXXXXX` ID → one-click copy → track by Case ID
+- **HR/Manager view**: Live active cases dashboard + archived cases with resolve/dismiss actions
+- **New service**: `complaintApi.js` — `fetchComplaints()`, `createComplaint()`, `updateComplaintStatus()`
+- **New hooks**: `useComplaints.js` — React Query wrappers
+- **Bug fixed**: `409 Conflict` on submission — double-click guard via synchronous `submitting` state
+
+---
+
+#### 5. 👤 RBAC Employee Profile Editor
+
+Rebuilt `EmployeeProfilePage.jsx` with role-aware edit controls:
+
+| Role | Editable Fields |
+|------|----------------|
+| **Employee (own profile)** | Personal info, emergency contact, banking details |
+| **HR Admin** | All fields including corporate, salary, compliance |
+| **Manager (viewing another employee)** | Read-only |
+
+---
+
+#### 6. 🔐 Bug Fixes — HR Specialist & Manager Profile Lookup
+
+**Root Cause**: HR Specialists and Managers have `profiles` records but no `employees` table entries. Switching to Employee View triggered `useEmployeeProfile(user.id)` → `"Employee profile not found"` crash.
+
+**Fix**: Changed condition from `originalRole !== "hr"` to `originalRole === "employee"` across 5 files:
+
+| File | Fix Applied |
+|------|------------|
+| `AttendanceDashboardPage.jsx` | `shouldFetchProfile = isEmployeeMode && originalRole === "employee"` |
+| `LeavesDashboardPage.jsx` | Same; submit guard also scoped to `originalRole === "employee"` |
+| `LeaveSubmitStatusPage.jsx` | Same |
+| `PayrollSlipsPage.jsx` | `originalRole === "employee" ? user.id : null` |
+| `PayrollDashboardPage.jsx` | Same |
+
+---
+
+### 🐛 All Bugs Fixed This Session
+
+| Bug | Root Cause | Fix |
+|-----|-----------|-----|
+| `FormControl is not defined` | Missing Chakra import | Added to `PayrollOverviewPage.jsx` |
+| `Employee profile not found` | HR/Manager querying `employees` table | Skip fetch when `originalRole !== "employee"` |
+| Payroll `date ~~ unknown` error | `.like()` on date column | Replaced with `.gte()` / `.lte()` |
+| Attendance: spinner forever in employee view | Manager had no `selectedEmployeeForLogs` | Dedicated `EmployeeAttendanceDashboard` with own `auth_user_id` lookup |
+| `Cannot access 'loading' before initialization` | `isPageLoading` used `loading` before `useState` (TDZ) | Moved below `useState` |
+| `409 Conflict` on complaint submit | Double-click fired two parallel POSTs | `submitting` guard + button `isLoading` |
+| `"Profile not loaded yet. Try again."` | Submit guard blocked Manager | Scoped guard to `originalRole === "employee"` only |
+
+---
+
+### 📦 New Files Added
+
+| File | Purpose |
+|------|---------|
+| `features/attendance/pages/EmployeeAttendanceDashboard.jsx` | Personal attendance dashboard for employees & managers in employee-view |
+| `services/complaintApi.js` | Complaints CRUD API |
+| `hooks/useComplaints.js` | React Query wrappers for complaints |
+| `supabase/migrations/20260708172232_expand_leave_and_complaints.sql` | Schema: `document_url`, `complaints` table, `leaves` bucket |
+| `supabase/migrations/20260708181624_fix_leave_requests_rls.sql` | Schema: Adds INSERT/DELETE RLS policies on leave_requests |
+| `supabase/migrations/20260708183614_fix_leave_requests_select_rls.sql` | Schema: Relaxes leave_requests SELECT/INSERT RLS policies for all roles |
+
+---
+
+### 🔨 Build Status
+
+```
+✓ 1671 modules transformed — built in 9.1s (Production, zero errors)
+```
+
+---
+
+## 📁 Full Updated Monorepo Folder Structure
+
+```txt
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       ├── src/
+│       │   ├── assets/
+│       │   ├── components/
+│       │   │   ├── atomic/
+│       │   │   │   ├── atoms/
+│       │   │   │   │   ├── HRMSButton.jsx
+│       │   │   │   │   ├── HRMSInput.jsx
+│       │   │   │   │   ├── Logo.jsx
+│       │   │   │   │   ├── SectionTitle.jsx
+│       │   │   │   │   ├── SidebarToggleButton.jsx
+│       │   │   │   │   ├── StatusDot.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   ├── molecules/
+│       │   │   │   │   ├── AttendanceConfigItem.jsx
+│       │   │   │   │   ├── BirthdayListItem.jsx
+│       │   │   │   │   ├── DepartmentListItem.jsx
+│       │   │   │   │   ├── EmployeeConfigItem.jsx
+│       │   │   │   │   ├── EmployeeTableRow.jsx
+│       │   │   │   │   ├── HRMSCard.jsx
+│       │   │   │   │   ├── HRMSTable.jsx
+│       │   │   │   │   ├── InfoRow.jsx
+│       │   │   │   │   ├── LegendItem.jsx
+│       │   │   │   │   ├── LogoutButton.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   ├── organisms/
+│       │   │   │   │   ├── AttendanceConfigCard.jsx
+│       │   │   │   │   ├── BirthdayTrackerCard.jsx
+│       │   │   │   │   ├── CalendarCard.jsx
+│       │   │   │   │   ├── CompanyEventsCard.jsx
+│       │   │   │   │   ├── EmployeeConfigCard.jsx
+│       │   │   │   │   ├── EmployeeTable.jsx
+│       │   │   │   │   ├── HRMSSidebar.jsx
+│       │   │   │   │   ├── HolidaysCard.jsx
+│       │   │   │   │   ├── NoticeBoardCard.jsx
+│       │   │   │   │   ├── TopBar.jsx
+│       │   │   │   │   ├── UserProfileMenu.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   ├── templates/
+│       │   │   │   │   ├── DashboardLayout.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   └── pages/
+│       │   │   └── ui/
+│       │   │   ├── ProtectedRoute.jsx
+│       │   │   └── RoleRoute.jsx
+│       │   ├── contexts/
+│       │   │   ├── AuthContext.jsx
+│       │   │   ├── AuthProvider.jsx
+│       │   │   └── useAuthContext.js
+│       │   ├── features/
+│       │   │   ├── attendance/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── molecules/
+│       │   │   │   │   │   ├── AttendanceSearchInput.jsx
+│       │   │   │   │   │   ├── AttendanceStatusBadge.jsx
+│       │   │   │   │   │   ├── EmployeeAvatarName.jsx
+│       │   │   │   │   │   ├── RuleField.jsx
+│       │   │   │   │   │   ├── RuleListItem.jsx
+│       │   │   │   │   │   ├── WeekdaySelector.jsx
+│       │   │   │   │   │   ├── WorkingDayItem.jsx
+│       │   │   │   │   │   └── WorkingHourItem.jsx
+│       │   │   │   │   └── organisms/
+│       │   │   │   │       ├── AttendanceTable.jsx
+│       │   │   │   │       ├── AttendanceTableRow.jsx
+│       │   │   │   │       ├── ExportAttendanceCard.jsx
+│       │   │   │   │       ├── RuleEditCard.jsx
+│       │   │   │   │       ├── WorkingDaysForm.jsx
+│       │   │   │   │       ├── WorkingDaysList.jsx
+│       │   │   │   │       ├── WorkingHoursCard.jsx
+│       │   │   │   │       └── WorkingRulesList.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── AttendanceDashboardPage.jsx
+│       │   │   │       ├── AttendanceExportPage.jsx
+│       │   │   │       ├── EditAttendancePage.jsx
+│       │   │   │       ├── EditWorkingDaysPage.jsx
+│       │   │   │       ├── EditWorkingRulePage.jsx
+│       │   │   │       ├── EmployeeAttendanceDashboard.jsx
+│       │   │   │       ├── WorkingDaysPage.jsx
+│       │   │   │       ├── WorkingHoursPage.jsx
+│       │   │   │       └── WorkingRulesPage.jsx
+│       │   │   ├── auth/
+│       │   │   │   └── pages/
+│       │   │   │       ├── ChangePasswordPage.jsx
+│       │   │   │       ├── ForgotPasswordPage.jsx
+│       │   │   │       ├── LoginPage.jsx
+│       │   │   │       ├── MFAEnrollPage.jsx
+│       │   │   │       ├── PasswordChangedPage.jsx
+│       │   │   │       ├── ResetPasswordPage.jsx
+│       │   │   │       ├── TwoFactorPage.jsx
+│       │   │   │       └── VerifyEmailPage.jsx
+│       │   │   ├── employee/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── DeleteEmployeeModal.jsx
+│       │   │   │   │   ├── EmployeeBulkImportModal.jsx
+│       │   │   │   │   ├── EmployeeMasterForm.jsx
+│       │   │   │   │   └── EmployeeProfilePage.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── EmployeeBranchesPage.jsx
+│       │   │   │       ├── EmployeeDepartmentsPage.jsx
+│       │   │   │       ├── EmployeeDesignationsPage.jsx
+│       │   │   │       ├── EmployeeExportPage.jsx
+│       │   │   │       ├── EmployeeListPage.jsx
+│       │   │   │       ├── EmployeeStatusesPage.jsx
+│       │   │   │       └── EmployeeTypesPage.jsx
+│       │   │   ├── home/
+│       │   │   │   ├── ComplaintCenterPage.jsx
+│       │   │   │   ├── ProFeatureGatePage.jsx
+│       │   │   │   └── homePage.jsx
+│       │   │   ├── leaves/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── LeaveRequestForm.jsx
+│       │   │   │   │   └── LeaveUploadOverlay.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── LeaveRequestActionPage.jsx
+│       │   │   │       ├── LeaveRequestListPage.jsx
+│       │   │   │       ├── LeaveRequestUploadPage.jsx
+│       │   │   │       ├── LeaveRequiredFormPage.jsx
+│       │   │   │       ├── LeaveRulesApprovalFlowPage.jsx
+│       │   │   │       ├── LeaveRulesPage.jsx
+│       │   │   │       ├── LeaveSubmitStatusPage.jsx
+│       │   │   │       ├── LeavesDashboardPage.jsx
+│       │   │   │       └── leaveMockData.js
+│       │   │   ├── payroll/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── PaymentTable.jsx
+│       │   │   │   │   ├── ReimbursementForm.jsx
+│       │   │   │   │   └── SalaryStructureForm.jsx
+│       │   │   │   ├── constants/
+│       │   │   │   │   └── payrollMockData.js
+│       │   │   │   └── pages/
+│       │   │   │       ├── PayrollDashboardPage.jsx
+│       │   │   │       ├── PayrollOverviewPage.jsx
+│       │   │   │       ├── PayrollSlipsPage.jsx
+│       │   │   │       ├── PendingPaymentsPage.jsx
+│       │   │   │       ├── RecordPaymentPage.jsx
+│       │   │   │       ├── ReimbursementStatusPage.jsx
+│       │   │   │       └── SalaryStructurePage.jsx
+│       │   │   ├── performance/
+│       │   │   │   └── pages/
+│       │   │   │       ├── PerformanceDashboardPage.jsx
+│       │   │   │       ├── PerformanceHistoryPage.jsx
+│       │   │   │       ├── PerformanceNewReviewPage.jsx
+│       │   │   │       └── PerformanceReviewDetailPage.jsx
+│       │   │   └── settings/
+│       │   │       └── pages/
+│       │   │           ├── CompanyDetailsPage.jsx
+│       │   │           ├── PermissionsManagerPage.jsx
+│       │   │           ├── SettingsDashboardPage.jsx
+│       │   │           └── UserManagementPage.jsx
+│       │   ├── hooks/
+│       │   │   ├── index.js
+│       │   │   ├── useAuth.js
+│       │   │   ├── useComplaints.js
+│       │   │   ├── useEmployeeProfile.js
+│       │   │   ├── useEmployees.js
+│       │   │   ├── useHome.js
+│       │   │   ├── useLeaves.js
+│       │   │   ├── usePayroll.js
+│       │   │   ├── usePerformance.js
+│       │   │   └── useRole.js
+│       │   ├── lib/
+│       │   │   ├── queryClient.js
+│       │   │   ├── supabaseClient.js
+│       │   │   └── totpUtils.js
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx
+│       │   │   └── HomeRoutes.jsx
+│       │   ├── services/
+│       │   │   ├── attendanceApi.js
+│       │   │   ├── complaintApi.js
+│       │   │   ├── employeeApi.js
+│       │   │   ├── homeApi.js
+│       │   │   ├── leaveApi.js
+│       │   │   ├── payrollApi.js
+│       │   │   ├── performanceApi.js
+│       │   │   ├── profileApi.js
+│       │   │   └── useProfile.js
+│       │   ├── App.css
+│       │   ├── App.jsx
+│       │   ├── index.css
+│       │   └── main.jsx
+│       ├── package.json
+│       └── vite.config.js
+│
+│   ├── shared/
+│   │   └── employeeFilters.js
+│
+├── packages/
+│   └── shared/
+│       └── employeeFilters.js
+│
+├── supabase/
+│   ├── functions/
+│   │   └── create-employee-user/
+│   │       ├── index.ts
+│   │       └── config.toml
+│   └── migrations/
+│       ├── 20260708160102_create_payroll_tables.sql
+│       ├── 20260708172232_expand_leave_and_complaints.sql
+│       ├── 20260708181624_fix_leave_requests_rls.sql
+│       └── 20260708183614_fix_leave_requests_select_rls.sql
+│
+├── .env.local
+├── package.json
+├── turbo.json
+└── README.md
+```
+
+

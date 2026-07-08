@@ -302,11 +302,11 @@ const HomeRoutes = () => (
       }
     />
 
-    {/* Payroll - HR + Employee, NO Manager */}
+    {/* Payroll - HR + Manager + Employee */}
     <Route
       path="/payroll"
       element={
-        <RoleRoute allow={["hr", "employee"]}>
+        <RoleRoute allow={["hr", "manager", "employee"]}>
           <PayrollDashboardPage />
         </RoleRoute>
       }
@@ -314,7 +314,7 @@ const HomeRoutes = () => (
     <Route
       path="/payroll/reimbursement"
       element={
-        <RoleRoute allow={["hr", "employee"]}>
+        <RoleRoute allow={["hr", "manager", "employee"]}>
           <ReimbursementStatusPage />
         </RoleRoute>
       }
@@ -330,7 +330,7 @@ const HomeRoutes = () => (
     <Route
       path="/payroll/payslips"
       element={
-        <RoleRoute allow={["hr", "employee"]}>
+        <RoleRoute allow={["hr", "manager", "employee"]}>
           <PayrollSlipsPage />
         </RoleRoute>
       }

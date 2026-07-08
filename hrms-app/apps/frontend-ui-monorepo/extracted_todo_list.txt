@@ -1,0 +1,112 @@
+--- PAGE 1 ---
+1.1 — Enable MFA in Supabase Dashboard
+Go to Authentication → Sign In Methods → Multi Factor Auth
+Enable TOTP (Time-based One-Time Password)
+1.2 — Update LoginPage.jsx
+After signIn() succeeds, check if user has TOTP enrolled
+If enrolled → navigate to /verify-mfa with factorId in state
+If NOT enrolled → navigate to /home (first-time users skip MFA until forced)
+1.3 — Build TOTP Enrollment Screen(first login only)
+Call enrollMFA() → get qr_code + secret
+Show QR code as scannable image
+Show secret key as copyable text
+User scans with Google Authenticator / ProtonPass
+User enters 6-digit code to confirm enrollment
+Call challengeMFA() + verifyMFA() to confirm
+Show QR once only — never again after confirmed
+1.4 — Update TwoFactorPage.jsx(subsequent logins)
+Receive factorId from navigation state
+Call challengeMFA(factorId) on mount → get challengeId
+User enters 6-digit code
+Call verifyMFA(factorId, challengeId, code)
+On success → navigate to /home
+On fail → show error + allow retry
+1.5 — Add /enroll-mfa route to AuthRoutes.jsx
+New page: MFAEnrollPage.jsx
+Triggered on first login when no TOTP enrolled
+/g0  TOTP + Employee User Creation — Full To-Do List
+/g0  Phase 1: TOTP / MFA Flow
+--- PAGE 2 ---
+2.1 — Create profiles table in Supabase
+CREATE TABLE profiles (
+  id UUID PRIMARY KEYREFERENCES auth.users(id),
+  full_name TEXT,
+  role TEXT CHECK (role IN ('hr', 'manager', 'employee')),
+  must_change_password BOOLEANDEFAULTtrue,
+  avatar_url TEXT,
+  created_at TIMESTAMPDEFAULT NOW()
+);
+2.2 — Create Supabase Edge Function: create-employee-user
+Uses Service Role key (never on frontend)
+Accepts: email, full_name, temp_password, role
+Calls supabase.auth.admin.createUser()
+Sets email_confirmed: true
+Inserts row into profiles with must_change_password: true
+2.3 — Update EmployeeListPage.jsx / Add Employee Form
+Add temp_password field to the create employee form
+On submit → call Edge Function via supabase.functions.invoke()
+Employee gets created in both auth.users + profiles + employees tables
+2.4 — First Login Detection
+After login → check profiles.must_change_password
+If true → redirect to /change-password before anything else
+After password change → set must_change_password: false
+Then → redirect to /enroll-mfa for TOTP setup
+HR creates employee (email + temp password + role)
+        ↓
+Employee logs in with temp password
+        ↓
+Detected: must_change_password = true
+        ↓
+Forced → /change-password page
+        ↓
+Password updated → must_change_password = false
+        ↓
+/g0  Phase 2: Employee → Supabase User Creation
+/g0  Phase 3: First Login Full Journey
+--- PAGE 3 ---
+Redirected → /enroll-mfa
+        ↓
+QR code + secret shown (ONCE ONLY)
+        ↓
+Employee scans → enters 6-digit code → confirmed
+        ↓
+All future logins → password + 6-digit TOTP only
+        ↓
+Navigate → /home ✅
+4.1 — useRole hook
+const { isHR, isManager, isEmployee, role } = useRole();
+4.2 — Supabase RLS Policies
+Table HR Manager Employee
+employees Full CRUD Read only Own record only
+attendance Full CRUD Read team Own only
+leaves Approve/deny Approve team Own only
+payroll Full access ❌ Own payslips
+performance Full access Own team Own only
+4.3 — UI visibility by role
+HR → sees everything
+Manager → limited sidebar items
+Employee → read-only, own data only
+File Purpose
+MFAEnrollPage.jsx QR + secret + confirm 6-digit
+ChangePasswordPage.jsx Forced on first login
+create-employee-user (Edge Function) Admin user creation
+useRole.js RBAC hook
+useProfile.js Fetch profiles row for current user
+/g0   Phase 4: Roles & Permissions (RBAC)
+/g0   Phase 5: New Files to Create
+--- PAGE 4 ---
+Step Task
+✅  Done Env vars cleaned up
+/g0  Next Phase 1.1 — Enable MFA in Supabase dashboard
+/g0 Phase 1.5 + 1.3 — Build MFAEnrollPage.jsx
+/g0 Phase 1.4 — Update TwoFactorPage.jsx
+/g0 Phase 1.2 — Update LoginPage.jsx MFA check
+/g0 Phase 2.1 — Create profiles table
+/g0 Phase 2.2 — Edge Function
+/g0 Phase 2.3 — Employee form update
+/g0 Phase 2.4 — First login detection
+/g0 Phase 3 — Wire full journey together
+/g0 Phase 4 — RBAC + RLS
+Ready to start? Send me your current TwoFactorPage.jsx and confirm MFA is enabled in your
+Supabase dashboard → we'll kick off Phase 1 /g0
+/g0  Order of Execution

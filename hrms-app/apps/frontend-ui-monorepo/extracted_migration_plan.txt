@@ -1,0 +1,70 @@
+Auth0 → Supabase Auth Migration Plan
+Current State Audit
+Before touching any code, we need to know what Auth0 is doing right now:
+useAuth0() hook used in AppRoutes.jsx for isAuthenticated, isLoading
+ProtectedRoute component wraps all private routes
+Auth0 provider wraps the app in main.jsx or App.jsx
+Login/logout/reset password pages exist under features/auth/
+Send these files first:
+main.jsx
+App.jsx
+src/components/ProtectedRoute.jsx
+src/features/auth/pages/ (all files)
+Migration Phases
+Phase M1 — Setup Supabase Auth
+Enable Email/Password provider in Supabase dashboard
+Enable TOTP (MFA) in Supabase Auth settings
+Configure redirect URLs
+No code changes yet
+Phase M2 — Replace Auth Provider
+Remove:  @auth0/auth0-react provider in main.jsxAdd:     Supabase session listener (onAuthStateChange)Add:     AuthContext.jsx → global session state
+Phase M3 — Replace ProtectedRoute
+Remove:  useAuth0() → isAuthenticated checkAdd:     useSession() from Supabase         Redirect to /login if no session
+Phase M4 — Replace Auth Pages
+Old (Auth0)
+New (Supabase)
+Auth0 hosted login
+Custom LoginPage.jsx
+Auth0 password reset
+supabase.auth.resetPasswordForEmail()
+Auth0 logout
+supabase.auth.signOut()
+Auth0 callback page
+supabase.auth.onAuthStateChange()
+Phase M5 — TOTP / MFA Setup
+Supabase supports native TOTP MFA:  → supabase.auth.mfa.enroll()     — generate QR code  → supabase.auth.mfa.challenge()  — start challenge  → supabase.auth.mfa.verify()     — verify code
+Add MFA enrollment page for first login
+Add TOTP verification step after password login
+Works with Google Authenticator / any TOTP app
+Phase M6 — Multi-User & Role Management
+Supabase approach:  → user_roles table in DB  → Row Level Security (RLS) policies  → Custom claims via Supabase Edge Functions
+Phase M7 — Cleanup
+npm uninstall @auth0/auth0-reactRemove all useAuth0() referencesRemove Auth0 env variables
+File Change Map
+MODIFY:  main.jsx                          → remove Auth0Provider  App.jsx                           → add Supabase session listener  src/components/ProtectedRoute.jsx → replace useAuth0 with useSession  src/routes/AppRoutes.jsx          → replace isAuthenticated sourceCREATE:  src/contexts/AuthContext.jsx       → global Supabase session state  src/hooks/useAuth.js               → clean auth hook  src/features/auth/pages/LoginPage.jsx         → Supabase login  src/features/auth/pages/ResetPasswordPage.jsx → Supabase reset  src/features/auth/pages/MFASetupPage.jsx      → TOTP enrollment  src/features/auth/pages/MFAVerifyPage.jsx     → TOTP challengeDELETE:  Any Auth0 callback/redirect pages
+Recommended Order
+Step
+Task
+Risk
+M1
+Supabase Auth settings
+🟢 Zero
+M2
+AuthContext + session listener
+🟢 Low
+M3
+ProtectedRoute swap
+🟡 Medium
+M4
+Auth pages rebuild
+🟡 Medium
+M5
+TOTP/MFA wiring
+🟡 Medium
+M6
+Roles & RLS
+🔴 High
+M7
+Remove Auth0
+🟢 Low (last)
+Send main.jsx, App.jsx, ProtectedRoute.jsx and all auth pages → we start M1 + M2 immediately 🚀

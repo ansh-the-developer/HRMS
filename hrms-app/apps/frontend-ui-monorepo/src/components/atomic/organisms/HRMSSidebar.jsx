@@ -54,7 +54,7 @@ const HRMSSidebar = ({
   if (role === "employee") {
     navItemsList.push(
       { label: "Home", icon: FiHome, path: "/home" },
-      { label: "Schedule", icon: FiClock, path: "/attendance" },
+      { label: "Attendance", icon: FiClock, path: "/attendance" },
       { label: "Leave/Vacation", icon: FiClipboard, path: "/leaves" },
       { label: "Salary", icon: FiDollarSign, path: "/payroll" },
       { label: "Complaint Center", icon: FiShield, path: "/complaints" },
@@ -64,7 +64,7 @@ const HRMSSidebar = ({
     navItemsList.push(
       { label: "Home", icon: FiHome, path: "/home" },
       { label: "Employee Mgmt.", icon: FiUsers, path: "/employees" },
-      { label: "Schedule Mgmt.", icon: FiClock, path: "/attendance" },
+      { label: "Attendance", icon: FiClock, path: "/attendance" },
       { label: "Leave Request Data", icon: FiClipboard, path: "/leaves/requests" },
       { label: "Salary Mgmt.", icon: FiDollarSign, path: "/payroll" },
       { label: "Complaint Center", icon: FiShield, path: "/complaints" },
