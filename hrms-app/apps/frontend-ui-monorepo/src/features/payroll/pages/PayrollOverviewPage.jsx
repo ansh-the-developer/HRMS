@@ -215,17 +215,17 @@ export default function PayrollOverviewPage() {
           onClick={() => navigate('/payroll')}
           mb={4}
           alignSelf="flex-start"
-          _hover={{ bg: 'gray.100' }}
+          _hover={{ bg: "hover-bg" }}
         >
           Back to Payroll Dashboard
         </Button>
-        <Heading size="lg" mb={6} color="gray.800">Monthly Payroll Processing</Heading>
+        <Heading size="lg" mb={6} color="text-primary">Monthly Payroll Processing</Heading>
 
         {/* Filters Panel */}
-        <Box bg="white" borderRadius="lg" border="1px solid" borderColor="gray.200" p={5} mb={6}>
+        <Box bg="card-bg" borderRadius="lg" border="1px solid" borderColor="border-color" p={5} mb={6}>
           <SimpleGrid columns={{ base: 1, md: 3 }} gap={4} align="center">
             <FormControl>
-              <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">Select Processing Month</FormLabel>
+              <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">Select Processing Month</FormLabel>
               <Select value={selectedMonth} onChange={(e) => setSelectedMonth(e.target.value)}>
                 <option value="2026-07">July 2026</option>
                 <option value="2026-06">June 2026</option>
@@ -261,20 +261,20 @@ export default function PayrollOverviewPage() {
               <VStack spacing={6} align="stretch">
                 {/* stats */}
                 <SimpleGrid columns={{ base: 1, md: 4 }} gap={5}>
-                  <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4}>
-                    <Text fontSize="xs" fontWeight="semibold" color="gray.400" textTransform="uppercase">Gross Payout</Text>
-                    <Text fontSize="xl" fontWeight="bold" color="gray.700">{formatRs(totals.gross)}</Text>
+                  <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={4}>
+                    <Text fontSize="xs" fontWeight="semibold" color="text-muted" textTransform="uppercase">Gross Payout</Text>
+                    <Text fontSize="xl" fontWeight="bold" color="text-secondary">{formatRs(totals.gross)}</Text>
                   </Box>
-                  <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4}>
-                    <Text fontSize="xs" fontWeight="semibold" color="gray.400" textTransform="uppercase">Deductions</Text>
+                  <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={4}>
+                    <Text fontSize="xs" fontWeight="semibold" color="text-muted" textTransform="uppercase">Deductions</Text>
                     <Text fontSize="xl" fontWeight="bold" color="red.500">{formatRs(totals.deductions)}</Text>
                   </Box>
-                  <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4}>
-                    <Text fontSize="xs" fontWeight="semibold" color="gray.400" textTransform="uppercase">Net Payable</Text>
+                  <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={4}>
+                    <Text fontSize="xs" fontWeight="semibold" color="text-muted" textTransform="uppercase">Net Payable</Text>
                     <Text fontSize="xl" fontWeight="bold" color="green.600">{formatRs(totals.net)}</Text>
                   </Box>
-                  <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4}>
-                    <Text fontSize="xs" fontWeight="semibold" color="gray.400" textTransform="uppercase">Run Status</Text>
+                  <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={4}>
+                    <Text fontSize="xs" fontWeight="semibold" color="text-muted" textTransform="uppercase">Run Status</Text>
                     <HStack spacing={2} mt={1}>
                       <Badge colorScheme={getStatusBadgeColor(currentRun.status)} px={2} py={0.5} borderRadius="full">
                         {currentRun.status.toUpperCase()}
@@ -289,10 +289,10 @@ export default function PayrollOverviewPage() {
                 </SimpleGrid>
 
                 {/* console actions */}
-                <Flex bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={4} justify="space-between" align="center" gap={4}>
+                <Flex bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={4} justify="space-between" align="center" gap={4}>
                   <Box>
-                    <Text fontWeight="semibold" fontSize="sm" color="gray.700">Admin Actions Console</Text>
-                    <Text fontSize="xs" color="gray.400">Locking payroll runs finalizes calculation values and prevents duplicate regenerations.</Text>
+                    <Text fontWeight="semibold" fontSize="sm" color="text-secondary">Admin Actions Console</Text>
+                    <Text fontSize="xs" color="text-muted">Locking payroll runs finalizes calculation values and prevents duplicate regenerations.</Text>
                   </Box>
                   
                   <HStack spacing={3}>
@@ -315,10 +315,10 @@ export default function PayrollOverviewPage() {
                 </Flex>
 
                 {/* Detailed Table */}
-                <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" overflow="hidden">
+                <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" overflow="hidden">
                   <Table size="sm" variant="simple">
                     <Thead>
-                      <Tr bg="gray.50">
+                      <Tr bg="app-bg-secondary">
                         <Th py={3}>Employee</Th>
                         <Th textAlign="center">Present</Th>
                         <Th textAlign="center">Off Days</Th>
@@ -333,8 +333,8 @@ export default function PayrollOverviewPage() {
                     <Tbody>
                       {slips && slips.length > 0 ? (
                         slips.map(slip => (
-                          <Tr key={slip.id} _hover={{ bg: 'gray.50' }}>
-                            <Td fontWeight="medium" color="gray.700" py={3}>{slip.employees?.name}</Td>
+                          <Tr key={slip.id} _hover={{ bg: "hover-bg" }}>
+                            <Td fontWeight="medium" color="text-secondary" py={3}>{slip.employees?.name}</Td>
                             
                             {/* present drill */}
                             <Td textAlign="center">
@@ -371,8 +371,8 @@ export default function PayrollOverviewPage() {
                               </Text>
                             </Td>
 
-                            <Td textAlign="right" color="gray.700">{formatRs(slip.gross_salary)}</Td>
-                            <Td textAlign="right" fontWeight="semibold" color="gray.800">{formatRs(slip.net_salary)}</Td>
+                            <Td textAlign="right" color="text-secondary">{formatRs(slip.gross_salary)}</Td>
+                            <Td textAlign="right" fontWeight="semibold" color="text-primary">{formatRs(slip.net_salary)}</Td>
                             
                             <Td textAlign="center">
                               <Badge colorScheme={slip.payment_status === 'paid' ? 'green' : 'yellow'}>
@@ -382,15 +382,15 @@ export default function PayrollOverviewPage() {
                           </Tr>
                         ))
                       ) : (
-                        <Tr><Td colSpan={9} textAlign="center" py={6} color="gray.400">No payslips data found.</Td></Tr>
+                        <Tr><Td colSpan={9} textAlign="center" py={6} color="text-muted">No payslips data found.</Td></Tr>
                       )}
                     </Tbody>
                   </Table>
                 </Box>
               </VStack>
             ) : (
-              <Box bg="white" borderRadius="lg" border="1px solid" borderColor="gray.200" p={12} textAlign="center">
-                <Text color="gray.400" fontSize="lg" mb={6}>No calculations generated for {selectedMonth} yet.</Text>
+              <Box bg="card-bg" borderRadius="lg" border="1px solid" borderColor="border-color" p={12} textAlign="center">
+                <Text color="text-muted" fontSize="lg" mb={6}>No calculations generated for {selectedMonth} yet.</Text>
                 <HRMSButton onClick={handleGenerate} isLoading={generatePayrollMutation.isPending}>
                   🚀 Generate Payroll for {selectedMonth}
                 </HRMSButton>
@@ -410,7 +410,7 @@ export default function PayrollOverviewPage() {
           <ModalCloseButton />
           
           <ModalBody pb={6}>
-            <Text mb={4} fontSize="sm" color="gray.500">
+            <Text mb={4} fontSize="sm" color="text-muted">
               Drill-down verifying logs for metric: <strong>{activeDrillDown?.metric}</strong> in month {selectedMonth}.
             </Text>
             
@@ -419,7 +419,7 @@ export default function PayrollOverviewPage() {
             ) : (
               <VStack align="stretch" spacing={4}>
                 {filteredDrillDownLogs.length === 0 ? (
-                  <Text py={4} fontSize="sm" color="gray.400" textAlign="center">No logs matching this category.</Text>
+                  <Text py={4} fontSize="sm" color="text-muted" textAlign="center">No logs matching this category.</Text>
                 ) : (
                   <Table size="sm" variant="simple">
                     <Thead>
@@ -450,9 +450,9 @@ export default function PayrollOverviewPage() {
                 <Divider />
                 
                 {/* Description of terms */}
-                <Box bg="gray.50" p={3} borderRadius="md">
-                  <Text fontWeight="semibold" fontSize="xs" color="gray.600" mb={1} textTransform="uppercase">Payroll Terms Guide:</Text>
-                  <UnorderedList spacing={1} fontSize="xs" color="gray.500">
+                <Box bg="app-bg-secondary" p={3} borderRadius="md">
+                  <Text fontWeight="semibold" fontSize="xs" color="text-secondary" mb={1} textTransform="uppercase">Payroll Terms Guide:</Text>
+                  <UnorderedList spacing={1} fontSize="xs" color="text-muted">
                     <ListItem><strong>Present:</strong> Employee logged check-in status. Eligible for pro-rated pay.</ListItem>
                     <ListItem><strong>Off Day:</strong> Weekends or company holidays. Eligible for pro-rated pay.</ListItem>
                     <ListItem><strong>On Leave:</strong> Approved leaves. Deducted from pay (unpaid leaves as per system policy).</ListItem>

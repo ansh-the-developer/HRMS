@@ -320,34 +320,36 @@ const EmployeeBulkImportModal = ({ isOpen, onClose, onSuccess }) => {
       <ModalOverlay bg="blackAlpha.600" backdropFilter="blur(5px)" />
       <ModalContent borderRadius="3xl" p={6} mx={4}>
         <ModalHeader pb={1} pt={4} px={2} display="flex" justifyContent="space-between" alignItems="center">
-          <Text fontSize="xl" fontWeight="bold" color="gray.900">
+          <Text fontSize="xl" fontWeight="bold" color="text-primary">
             Bulk Import
           </Text>
-          <ModalCloseButton position="static" borderRadius="full" size="sm" bg="gray.100" />
+          <ModalCloseButton position="static" borderRadius="full" size="sm" bg="app-bg-secondary" />
         </ModalHeader>
 
         <ModalBody py={4} px={2}>
           <VStack spacing={5} align="stretch">
             {/* CSV Format Banner */}
             <Flex
-              bg="#F3F4FD"
+              bg="app-bg-secondary"
+              border="1px solid"
+              borderColor="border-color"
               borderRadius="2xl"
               p={4}
               align="center"
               justify="space-between"
             >
               <Box>
-                <Text fontSize="xs" fontWeight="bold" color="gray.800">
+                <Text fontSize="xs" fontWeight="bold" color="text-primary">
                   CSV Format
                 </Text>
-                <Text fontSize="2xs" color="gray.500" fontWeight="medium" mt={0.5}>
+                <Text fontSize="2xs" color="text-muted" fontWeight="medium" mt={0.5}>
                   EMP_ID, FULL_NAME (REQUIRED), TEMP_PASSWORD
                 </Text>
               </Box>
               <HRMSButton
-                bg="#4F22FF"
+                bg="accent"
                 color="white"
-                _hover={{ bg: "#3D17D9" }}
+                _hover={{ bg: "accent-hover" }}
                 borderRadius="xl"
                 onClick={handleTemplateDownload}
                 px={4}
@@ -360,8 +362,8 @@ const EmployeeBulkImportModal = ({ isOpen, onClose, onSuccess }) => {
             {/* Upload Area */}
             <Flex
               border="2px dashed"
-              borderColor={selectedFile ? "#4F22FF" : "gray.200"}
-              bg={selectedFile ? "purple.50" : "transparent"}
+              borderColor={selectedFile ? "accent" : "border-color"}
+              bg={selectedFile ? "rgba(99, 102, 241, 0.12)" : "app-bg-secondary"}
               borderRadius="2xl"
               p={8}
               direction="column"
@@ -369,7 +371,7 @@ const EmployeeBulkImportModal = ({ isOpen, onClose, onSuccess }) => {
               justify="center"
               cursor={isProcessing ? "not-allowed" : "pointer"}
               onClick={handleUploadBoxClick}
-              _hover={{ borderColor: isProcessing ? "gray.200" : "#4F22FF" }}
+              _hover={{ borderColor: isProcessing ? "border-color" : "accent", bg: "hover-bg" }}
               transition="all 0.2s"
             >
               <input
@@ -383,13 +385,13 @@ const EmployeeBulkImportModal = ({ isOpen, onClose, onSuccess }) => {
               <Icon
                 as={FiUpload}
                 boxSize={6}
-                color={selectedFile ? "#4F22FF" : "gray.400"}
+                color={selectedFile ? "accent" : "text-muted"}
                 mb={3}
               />
-              <Text fontSize="sm" fontWeight="bold" color="gray.700" textAlign="center">
+              <Text fontSize="sm" fontWeight="bold" color="text-secondary" textAlign="center">
                 {selectedFile ? selectedFile.name : "Click to upload directory CSV"}
               </Text>
-              <Text fontSize="xs" color="gray.400" mt={1}>
+              <Text fontSize="xs" color="text-muted" mt={1}>
                 UTF-8 encoded CSV files only
               </Text>
             </Flex>
@@ -397,7 +399,7 @@ const EmployeeBulkImportModal = ({ isOpen, onClose, onSuccess }) => {
             {/* Progress Bar */}
             {isProcessing && (
               <Box px={1}>
-                <Text fontSize="xs" color="gray.500" mb={1} fontWeight="medium">
+                <Text fontSize="xs" color="text-muted" mb={1} fontWeight="medium">
                   Synchronizing records... {progress}%
                 </Text>
                 <Progress
@@ -412,8 +414,8 @@ const EmployeeBulkImportModal = ({ isOpen, onClose, onSuccess }) => {
 
             {/* Results Output */}
             {results && (
-              <Box bg="gray.50" borderRadius="xl" p={4} maxH="180px" overflowY="auto">
-                <Text fontSize="xs" fontWeight="bold" color="gray.700" mb={2}>
+              <Box bg="app-bg-secondary" borderRadius="xl" p={4} maxH="180px" overflowY="auto">
+                <Text fontSize="xs" fontWeight="bold" color="text-secondary" mb={2}>
                   Import Summary:
                 </Text>
                 <VStack align="stretch" spacing={1.5}>
@@ -448,10 +450,10 @@ const EmployeeBulkImportModal = ({ isOpen, onClose, onSuccess }) => {
             <HRMSButton
               w="full"
               h="50px"
-              bg={selectedFile ? "#4F22FF" : "#9B86FA"}
+              bg={selectedFile ? "accent" : "rgba(99, 102, 241, 0.50)"}
               color="white"
               borderRadius="2xl"
-              _hover={selectedFile ? { bg: "#3D17D9" } : { bg: "#9B86FA" }}
+              _hover={selectedFile ? { bg: "accent-hover" } : { bg: "rgba(99, 102, 241, 0.50)" }}
               cursor={selectedFile ? "pointer" : "not-allowed"}
               onClick={handleSyncRecords}
               isLoading={isProcessing}

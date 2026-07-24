@@ -176,7 +176,7 @@ const CompanyEventsCard = () => {
         <SectionTitle>Company Events</SectionTitle>
         <Flex align="center" gap={3} py={8} justify="center">
           <Spinner size="sm" />
-          <Text fontSize="sm" color="gray.500">Loading events...</Text>
+          <Text fontSize="sm" color="text-muted">Loading events...</Text>
         </Flex>
       </HRMSCard>
     );
@@ -197,9 +197,9 @@ const CompanyEventsCard = () => {
         <Box mb={4}>
           {events.length === 0 ? (
             <VStack align="start" py={8} spacing={2}>
-              <Text fontSize="sm" color="gray.500">No events yet</Text>
+              <Text fontSize="sm" color="text-muted">No events yet</Text>
               {isHR && (
-                <Text fontSize="xs" color="gray.400">
+                <Text fontSize="xs" color="text-muted">
                   Click Add an Event to create one
                 </Text>
               )}
@@ -245,7 +245,7 @@ const CompanyEventsCard = () => {
 
         <HStack spacing={4}>
           <LegendItem label="Upcoming" color="purple.500" />
-          <LegendItem label="Past Events" color="gray.400" />
+          <LegendItem label="Past Events" color="text-muted" />
         </HStack>
       </HRMSCard>
 

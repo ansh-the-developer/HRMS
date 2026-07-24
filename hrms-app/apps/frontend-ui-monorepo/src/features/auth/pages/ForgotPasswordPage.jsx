@@ -52,7 +52,7 @@ const { forgotPassword: resetPassword } = useAuth(); // destructure alias
 
           <VStack spacing={6} align="stretch">
             <Box textAlign="center">
-              <Text fontSize="sm" color="gray.600">
+              <Text fontSize="sm" color="text-secondary">
                 Forgot your password?
               </Text>
               <Heading
@@ -73,7 +73,7 @@ const { forgotPassword: resetPassword } = useAuth(); // destructure alias
                   <AlertIcon />
                   Password reset email sent! Check your inbox.
                 </Alert>
-                <Text fontSize="sm" color="gray.600" textAlign="center">
+                <Text fontSize="sm" color="text-secondary" textAlign="center">
                   Didn't receive it? Check your spam folder or try again.
                 </Text>
                 <Button
@@ -110,7 +110,7 @@ const { forgotPassword: resetPassword } = useAuth(); // destructure alias
                     </Alert>
                   )}
 
-                  <Text fontSize="sm" color="gray.500">
+                  <Text fontSize="sm" color="text-muted">
                     Enter your registered email address. We'll send you a
                     link to reset your password.
                   </Text>
@@ -145,7 +145,7 @@ const { forgotPassword: resetPassword } = useAuth(); // destructure alias
                     variant="ghost"
                     size="md"
                     w="100%"
-                    color="gray.500"
+                    color="text-muted"
                     onClick={() => navigate("/login")}
                   >
                     ← Back to Login

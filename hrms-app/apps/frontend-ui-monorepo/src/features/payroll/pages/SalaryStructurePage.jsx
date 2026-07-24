@@ -85,7 +85,7 @@ function StructurePanel({ title, placeholder, storageKey, initialItems, onChange
 
   return (
     <Flex direction="column" gap={5}>
-      <Text fontWeight="semibold" fontSize="md" color="gray.700">{title}</Text>
+      <Text fontWeight="semibold" fontSize="md" color="text-secondary">{title}</Text>
 
       {/* Input + Add */}
       <Flex gap={3}>
@@ -102,10 +102,10 @@ function StructurePanel({ title, placeholder, storageKey, initialItems, onChange
       </Flex>
 
       {/* List */}
-      <Box border="1px solid" borderColor="gray.200" borderRadius="md" overflow="hidden" bg="white">
+      <Box border="1px solid" borderColor="border-color" borderRadius="md" overflow="hidden" bg="card-bg">
         {items.length === 0 && (
           <Flex justify="center" py={6}>
-            <Text fontSize="sm" color="gray.400">No items yet</Text>
+            <Text fontSize="sm" color="text-muted">No items yet</Text>
           </Flex>
         )}
         {items.map((item, idx) => (
@@ -115,8 +115,8 @@ function StructurePanel({ title, placeholder, storageKey, initialItems, onChange
             justify="space-between"
             px={4} py={3}
             borderBottom={idx < items.length - 1 ? '1px solid' : 'none'}
-            borderColor="gray.100"
-            _hover={{ bg: 'gray.50' }}
+            borderColor="border-color"
+            _hover={{ bg: "hover-bg" }}
             gap={3}
           >
             {editingId === item.id ? (
@@ -132,7 +132,7 @@ function StructurePanel({ title, placeholder, storageKey, initialItems, onChange
                 flex="1"
               />
             ) : (
-              <Text fontSize="sm" fontWeight="medium" color="gray.700" flex="1">
+              <Text fontSize="sm" fontWeight="medium" color="text-secondary" flex="1">
                 {item.name}
               </Text>
             )}
@@ -301,11 +301,11 @@ export default function SalaryStructurePage() {
           onClick={() => navigate('/payroll')}
           mb={4}
           alignSelf="flex-start"
-          _hover={{ bg: 'gray.100' }}
+          _hover={{ bg: "hover-bg" }}
         >
           Back to Payroll Dashboard
         </Button>
-        <Heading size="lg" mb={6} color="gray.800">Salary Structure Management</Heading>
+        <Heading size="lg" mb={6} color="text-primary">Salary Structure Management</Heading>
         
         <Tabs variant="enclosed" colorScheme="blue">
           <TabList>
@@ -316,8 +316,8 @@ export default function SalaryStructurePage() {
           <TabPanels>
             {/* TAB 1: Employee specific breakdown */}
             <TabPanel px={0} py={6}>
-              <Box bg="white" borderRadius="lg" border="1px solid" borderColor="gray.200" p={6} mb={6}>
-                <Heading size="sm" mb={4} color="gray.700">Select Employee</Heading>
+              <Box bg="card-bg" borderRadius="lg" border="1px solid" borderColor="border-color" p={6} mb={6}>
+                <Heading size="sm" mb={4} color="text-secondary">Select Employee</Heading>
                 {loadingEmployees ? (
                   <Spinner size="md" />
                 ) : (
@@ -326,8 +326,8 @@ export default function SalaryStructurePage() {
                     value={selectedEmpId}
                     onChange={(e) => setSelectedEmpId(e.target.value)}
                     maxW="400px"
-                    bg="white"
-                    borderColor="gray.300"
+                    bg="card-bg"
+                    borderColor="border-color"
                   >
                     {employees?.map(emp => (
                       <option key={emp.id} value={emp.id}>{emp.name} ({emp.department} - {emp.designation})</option>
@@ -337,11 +337,11 @@ export default function SalaryStructurePage() {
               </Box>
 
               {selectedEmp && (
-                <Box bg="white" borderRadius="lg" border="1px solid" borderColor="gray.200" p={6}>
+                <Box bg="card-bg" borderRadius="lg" border="1px solid" borderColor="border-color" p={6}>
                   <Flex justify="space-between" align="center" mb={6}>
                     <Box>
-                      <Heading size="md" color="gray.800">{selectedEmp.name}</Heading>
-                      <Text fontSize="sm" color="gray.500">CTC: Rs. {monthlyCtc.toLocaleString('en-IN')} / month</Text>
+                      <Heading size="md" color="text-primary">{selectedEmp.name}</Heading>
+                      <Text fontSize="sm" color="text-muted">CTC: Rs. {monthlyCtc.toLocaleString('en-IN')} / month</Text>
                     </Box>
                     <HRMSButton onClick={handleSaveStructure} isLoading={saveStructureMutation.isPending}>
                       💾 Save Structure
@@ -359,29 +359,29 @@ export default function SalaryStructurePage() {
                         <Heading size="xs" textTransform="uppercase" letterSpacing="wider" mb={4} color="blue.600">Earnings Components</Heading>
                         <SimpleGrid columns={1} spacing={4}>
                           <FormControl>
-                            <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">Basic Salary (Rs.)</FormLabel>
+                            <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">Basic Salary (Rs.)</FormLabel>
                             <HRMSInput type="number" value={basic} onChange={(e) => setBasic(e.target.value)} />
                           </FormControl>
 
                           <FormControl>
-                            <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">House Rent Allowance - HRA (Rs.)</FormLabel>
+                            <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">House Rent Allowance - HRA (Rs.)</FormLabel>
                             <HRMSInput type="number" value={hra} onChange={(e) => setHra(e.target.value)} />
                           </FormControl>
 
                           <FormControl>
-                            <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">Dearness Allowance - DA (Rs.)</FormLabel>
+                            <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">Dearness Allowance - DA (Rs.)</FormLabel>
                             <HRMSInput type="number" value={da} onChange={(e) => setDa(e.target.value)} />
                           </FormControl>
 
                           <FormControl>
-                            <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">Other Allowances (Rs.)</FormLabel>
+                            <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">Other Allowances (Rs.)</FormLabel>
                             <HRMSInput type="number" value={allowances} onChange={(e) => setAllowances(e.target.value)} />
                           </FormControl>
 
                           {/* Dynamic Custom Earnings */}
                           {globalEarnings.filter(e => !['basic salary', 'house rent allowance', 'conveyance allowance', 'medical allowance', 'special allowance', 'da'].includes(e.name.toLowerCase())).map(item => (
                             <FormControl key={item.id}>
-                              <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">{item.name} (Rs.)</FormLabel>
+                              <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">{item.name} (Rs.)</FormLabel>
                               <HRMSInput 
                                 type="number" 
                                 value={customEarnings[item.name] || ''} 
@@ -397,24 +397,24 @@ export default function SalaryStructurePage() {
                         <Heading size="xs" textTransform="uppercase" letterSpacing="wider" mb={4} color="red.600">Deduction Percentages</Heading>
                         <SimpleGrid columns={1} spacing={4}>
                           <FormControl>
-                            <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">Provident Fund (PF) %</FormLabel>
+                            <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">Provident Fund (PF) %</FormLabel>
                             <HRMSInput type="number" step="0.1" value={pfPercent} onChange={(e) => setPfPercent(e.target.value)} />
                           </FormControl>
 
                           <FormControl>
-                            <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">ESI %</FormLabel>
+                            <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">ESI %</FormLabel>
                             <HRMSInput type="number" step="0.01" value={esiPercent} onChange={(e) => setEsiPercent(e.target.value)} />
                           </FormControl>
 
                           <FormControl>
-                            <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">Tax Deducted at Source (TDS) %</FormLabel>
+                            <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">Tax Deducted at Source (TDS) %</FormLabel>
                             <HRMSInput type="number" step="0.1" value={tdsPercent} onChange={(e) => setTdsPercent(e.target.value)} />
                           </FormControl>
 
                           {/* Dynamic Custom Deductions */}
                           {globalDeductions.filter(d => !['employee provident fund', 'esi / health insurance', 'professional tax'].includes(d.name.toLowerCase())).map(item => (
                             <FormControl key={item.id}>
-                              <FormLabel fontSize="sm" fontWeight="medium" color="gray.600">{item.name} (Rs.)</FormLabel>
+                              <FormLabel fontSize="sm" fontWeight="medium" color="text-secondary">{item.name} (Rs.)</FormLabel>
                               <HRMSInput 
                                 type="number" 
                                 value={customDeductions[item.name] || ''} 

@@ -48,7 +48,7 @@ const EditWorkingRulePage = () => {
           
           {/* Rule Name */}
           <VStack spacing={2} align="start" w="full">
-            <Text fontWeight="500" color="gray.700" fontSize="md">
+            <Text fontWeight="500" color="text-secondary" fontSize="md">
               Rule Name
             </Text>
             <Input
@@ -63,7 +63,7 @@ const EditWorkingRulePage = () => {
 
           {/* Hours Above */}
           <VStack spacing={2} align="start" w="full">
-            <Text fontWeight="500" color="gray.700" fontSize="md">
+            <Text fontWeight="500" color="text-secondary" fontSize="md">
               Hours Above
             </Text>
             <NumberInput 
@@ -90,13 +90,8 @@ const EditWorkingRulePage = () => {
           <HRMSButton
             onClick={handleSave}
             w="full"
-            h={14}
-            bgGradient="linear(to-r, #307DC7, #C1B9B8)"
-            color="white"
-            borderRadius="full"
-            fontSize="lg"
-            fontWeight="500"
-            size="lg"
+            h="42px"
+            borderRadius="12px"
           >
             Save
           </HRMSButton>

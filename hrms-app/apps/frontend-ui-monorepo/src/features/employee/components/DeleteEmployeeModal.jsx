@@ -102,12 +102,12 @@ const DeleteEmployeeModal = ({ isOpen, onClose, employee }) => {
         {/* ── Body ─────────────────────────────────────────── */}
         <ModalBody px={6} py={5}>
           <VStack spacing={5} align="stretch">
-            <Text fontSize="sm" color="gray.600" lineHeight="1.6">
+            <Text fontSize="sm" color="text-secondary" lineHeight="1.6">
               You are about to permanently delete{" "}
-              <Text as="span" fontWeight="bold" color="gray.900">
+              <Text as="span" fontWeight="bold" color="text-primary">
                 {employee.name}
               </Text>{" "}
-              <Text as="span" fontWeight="bold" color="gray.900">
+              <Text as="span" fontWeight="bold" color="text-primary">
                 ({empShortId})
               </Text>{" "}
               and all their files.
@@ -118,7 +118,7 @@ const DeleteEmployeeModal = ({ isOpen, onClose, employee }) => {
               <Text
                 fontSize="2xs"
                 fontWeight="bold"
-                color="gray.500"
+                color="text-muted"
                 textTransform="uppercase"
                 letterSpacing="wider"
                 mb={3}
@@ -148,11 +148,11 @@ const DeleteEmployeeModal = ({ isOpen, onClose, employee }) => {
                       borderColor={totpError ? "red.400" : "gray.200"}
                       bg={totpError ? "red.50" : "gray.50"}
                       _focus={{
-                        borderColor: totpError ? "red.400" : "purple.400",
+                        borderColor: totpError ? "red.400" : "accent",
                         boxShadow: totpError
-                          ? "0 0 0 1px #FC8181"
-                          : "0 0 0 1px #7152F3",
-                        bg: "white",
+                          ? "0 0 0 3px rgba(239, 68, 68, 0.25)"
+                          : "0 0 0 3px rgba(99, 102, 241, 0.25)",
+                        bg: "card-bg",
                       }}
                     />
                   ))}
@@ -172,7 +172,7 @@ const DeleteEmployeeModal = ({ isOpen, onClose, employee }) => {
           <HStack spacing={3} w="full" justify="flex-end">
             <Button
               variant="ghost"
-              color="gray.500"
+              color="text-muted"
               fontWeight="medium"
               fontSize="sm"
               onClick={handleClose}

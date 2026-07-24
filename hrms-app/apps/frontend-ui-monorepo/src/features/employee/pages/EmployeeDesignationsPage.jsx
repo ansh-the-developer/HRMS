@@ -73,7 +73,7 @@ const EmployeeDesignationsPage = () => {
             </Heading>
 
             {!isHR && (
-              <Text fontSize="sm" color="gray.500" mb={4}>
+              <Text fontSize="sm" color="text-muted" mb={4}>
                 You have view-only access. Only HR can add, edit, or delete designations.
               </Text>
             )}
@@ -96,11 +96,11 @@ const EmployeeDesignationsPage = () => {
           </Box>
 
           <Box
-            bg="white"
+            bg="card-bg"
             borderRadius="lg"
             boxShadow="sm"
             borderWidth="1px"
-            borderColor="gray.100"
+            borderColor="border-color"
           >
             {designationList.map((d) => (
               <DepartmentListItem

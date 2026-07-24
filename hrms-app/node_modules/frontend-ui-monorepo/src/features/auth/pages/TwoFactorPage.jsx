@@ -79,10 +79,10 @@ const TwoFactorPage = () => {
   // Loading state while creating challenge
   if (isChallenging) {
     return (
-      <Center minH="100vh" bg="gray.50">
+      <Center minH="100vh" bg="app-bg-secondary">
         <VStack spacing={3}>
           <Spinner size="xl" color="purple.500" thickness="3px" />
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text-muted">
             Preparing verification…
           </Text>
         </VStack>
@@ -93,13 +93,13 @@ const TwoFactorPage = () => {
   return (
     <Box
       minH="100vh"
-      bg="gray.50"
+      bg="app-bg-secondary"
       display="flex"
       alignItems="center"
       justifyContent="center"
     >
       <Box
-        bg="white"
+        bg="card-bg"
         p={8}
         borderRadius="xl"
         boxShadow="lg"
@@ -115,7 +115,7 @@ const TwoFactorPage = () => {
             <Heading size="md" mt={2}>
               Two-Factor Verification
             </Heading>
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text-muted">
               Enter the 6-digit code from your authenticator app.
             </Text>
           </VStack>
@@ -162,7 +162,7 @@ const TwoFactorPage = () => {
             <Button
               variant="ghost"
               size="sm"
-              color="gray.500"
+              color="text-muted"
               onClick={() => navigate("/login", { replace: true })}
             >
               ← Back to Login

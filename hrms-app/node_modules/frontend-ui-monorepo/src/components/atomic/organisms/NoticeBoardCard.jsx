@@ -121,7 +121,7 @@ const NoticeBoardCard = () => {
         <SectionTitle>Notice Board</SectionTitle>
         <VStack align="start" spacing={2} py={8}>
           <Spinner size="sm" />
-          <Text fontSize="sm" color="gray.500">Loading notices...</Text>
+          <Text fontSize="sm" color="text-muted">Loading notices...</Text>
         </VStack>
       </HRMSCard>
     );
@@ -147,9 +147,9 @@ const NoticeBoardCard = () => {
 
         {notices.length === 0 ? (
           <VStack align="start" py={8} spacing={2}>
-            <Text fontSize="sm" color="gray.500">No notices yet</Text>
+            <Text fontSize="sm" color="text-muted">No notices yet</Text>
             {isHR && (
-              <Text fontSize="xs" color="gray.400">
+              <Text fontSize="xs" color="text-muted">
                 Click Add Notice to create your first one
               </Text>
             )}
@@ -160,15 +160,17 @@ const NoticeBoardCard = () => {
               <Box
                 key={notice.id}
                 w="full"
-                p={3}
-                borderRadius="md"
-                bg={notice.pinned ? "orange.50" : "gray.50"}
+                p={3.5}
+                borderRadius="lg"
+                bg={notice.pinned ? "rgba(234, 88, 12, 0.10)" : "hover-bg"}
+                border="1px solid"
+                borderColor="border-color"
               >
                 <Flex justify="space-between" align="flex-start" gap={3}>
                   <Box flex={1}>
                     <HStack spacing={2} mb={1}>
                       {notice.title && (
-                        <Text fontSize="sm" fontWeight="medium" color="blue.600">
+                        <Text fontSize="sm" fontWeight="bold" color="accent">
                           {notice.title}
                         </Text>
                       )}
@@ -176,7 +178,7 @@ const NoticeBoardCard = () => {
                         <Badge colorScheme="orange" fontSize="xs">📌 Pinned</Badge>
                       )}
                     </HStack>
-                    <Text fontSize="sm" color="gray.700" lineHeight="short">
+                    <Text fontSize="sm" color="text-secondary" lineHeight="short">
                       {notice.body}
                     </Text>
                   </Box>

@@ -42,9 +42,9 @@ const HoursItem = ({ item, onEye, onDelete }) => {
   return (
     <Flex 
       p={3} 
-      bg="white" 
+      bg="card-bg" 
       border="1px solid"
-      borderColor="gray.200"
+      borderColor="border-color"
       borderRadius="md" 
       align="center" 
       justify="space-between"
@@ -66,7 +66,7 @@ const HoursItem = ({ item, onEye, onDelete }) => {
             <Text fontWeight="500" fontSize="md" mr={2}>
               {item.name}
             </Text>
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text-muted">
               {item.start}-{item.end}
             </Text>
           </>
@@ -153,8 +153,8 @@ const WorkingHoursPage = () => {
         <Flex direction={{ base: 'column', lg: 'row' }} gap={6}>
           
           {/* LEFT: Shift Name + Time Inputs + Add */}
-          <Box flex={1} bg="white" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="gray.100">
-            <Heading size="md" mb={4} color="gray.800">Create Working Hours</Heading>
+          <Box flex={1} bg="card-bg" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="border-color">
+            <Heading size="md" mb={4} color="text-primary">Create Working Hours</Heading>
             
             <Input
               placeholder="Shift name (e.g. Regular 09:00-17:00)"
@@ -164,10 +164,10 @@ const WorkingHoursPage = () => {
               size="lg"
             />
             
-            <Text mb={2} fontWeight="500" color="gray.700">Time Range:</Text>
+            <Text mb={2} fontWeight="500" color="text-secondary">Time Range:</Text>
             <HStack spacing={4} mb={6}>
               <InputGroup flex={1}>
-                <InputLeftAddon children="Start" bg="gray.50" />
+                <InputLeftAddon children="Start" bg="app-bg-secondary" />
                 <Input
                   type="time"
                   value={startTime}
@@ -176,7 +176,7 @@ const WorkingHoursPage = () => {
                 />
               </InputGroup>
               <InputGroup flex={1}>
-                <InputLeftAddon children="End" bg="gray.50" />
+                <InputLeftAddon children="End" bg="app-bg-secondary" />
                 <Input
                   type="time"
                   value={endTime}
@@ -189,20 +189,17 @@ const WorkingHoursPage = () => {
             <HRMSButton
               onClick={handleAddShift}
               w="full"
-              h={12}
-              bgGradient="linear(to-r, #307DC7, #C1B9B8)"
-              color="white"
-              borderRadius="full"
+              h="42px"
+              borderRadius="12px"
               leftIcon={<FiPlus />}
-              fontSize="lg"
             >
               Add
             </HRMSButton>
           </Box>
 
           {/* RIGHT: Hours List (View + Edit + Delete) */}
-          <Box flex={1} bg="white" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="gray.100">
-            <Heading size="md" mb={4} color="gray.800">Working Hours List</Heading>
+          <Box flex={1} bg="card-bg" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="border-color">
+            <Heading size="md" mb={4} color="text-primary">Working Hours List</Heading>
             <VStack spacing={0} align="stretch">
               {workingHours.map(shift => (
                 <HoursItem

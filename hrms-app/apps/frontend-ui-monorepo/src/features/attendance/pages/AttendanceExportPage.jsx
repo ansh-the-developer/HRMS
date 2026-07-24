@@ -8,7 +8,7 @@ const AttendanceExportPage = () => {
         <Heading size="md" mb={1}>
           AttendanceExportPage
         </Heading>
-        <Text fontSize="sm" color="gray.500">
+        <Text fontSize="sm" color="text-muted">
           AttendanceExportPage module UI
         </Text>
       </Box>  

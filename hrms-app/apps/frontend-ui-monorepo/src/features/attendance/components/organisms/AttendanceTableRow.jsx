@@ -27,15 +27,15 @@ const AttendanceTableRow = ({ row, employee, onAction, onRowClick }) => {
   return (
     <Tr
       borderBottomWidth="1px"
-      borderColor="gray.100"
-      _hover={{ bg: "gray.50" }}
+      borderColor="border-color"
+      _hover={{ bg: "hover-bg" }}
       transition="background 0.15s"
       cursor="pointer"
       onClick={() => onRowClick?.(employee)}
     >
       {/* EMP ID */}
       <Td whiteSpace="nowrap" py={3}>
-        <Text fontSize="sm" color="gray.500" fontWeight="600" fontFamily="mono">
+        <Text fontSize="sm" color="text-muted" fontWeight="600" fontFamily="mono">
           {employee.emp_code ? `#${employee.emp_code}` : `#${employee.id.slice(0, 8)}`}
         </Text>
       </Td>
@@ -52,10 +52,10 @@ const AttendanceTableRow = ({ row, employee, onAction, onRowClick }) => {
             fontSize="xs"
           />
           <VStack spacing={0} align="start">
-            <Text fontSize="sm" fontWeight="700" color="#1E293B">
+            <Text fontSize="sm" fontWeight="700" color="text-primary">
               {employee.name}
             </Text>
-            <Text fontSize="xs" color="gray.400">
+            <Text fontSize="xs" color="text-muted">
               {employee.email}
             </Text>
           </VStack>
@@ -64,28 +64,28 @@ const AttendanceTableRow = ({ row, employee, onAction, onRowClick }) => {
 
       {/* DEPARTMENT */}
       <Td whiteSpace="nowrap" py={3}>
-        <Text fontSize="sm" color="gray.600">
+        <Text fontSize="sm" color="text-secondary">
           {employee.department || "—"}
         </Text>
       </Td>
 
       {/* LOCATION */}
       <Td whiteSpace="nowrap" py={3}>
-        <Text fontSize="sm" color="gray.600">
+        <Text fontSize="sm" color="text-secondary">
           {employee.work_location || "—"}
         </Text>
       </Td>
 
       {/* IN TIME */}
       <Td whiteSpace="nowrap" py={3}>
-        <Text fontSize="sm" color="gray.600" fontWeight="500">
+        <Text fontSize="sm" color="text-secondary" fontWeight="500">
           {row.in_time || "--:--"}
         </Text>
       </Td>
 
       {/* OUT TIME */}
       <Td whiteSpace="nowrap" py={3}>
-        <Text fontSize="sm" color="gray.600" fontWeight="500">
+        <Text fontSize="sm" color="text-secondary" fontWeight="500">
           {row.out_time || "--:--"}
         </Text>
       </Td>

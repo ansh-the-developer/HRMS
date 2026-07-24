@@ -10,7 +10,7 @@ const LeaveRulesPage = () => {
   return (
     <DashboardLayout pageTitle="Leave Rules">
       <Box
-        bg="white"
+        bg="card-bg"
         p={8}
         borderRadius="xl"
         shadow="sm"
@@ -25,7 +25,7 @@ const LeaveRulesPage = () => {
             py={4}
             px={4}
             borderBottomWidth="1px"
-            borderColor="gray.100"
+            borderColor="border-color"
           >
             <Text fontSize="sm" fontWeight="medium">
               Notice Period
@@ -33,8 +33,8 @@ const LeaveRulesPage = () => {
             <Box
               as="button"
               fontSize="xs"
-              color="gray.500"
-              _hover={{ color: "gray.700" }}
+              color="text-muted"
+              _hover={{ color: "text-primary" }}
             >
               ✎
             </Box>
@@ -47,7 +47,7 @@ const LeaveRulesPage = () => {
             py={4}
             px={4}
             borderBottomWidth="1px"
-            borderColor="gray.100"
+            borderColor="border-color"
           >
             <Text fontSize="sm" fontWeight="medium">
               Approval Flow
@@ -55,8 +55,8 @@ const LeaveRulesPage = () => {
             <Box
               as="button"
               fontSize="xs"
-              color="gray.500"
-              _hover={{ color: "gray.700" }}
+              color="text-muted"
+              _hover={{ color: "text-primary" }}
               onClick={() => navigate("/leaves/rules/approval-flow")}
             >
               ✎

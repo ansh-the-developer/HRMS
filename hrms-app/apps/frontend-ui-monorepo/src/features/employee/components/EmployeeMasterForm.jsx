@@ -55,7 +55,7 @@ const FieldLabel = ({ children }) => (
   <Text
     fontSize="2xs"
     fontWeight="semibold"
-    color="gray.500"
+    color="text-muted"
     textTransform="uppercase"
     letterSpacing="wider"
     mb={1}
@@ -65,17 +65,18 @@ const FieldLabel = ({ children }) => (
 );
 
 const iStyle = {
-  bg: "gray.50",
+  bg: "app-bg-secondary",
   border: "1px solid",
-  borderColor: "gray.200",
+  borderColor: "border-color",
   borderRadius: "lg",
   fontSize: "sm",
+  color: "text-primary",
   h: "40px",
-  _placeholder: { color: "gray.400", fontSize: "sm" },
+  _placeholder: { color: "text-muted", fontSize: "sm" },
   _focus: {
-    borderColor: "purple.400",
-    bg: "white",
-    boxShadow: "0 0 0 1px #7152F3",
+    borderColor: "accent",
+    bg: "app-bg-secondary",
+    boxShadow: "0 0 0 1px #818CF8",
   },
 };
 
@@ -510,7 +511,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
         overflow="hidden"
       >
         <ModalHeader pb={3} pt={6} px={8}>
-          <Text fontSize="xl" fontWeight="bold" color="gray.900">
+          <Text fontSize="xl" fontWeight="bold" color="text-primary">
             {isEditing
               ? `Modifying: ${employee?.name || "Employee"}`
               : "Create New Master Record"}
@@ -528,7 +529,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
         </ModalHeader>
 
         <ModalCloseButton top={5} right={6} />
-        <Divider borderColor="gray.100" />
+        <Divider borderColor="border-color" />
 
         <ModalBody px={8} py={6} overflowY="auto">
           <VStack spacing={8} align="stretch">
@@ -761,7 +762,7 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
               >
                 <Box
                   border="1px solid"
-                  borderColor="gray.200"
+                  borderColor="border-color"
                   borderRadius="xl"
                   p={4}
                 >
@@ -803,14 +804,14 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
 
                 <Box
                   border="1px solid"
-                  borderColor="gray.200"
+                  borderColor="border-color"
                   borderRadius="xl"
                   p={4}
                 >
                   <Text
                     fontSize="2xs"
                     fontWeight="bold"
-                    color="gray.500"
+                    color="text-muted"
                     textTransform="uppercase"
                     letterSpacing="wider"
                     mb={3}
@@ -935,15 +936,15 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
           </VStack>
         </ModalBody>
 
-        <ModalFooter px={8} py={5} borderTop="1px solid" borderColor="gray.100">
+        <ModalFooter px={8} py={5} borderTop="1px solid" borderColor="border-color">
           <Flex justify="flex-end" align="center" gap={4} w="full">
             <Button
               variant="ghost"
-              color="gray.400"
+              color="text-muted"
               fontWeight="medium"
               fontSize="sm"
               onClick={handleClose}
-              _hover={{ color: "gray.600" }}
+              _hover={{ color: "text-primary" }}
             >
               Discard Changes
             </Button>

@@ -7,7 +7,7 @@ const WorkingDayItem = ({ day }) => {
       py={2}
       borderRadius="md"
       borderWidth="1px"
-      borderColor="gray.200"
+      borderColor="border-color"
     >
       <Text fontSize="sm">{day}</Text>
     </Flex>

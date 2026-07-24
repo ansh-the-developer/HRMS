@@ -20,27 +20,32 @@ const EmployeeTableRow = ({ employee }) => {
   if (!employee) return null; // 🔒 prevents runtime crash
 
   return (
-    <Tr borderBottomWidth="1px" borderColor="gray.100">
+    <Tr
+      borderBottomWidth="1px"
+      borderColor="border-color"
+      _hover={{ bg: "hover-bg" }}
+      transition="background 0.15s"
+    >
       {/* Sticky Employee Name */}
       <Td
         position="sticky"
         left={0}
-        bg="white"
+        bg="inherit"
         zIndex={1}
         minW="200px"
       >
         <HStack spacing={3}>
           <Avatar size="sm" name={employee.name} src={employee.avatar} />
-          <Text fontSize="sm" fontWeight="medium" noOfLines={1}>
+          <Text fontSize="sm" fontWeight="medium" color="text-primary" noOfLines={1}>
             {employee.name}
           </Text>
         </HStack>
       </Td>
 
-      <Td whiteSpace="nowrap">{employee.id}</Td>
-      <Td whiteSpace="nowrap">{employee.department}</Td>
-      <Td whiteSpace="nowrap">{employee.designation}</Td>
-      <Td whiteSpace="nowrap">{employee.location}</Td>
+      <Td whiteSpace="nowrap" color="text-secondary">{employee.id}</Td>
+      <Td whiteSpace="nowrap" color="text-secondary">{employee.department}</Td>
+      <Td whiteSpace="nowrap" color="text-secondary">{employee.designation}</Td>
+      <Td whiteSpace="nowrap" color="text-secondary">{employee.location}</Td>
 
       <Td whiteSpace="nowrap">
         <Badge

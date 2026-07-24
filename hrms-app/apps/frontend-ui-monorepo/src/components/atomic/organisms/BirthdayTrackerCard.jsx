@@ -62,15 +62,15 @@ const BirthdayTrackerCard = ({ minH }) => {
           <Badge colorScheme="green" fontSize="xs">Central Cache</Badge>
         </Flex>
         
-        <Text fontSize="sm" color="gray.500" mb={3} fontWeight="medium">
+        <Text fontSize="sm" color="text-muted" mb={3} fontWeight="medium">
           {monthName}
         </Text>
 
         <VStack align="stretch" spacing={2} flex="1">
           {birthdays.length === 0 ? (
             <Flex direction="column" align="center" py={8} gap={2}>
-              <Text fontSize="sm" color="gray.500">No birthdays</Text>
-              <Text fontSize="xs" color="gray.400">in this month</Text>
+              <Text fontSize="sm" color="text-muted">No birthdays</Text>
+              <Text fontSize="xs" color="text-muted">in this month</Text>
             </Flex>
           ) : (
             birthdays.map((b, index) => (

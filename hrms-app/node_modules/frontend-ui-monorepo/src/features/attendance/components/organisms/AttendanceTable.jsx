@@ -79,18 +79,18 @@ const AttendanceTable = ({ data = [], employees = [], onAction, onRowClick }) =>
         py={4}
         fontSize="xs"
         fontWeight="700"
-        color="gray.400"
+        color="text-muted"
         textTransform="uppercase"
-        borderColor="gray.100"
+        borderColor="border-color"
         userSelect="none"
       >
         <Flex align="center" gap={1}>
-          <Text fontSize="10px" letterSpacing="wider" color="#64748B">
+          <Text fontSize="10px" letterSpacing="wider" color="text-secondary">
             {label}
           </Text>
           {extraElement}
           {isSortable && (
-            <Flex direction="column" align="center" fontSize="8px" color={isCurrent ? "#6366F1" : "gray.300"}>
+            <Flex direction="column" align="center" fontSize="8px" color={isCurrent ? "accent" : "text-muted"}>
               {(!isCurrent || sortOrder === "asc") && <FiChevronUp />}
               {(!isCurrent || sortOrder === "desc") && <FiChevronDown />}
             </Flex>
@@ -101,10 +101,10 @@ const AttendanceTable = ({ data = [], employees = [], onAction, onRowClick }) =>
   };
 
   return (
-    <Box bg="white" borderRadius="2xl" overflow="hidden" shadow="sm" border="1px solid" borderColor="gray.100" p={2}>
+    <Box bg="card-bg" borderRadius="2xl" overflow="hidden" shadow="sm" border="1px solid" borderColor="border-color" p={2}>
       <HRMSTable>
         <Thead>
-          <Tr borderBottomWidth="1.5px" borderColor="gray.100">
+          <Tr borderBottomWidth="1.5px" borderColor="border-color">
             {renderHeader("EMP ID", "emp_id")}
             {renderHeader(
               "EMPLOYEE",
@@ -125,7 +125,7 @@ const AttendanceTable = ({ data = [], employees = [], onAction, onRowClick }) =>
         <Tbody>
           {sortedData.length === 0 ? (
             <Tr>
-              <Th colSpan={8} textAlign="center" py={12} color="gray.400" textTransform="none" fontSize="sm">
+              <Th colSpan={8} textAlign="center" py={12} color="text-muted" textTransform="none" fontSize="sm">
                 No attendance logs found for this filter.
               </Th>
             </Tr>

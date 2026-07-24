@@ -204,18 +204,18 @@ const EmployeeListPage = () => {
 
   return (
     <DashboardLayout>
-      <Box px={{ base: 4, md: 8 }} py={6} minH="100vh" bg="gray.50">
+      <Box px={{ base: 4, md: 8 }} py={6} minH="100vh" bg="app-bg-secondary">
         <Flex justify="space-between" align="flex-start" mb={6}>
           <Box>
             <Text
               fontSize="2xl"
               fontWeight="bold"
-              color="gray.900"
+              color="text-primary"
               lineHeight="1.2"
             >
               Employee Management
             </Text>
-            <Text fontSize="sm" color="gray.400" mt={1}>
+            <Text fontSize="sm" color="text-muted" mt={1}>
               Compliance, Identity & Financial Directory
             </Text>
             {isManager && !isHR && (
@@ -230,13 +230,13 @@ const EmployeeListPage = () => {
               <IconButton
                 icon={<FiDownload />}
                 variant="outline"
-                bg="white"
-                borderColor="gray.200"
-                color="gray.600"
+                bg="card-bg"
+                borderColor="border-color"
+                color="text-secondary"
                 h="44px"
                 w="44px"
                 borderRadius="xl"
-                _hover={{ bg: "gray.50", borderColor: "gray.300" }}
+                _hover={{ bg: "hover-bg", borderColor: "accent" }}
                 aria-label="Export CSV"
                 onClick={handleExportCSV}
                 isLoading={isExporting}
@@ -247,13 +247,13 @@ const EmployeeListPage = () => {
                 <IconButton
                   icon={<FiUpload />}
                   variant="outline"
-                  bg="white"
-                  borderColor="gray.200"
-                  color="gray.600"
+                  bg="card-bg"
+                  borderColor="border-color"
+                  color="text-secondary"
                   h="44px"
                   w="44px"
                   borderRadius="xl"
-                  _hover={{ bg: "gray.50", borderColor: "gray.300" }}
+                  _hover={{ bg: "hover-bg", borderColor: "accent" }}
                   aria-label="Bulk Import"
                   onClick={() => setIsImportOpen(true)}
                 />
@@ -261,7 +261,7 @@ const EmployeeListPage = () => {
                   onClick={handleAddNew}
                   h="44px"
                   px={6}
-                  bg="#4F22FF"
+                  bg="accent"
                   color="white"
                   borderRadius="xl"
                   _hover={{ bg: "#3D17D9" }}
@@ -305,4 +305,4 @@ const EmployeeListPage = () => {
   );
 };
 
-export default EmployeeListPage;
+export default EmployeeListPage;

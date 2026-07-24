@@ -2,11 +2,9 @@ import { useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
-  Button,
   FormControl,
   FormLabel,
   Heading,
-  Input,
   InputGroup,
   InputRightElement,
   IconButton,
@@ -16,11 +14,14 @@ import {
   AlertIcon,
   Link,
   Divider,
+  useColorModeValue,
 } from "@chakra-ui/react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import { useAuth } from "@/hooks/useAuth";
 import { getProfile } from "@/services/profileApi";
-import { Logo } from "@/components/atomic/atoms";
+import { Logo, HRMSButton, HRMSInput } from "@/components/atomic/atoms";
+import RainGlassEffect from "@/components/ui/RainGlassEffect";
+import { designTokens } from "@/theme/designTokens";
 
 const LoginPage = () => {
   const { signIn, getMFALevel, listMFAFactors } = useAuth();
@@ -98,16 +99,66 @@ const LoginPage = () => {
       display="flex"
       alignItems="center"
       justifyContent="center"
-      bg="gray.50"
+      position="relative"
+      overflow="hidden"
     >
+      {/* Premium Background Layer (Aurora gradient shapes) */}
       <Box
-        bg="white"
+        position="fixed"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        zIndex={-2}
+        bg="app-bg"
+        overflow="hidden"
+        pointerEvents="none"
+      >
+        {designTokens.enableBackgroundOverlay && (
+          <>
+            <Box
+              position="absolute"
+              top="-20%"
+              left="-10%"
+              w="55%"
+              h="60%"
+              bgGradient={useColorModeValue(
+                "radial(circle, rgba(79, 70, 229, 0.06) 0%, rgba(79, 70, 229, 0) 70%)",
+                "radial(circle, rgba(99, 102, 241, 0.12) 0%, rgba(99, 102, 241, 0) 75%)"
+              )}
+              filter="blur(90px)"
+            />
+            <Box
+              position="absolute"
+              bottom="-15%"
+              right="-10%"
+              w="60%"
+              h="65%"
+              bgGradient={useColorModeValue(
+                "radial(circle, rgba(147, 51, 234, 0.04) 0%, rgba(147, 51, 234, 0) 70%)",
+                "radial(circle, rgba(139, 92, 246, 0.08) 0%, rgba(139, 92, 246, 0) 75%)"
+              )}
+              filter="blur(110px)"
+            />
+          </>
+        )}
+      </Box>
+
+      {/* Subtle Rain droplets */}
+      <RainGlassEffect />
+
+      {/* Main card box container */}
+      <Box
+        bg="card-bg"
         p={8}
-        borderRadius="xl"
-        boxShadow="lg"
+        borderRadius={designTokens.borderRadiusCard}
+        boxShadow={designTokens.cardShadow}
+        border="1px solid"
+        borderColor="border-color"
         w="full"
         maxW="420px"
         mx={4}
+        zIndex={1}
       >
         <VStack spacing={6} align="stretch">
           {/* Header */}
@@ -116,7 +167,7 @@ const LoginPage = () => {
             <Heading size="md" mt={4}>
               Welcome back
             </Heading>
-            <Text fontSize="sm" color="gray.500" mt={1}>
+            <Text fontSize="sm" color="text-secondary" mt={1}>
               Sign in to your HRMS account
             </Text>
           </VStack>
@@ -132,7 +183,7 @@ const LoginPage = () => {
             <VStack spacing={4}>
               <FormControl isRequired>
                 <FormLabel fontSize="sm">Email</FormLabel>
-                <Input
+                <HRMSInput
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -143,13 +194,13 @@ const LoginPage = () => {
               <FormControl isRequired>
                 <FormLabel fontSize="sm">Password</FormLabel>
                 <InputGroup>
-                  <Input
+                  <HRMSInput
                     type={showPw ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
                   />
-                  <InputRightElement>
+                  <InputRightElement h="44px">
                     <IconButton
                       size="sm"
                       variant="ghost"
@@ -166,21 +217,21 @@ const LoginPage = () => {
                   as={RouterLink}
                   to="/forgot-password"
                   fontSize="sm"
-                  color="purple.600"
+                  color="brand.500"
+                  fontWeight="500"
                 >
                   Forgot password?
                 </Link>
               </Box>
 
-              <Button
+              <HRMSButton
                 type="submit"
-                colorScheme="purple"
                 w="full"
                 isLoading={isLoading}
                 loadingText="Signing in…"
               >
                 Sign In
-              </Button>
+              </HRMSButton>
             </VStack>
           </form>
         </VStack>

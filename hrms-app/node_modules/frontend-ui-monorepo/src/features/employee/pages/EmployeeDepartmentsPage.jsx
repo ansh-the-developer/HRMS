@@ -123,18 +123,18 @@ const EmployeeDepartmentsPage = () => {
         <Heading size="md" mb={1}>
           Departments & Teams
         </Heading>
-        <Text fontSize="sm" color="gray.500" mb={6}>
+        <Text fontSize="sm" color="text-muted" mb={6}>
           Manage departments and teams.
         </Text>
 
         {!isHR && (
-          <Text fontSize="sm" color="gray.500" mb={6}>
+          <Text fontSize="sm" color="text-muted" mb={6}>
             You have view-only access. Only HR can add, edit, or delete departments and teams.
           </Text>
         )}
 
         <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={6}>
-          <Box bg="white" borderRadius="lg" boxShadow="sm" p={4}>
+          <Box bg="card-bg" borderRadius="lg" boxShadow="sm" p={4}>
             <Text mb={3} fontWeight="semibold">
               Add Department
             </Text>
@@ -165,8 +165,8 @@ const EmployeeDepartmentsPage = () => {
               mt={4}
               borderRadius="lg"
               borderWidth="1px"
-              borderColor="gray.100"
-              bg="white"
+              borderColor="border-color"
+              bg="card-bg"
             >
               {departmentList.map((d) => (
                 <DepartmentListItem
@@ -190,7 +190,7 @@ const EmployeeDepartmentsPage = () => {
             </Box>
           </Box>
 
-          <Box bg="white" borderRadius="lg" boxShadow="sm" p={4}>
+          <Box bg="card-bg" borderRadius="lg" boxShadow="sm" p={4}>
             <Text mb={3} fontWeight="semibold">
               Add Team
             </Text>
@@ -221,8 +221,8 @@ const EmployeeDepartmentsPage = () => {
               mt={4}
               borderRadius="lg"
               borderWidth="1px"
-              borderColor="gray.100"
-              bg="white"
+              borderColor="border-color"
+              bg="card-bg"
             >
               {teamList.map((t) => (
                 <DepartmentListItem

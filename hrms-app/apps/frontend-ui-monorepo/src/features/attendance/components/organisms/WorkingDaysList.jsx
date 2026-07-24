@@ -11,7 +11,7 @@ const WorkingDaysList = ({ days = [] }) => {
         </Text>
 
         {days.length === 0 ? (
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text-muted">
             No working days selected
           </Text>
         ) : (

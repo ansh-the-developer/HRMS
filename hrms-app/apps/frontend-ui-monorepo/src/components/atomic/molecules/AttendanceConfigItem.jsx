@@ -15,13 +15,13 @@ const AttendanceConfigItem = ({
       align="center"
       justify="space-between"
       py={3}
-      _notLast={{ borderBottomWidth: "1px", borderColor: "gray.100" }}
+      _notLast={{ borderBottomWidth: "1px", borderColor: "border-color" }}
     >
       <Box>
         <Text fontSize="sm" fontWeight="semibold">
           {title}
         </Text>
-        <Text fontSize="xs" color="gray.500">
+        <Text fontSize="xs" color="text-muted">
           {description}
         </Text>
       </Box>

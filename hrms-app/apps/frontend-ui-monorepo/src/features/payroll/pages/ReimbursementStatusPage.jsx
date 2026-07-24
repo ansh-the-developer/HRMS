@@ -69,21 +69,21 @@ export default function ReimbursementStatusPage() {
       <Box px={{ base: 4, md: 6 }} py={6} maxW="4xl">
         {/* Header */}
         <Box mb={6}>
-          <Text fontSize="lg" fontWeight="semibold" color="gray.800">
+          <Text fontSize="lg" fontWeight="semibold" color="text-primary">
             Reimbursement Status
           </Text>
-          <Text fontSize="sm" color="gray.400">
+          <Text fontSize="sm" color="text-muted">
             Request claims (Pending, Approved, Rejected).
           </Text>
         </Box>
 
         {/* Form Card */}
-        <Box bg="white" borderRadius="xl" boxShadow="sm" p={{ base: 5, md: 8 }} border="1px solid" borderColor="gray.100">
+        <Box bg="card-bg" borderRadius="xl" boxShadow="sm" p={{ base: 5, md: 8 }} border="1px solid" borderColor="border-color">
           <VStack spacing={8} align="stretch">
             
             {/* 1. Reimbursement Type */}
             <Flex direction={{ base: "column", md: "row" }} align={{ md: "center" }} gap={4}>
-              <Text fontWeight="medium" fontSize="sm" color="gray.700" minW="160px">
+              <Text fontWeight="medium" fontSize="sm" color="text-secondary" minW="160px">
                 Reimbursement Type
               </Text>
               <HStack spacing={3}>
@@ -99,9 +99,9 @@ export default function ReimbursementStatusPage() {
                       fontSize="sm"
                       fontWeight="medium"
                       transition="all 0.2s"
-                      bg={isActive ? "blue.500" : "gray.100"}
-                      color={isActive ? "white" : "gray.600"}
-                      _hover={{ bg: isActive ? "blue.600" : "gray.200" }}
+                      bg={isActive ? "accent" : "app-bg-secondary"}
+                      color={isActive ? "white" : "text-secondary"}
+                      _hover={{ bg: isActive ? "accent" : "hover-bg" }}
                       boxShadow={isActive ? "md" : "none"}
                     >
                       {type}
@@ -113,7 +113,7 @@ export default function ReimbursementStatusPage() {
 
             {/* 2. For Date */}
             <Flex direction={{ base: "column", md: "row" }} align={{ md: "center" }} gap={4}>
-              <Text fontWeight="medium" fontSize="sm" color="gray.700" minW="160px">
+              <Text fontWeight="medium" fontSize="sm" color="text-secondary" minW="160px">
                 For Date
               </Text>
               <Input
@@ -121,10 +121,10 @@ export default function ReimbursementStatusPage() {
                 value={form.date}
                 onChange={handleDateChange}
                 maxW="200px"
-                bg="white"
+                bg="card-bg"
                 fontSize="sm"
-                color="gray.600"
-                borderColor="gray.200"
+                color="text-secondary"
+                borderColor="border-color"
               />
             </Flex>
 
@@ -132,10 +132,10 @@ export default function ReimbursementStatusPage() {
             <Flex direction={{ base: "column", md: "row" }} align={{ md: "center" }} justify="space-between" gap={4}>
               <Flex direction={{ base: "column", md: "row" }} align={{ md: "center" }} gap={4}>
                 <Box minW="160px">
-                  <Text fontWeight="medium" fontSize="sm" color="gray.700">
+                  <Text fontWeight="medium" fontSize="sm" color="text-secondary">
                     Submit Documents
                   </Text>
-                  <Text fontSize="xs" color="gray.400">
+                  <Text fontSize="xs" color="text-muted">
                     (If Applicable)
                   </Text>
                 </Box>
@@ -162,7 +162,7 @@ export default function ReimbursementStatusPage() {
                     accept=".pdf,.jpg,.jpeg,.png"
                   />
                   {form.file && (
-                    <Text fontSize="xs" color="gray.500" isTruncated maxW="150px">
+                    <Text fontSize="xs" color="text-muted" isTruncated maxW="150px">
                       {form.file.name}
                     </Text>
                   )}

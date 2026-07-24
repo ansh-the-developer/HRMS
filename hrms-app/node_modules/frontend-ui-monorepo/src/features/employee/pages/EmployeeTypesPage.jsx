@@ -87,23 +87,23 @@ const EmployeeTypesPage = () => {
               </Box>
             )}
 
-            <Text fontSize="xs" color="gray.500" mt={3}>
+            <Text fontSize="xs" color="text-muted" mt={3}>
               Define how employees are categorized for payroll and contracts.
             </Text>
 
             {!isHR && (
-              <Text fontSize="sm" color="gray.500" mt={3}>
+              <Text fontSize="sm" color="text-muted" mt={3}>
                 You have view-only access. Only HR can add, edit, or delete employee types.
               </Text>
             )}
           </Box>
 
           <Box
-            bg="white"
+            bg="card-bg"
             borderRadius="lg"
             boxShadow="sm"
             borderWidth="1px"
-            borderColor="gray.100"
+            borderColor="border-color"
           >
             {typeList.map((t) => (
               <DepartmentListItem

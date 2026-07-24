@@ -82,10 +82,10 @@ const MFAEnrollPage = () => {
   // Loading state while enrolling
   if (isEnrolling) {
     return (
-      <Center minH="100vh" bg="gray.50">
+      <Center minH="100vh" bg="app-bg-secondary">
         <VStack spacing={3}>
           <Spinner size="xl" color="purple.500" thickness="3px" />
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text-muted">
             Setting up your authenticator…
           </Text>
         </VStack>
@@ -96,14 +96,14 @@ const MFAEnrollPage = () => {
   return (
     <Box
       minH="100vh"
-      bg="gray.50"
+      bg="app-bg-secondary"
       display="flex"
       alignItems="center"
       justifyContent="center"
       py={10}
     >
       <Box
-        bg="white"
+        bg="card-bg"
         p={8}
         borderRadius="xl"
         boxShadow="lg"
@@ -122,7 +122,7 @@ const MFAEnrollPage = () => {
             <Heading size="md" mt={1}>
               Set up Two-Factor Authentication
             </Heading>
-            <Text fontSize="sm" color="gray.500" maxW="340px" mx="auto">
+            <Text fontSize="sm" color="text-muted" maxW="340px" mx="auto">
               Scan the QR code with <strong>Google Authenticator</strong> or{" "}
               <strong>ProtonPass</strong>. This screen will not appear again.
             </Text>
@@ -139,18 +139,18 @@ const MFAEnrollPage = () => {
 
           {/* Step 1 — QR Code */}
           <VStack spacing={2} align="stretch">
-            <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+            <Text fontSize="sm" fontWeight="semibold" color="text-secondary">
               Step 1 — Scan this QR code
             </Text>
             {factorData?.totp?.qr_code && (
               <Box
                 border="1px solid"
-                borderColor="gray.200"
+                borderColor="border-color"
                 borderRadius="lg"
                 p={4}
                 display="flex"
                 justifyContent="center"
-                bg="white"
+                bg="card-bg"
               >
                 <Image
                   src={factorData.totp.qr_code}
@@ -163,16 +163,16 @@ const MFAEnrollPage = () => {
 
           {/* Step 2 — Manual secret key */}
           <VStack spacing={2} align="stretch">
-            <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+            <Text fontSize="sm" fontWeight="semibold" color="text-secondary">
               Step 2 — Or enter the key manually
             </Text>
             <HStack
-              bg="gray.50"
+              bg="app-bg-secondary"
               px={3}
               py={2}
               borderRadius="md"
               border="1px solid"
-              borderColor="gray.200"
+              borderColor="border-color"
               justify="space-between"
             >
               <Code
@@ -201,7 +201,7 @@ const MFAEnrollPage = () => {
 
           {/* Step 3 — Enter 6-digit code */}
           <VStack spacing={4} align="stretch">
-            <Text fontSize="sm" fontWeight="semibold" color="gray.700">
+            <Text fontSize="sm" fontWeight="semibold" color="text-secondary">
               Step 3 — Enter the 6-digit code from your app
             </Text>
             <HStack justify="center">

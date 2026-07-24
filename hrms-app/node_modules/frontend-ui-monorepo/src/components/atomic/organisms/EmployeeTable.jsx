@@ -46,12 +46,12 @@ const getFormattedEmpId = (emp) => {
 const ColHeader = ({ children }) => (
   <Th
     fontSize="2xs"
-    color="gray.400"
+    color="text-muted"
     fontWeight="semibold"
     textTransform="uppercase"
     letterSpacing="wider"
     py={4}
-    borderColor="gray.100"
+    borderColor="border-color"
   >
     {children}
   </Th>
@@ -70,9 +70,9 @@ const EmployeeTable = ({
 
   if (isLoading) {
     return (
-      <Box bg="white" borderRadius="2xl" p={16} textAlign="center" boxShadow="sm">
+      <Box bg="card-bg" borderRadius="2xl" p={16} textAlign="center" boxShadow="sm">
         <Spinner size="lg" color="purple.500" thickness="3px" />
-        <Text mt={3} color="gray.400" fontSize="sm">
+        <Text mt={3} color="text-muted" fontSize="sm">
           Loading employees...
         </Text>
       </Box>
@@ -81,7 +81,7 @@ const EmployeeTable = ({
 
   if (error) {
     return (
-      <Box bg="white" borderRadius="2xl" p={12} textAlign="center" boxShadow="sm">
+      <Box bg="card-bg" borderRadius="2xl" p={12} textAlign="center" boxShadow="sm">
         <Text color="red.500" fontSize="sm">
           Error: {error.message}
         </Text>
@@ -91,11 +91,11 @@ const EmployeeTable = ({
 
   return (
     <>
-      <Box bg="white" borderRadius="2xl" boxShadow="sm" overflow="hidden">
+      <Box bg="card-bg" borderRadius="2xl" boxShadow="sm" overflow="hidden">
         <Box overflowX="auto">
           <Table variant="simple" size="md">
             <Thead>
-              <Tr borderBottom="1px solid" borderColor="gray.100">
+              <Tr borderBottom="1px solid" borderColor="border-color">
                 <ColHeader>EMP ID</ColHeader>
                 <ColHeader>Nickname</ColHeader>
                 <ColHeader>Official Identity</ColHeader>
@@ -114,7 +114,7 @@ const EmployeeTable = ({
                     textAlign="center"
                     borderColor="transparent"
                   >
-                    <VStack spacing={2} color="gray.400">
+                    <VStack spacing={2} color="text-muted">
                       <Text fontSize="sm">No employees found</Text>
                     </VStack>
                   </Td>
@@ -127,17 +127,17 @@ const EmployeeTable = ({
                     <Tr
                       key={emp.id}
                       borderBottom="1px solid"
-                      borderColor="gray.50"
-                      _hover={{ bg: "purple.50" }}
+                      borderColor="border-color"
+                      _hover={{ bg: "hover-bg" }}
                       transition="background 0.15s"
                       cursor="pointer"
                       onClick={() => onRowClick?.(emp)}
                     >
                       {/* EMP ID */}
-                      <Td py={4} borderColor="gray.50">
+                      <Td py={4} borderColor="border-color">
                         <Text
                           fontSize="sm"
-                          color="gray.500"
+                          color="text-muted"
                           fontWeight="medium"
                           fontFamily="mono"
                         >
@@ -146,10 +146,10 @@ const EmployeeTable = ({
                       </Td>
 
                       {/* Nickname */}
-                      <Td py={4} borderColor="gray.50">
+                      <Td py={4} borderColor="border-color">
                         <Text
                           fontSize="sm"
-                          color="gray.600"
+                          color="text-secondary"
                           fontStyle={emp.nickname ? "italic" : "normal"}
                         >
                           {emp.nickname || "—"}
@@ -157,7 +157,7 @@ const EmployeeTable = ({
                       </Td>
 
                       {/* Official Identity */}
-                      <Td py={4} borderColor="gray.50" minW="220px">
+                      <Td py={4} borderColor="border-color" minW="220px">
                         <HStack spacing={3}>
                           <Avatar
                             size="sm"
@@ -171,12 +171,12 @@ const EmployeeTable = ({
                             <Text
                               fontSize="sm"
                               fontWeight="semibold"
-                              color="gray.800"
+                              color="text-primary"
                               noOfLines={1}
                             >
                               {emp.name}
                             </Text>
-                            <Text fontSize="xs" color="gray.400">
+                            <Text fontSize="xs" color="text-muted">
                               {emp.email || "—"}
                             </Text>
                           </VStack>
@@ -184,38 +184,38 @@ const EmployeeTable = ({
                       </Td>
 
                       {/* Department */}
-                      <Td py={4} borderColor="gray.50">
-                        <Text fontSize="sm" color="gray.600">
+                      <Td py={4} borderColor="border-color">
+                        <Text fontSize="sm" color="text-secondary">
                           {emp.department || "—"}
                         </Text>
                       </Td>
 
                       {/* Location */}
-                      <Td py={4} borderColor="gray.50">
-                        <Text fontSize="sm" color="gray.600">
+                      <Td py={4} borderColor="border-color">
+                        <Text fontSize="sm" color="text-secondary">
                           {emp.work_location || "—"}
                         </Text>
                       </Td>
 
                       {/* Actions */}
                       {!isReadOnly && (
-                        <Td py={4} borderColor="gray.50">
+                        <Td py={4} borderColor="border-color">
                           <HStack spacing={2} onClick={(e) => e.stopPropagation()}>
                             <IconButton
                               icon={<FiEdit2 size={13} />}
                               size="sm"
                               variant="ghost"
-                              color="orange.400"
-                              _hover={{ bg: "orange.50" }}
+                              color="accent"
+                              _hover={{ bg: "hover-bg" }}
                               aria-label="Edit employee"
                               onClick={() => onEdit?.(emp)}
                             />
                             <IconButton
                               icon={<FiTrash2 size={13} />}
                               size="sm"
-                              bg="red.50"
-                              color="red.500"
-                              _hover={{ bg: "red.100" }}
+                              bg="rgba(239, 68, 68, 0.12)"
+                              color="red.400"
+                              _hover={{ bg: "rgba(239, 68, 68, 0.25)" }}
                               borderRadius="full"
                               aria-label="Delete employee"
                               onClick={() => setDeleteTarget(emp)}

@@ -114,7 +114,7 @@ const LeaveRequestActionPage = () => {
     return (
       <DashboardLayout pageTitle="Approve Leaves">
         <Box p={8} textAlign="center">
-          <Text color="gray.500">Leave request not found.</Text>
+          <Text color="text-muted">Leave request not found.</Text>
         </Box>
       </DashboardLayout>
     );
@@ -125,20 +125,20 @@ const LeaveRequestActionPage = () => {
 
   return (
     <DashboardLayout pageTitle="Approve Leaves">
-      <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+      <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
         {/* Header */}
         <VStack align="stretch" spacing={1} mb={6}>
           <Text fontSize="lg" fontWeight="bold">
             {leaveRequest.type} Leave Request
           </Text>
-          <Text fontSize="sm" color="gray.500">
+          <Text fontSize="sm" color="text-muted">
             {leaveRequest.start_date} to {leaveRequest.end_date} •{" "}
             {employeeName}
           </Text>
         </VStack>
 
         {/* Table header */}
-        <Flex px={4} py={2} fontSize="xs" color="gray.500">
+        <Flex px={4} py={2} fontSize="xs" color="text-muted">
           <Box flex="2">Employee Details</Box>
           <Box flex="1" textAlign="center">
             Approve
@@ -166,11 +166,11 @@ const LeaveRequestActionPage = () => {
                 <Text fontSize="sm" fontWeight="medium">
                   {employeeName}
                 </Text>
-                <Text fontSize="xs" color="gray.500">
+                <Text fontSize="xs" color="text-muted">
                   {leaveRequest.type} — {leaveRequest.start_date} to{" "}
                   {leaveRequest.end_date}
                 </Text>
-                <Text fontSize="xs" color="gray.400">
+                <Text fontSize="xs" color="text-muted">
                   {leaveRequest.reason || "No reason provided"}
                 </Text>
               </VStack>
@@ -214,7 +214,7 @@ const LeaveRequestActionPage = () => {
             <Input
               size="sm"
               placeholder="Optional notes..."
-              bg="white"
+              bg="card-bg"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />

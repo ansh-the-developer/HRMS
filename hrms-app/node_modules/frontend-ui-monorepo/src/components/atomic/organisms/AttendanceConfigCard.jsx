@@ -3,11 +3,11 @@ import AttendanceConfigItem from "@/components/atomic/molecules/AttendanceConfig
 const AttendanceConfigCard = () => {
   return (
     <Box
-      bg="white"
+      bg="card-bg"
       borderRadius="lg"
       boxShadow="sm"
       borderWidth="1px"
-      borderColor="gray.100"
+      borderColor="border-color"
       p={4}
     >
       <AttendanceConfigItem

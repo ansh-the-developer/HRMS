@@ -20,7 +20,7 @@ const PerformanceHistoryPage = () => {
   if (isLoading) {
     return (
       <DashboardLayout pageTitle="Performance">
-        <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+        <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
           <Flex justify="center" py={12}>
             <Spinner size="lg" />
           </Flex>
@@ -32,7 +32,7 @@ const PerformanceHistoryPage = () => {
   if (error) {
     return (
       <DashboardLayout pageTitle="Performance">
-        <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+        <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
           <Text color="red.500">Error loading reviews: {error.message}</Text>
         </Box>
       </DashboardLayout>
@@ -42,12 +42,12 @@ const PerformanceHistoryPage = () => {
   if (!reviews || reviews.length === 0) {
     return (
       <DashboardLayout pageTitle="Performance">
-        <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+        <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
           <VStack spacing={4} py={12}>
-            <Text fontSize="lg" color="gray.500">
+            <Text fontSize="lg" color="text-muted">
               No performance reviews yet
             </Text>
-            <Text fontSize="sm" color="gray.400">
+            <Text fontSize="sm" color="text-muted">
               Reviews will appear here once created
             </Text>
           </VStack>
@@ -58,7 +58,7 @@ const PerformanceHistoryPage = () => {
 
   return (
     <DashboardLayout pageTitle="Performance">
-      <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+      <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
         <VStack align="stretch" spacing={4}>
           <Text fontSize="lg" fontWeight="bold">
             Performance history ({reviews.length})
@@ -68,10 +68,10 @@ const PerformanceHistoryPage = () => {
             <Flex
               key={review.id}
               fontSize="md"
-              color="gray.800"
+              color="text-primary"
               py={3}
               px={4}
-              bg="gray.50"
+              bg="app-bg-secondary"
               borderRadius="md"
               cursor="pointer"
               _hover={{ bg: "blue.50", color: "blue.600" }}
@@ -84,7 +84,7 @@ const PerformanceHistoryPage = () => {
                 <Text fontWeight="medium">
                   {review.employees?.name ?? "Unknown"} — {review.period}
                 </Text>
-                <Text fontSize="sm" color="gray.500">
+                <Text fontSize="sm" color="text-muted">
                   {review.status} • {review.created_at.split("T")[0]}
                 </Text>
               </Box>

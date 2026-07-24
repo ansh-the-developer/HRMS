@@ -38,7 +38,7 @@ const LeaveRulesApprovalFlowPage = () => {
       >
         {/* Left: Add Approver */}
         <Box
-          bg="white"
+          bg="card-bg"
           p={8}
           borderRadius="xl"
           shadow="sm"
@@ -52,7 +52,7 @@ const LeaveRulesApprovalFlowPage = () => {
             </Text>
             <Input
               placeholder="Name of Approver"
-              bg="gray.50"
+              bg="app-bg-secondary"
               border="none"
               size="sm"
               value={newApprover}
@@ -79,7 +79,7 @@ const LeaveRulesApprovalFlowPage = () => {
 
         {/* Right: Approver List */}
         <Box
-          bg="white"
+          bg="card-bg"
           p={4}
           borderRadius="xl"
           shadow="sm"
@@ -97,9 +97,9 @@ const LeaveRulesApprovalFlowPage = () => {
                 py={3}
                 px={4}
                 borderBottomWidth={index === approvers.length - 1 ? "0" : "1px"}
-                borderColor="gray.100"
+                borderColor="border-color"
               >
-                <Text fontSize="sm" color="gray.800">
+                <Text fontSize="sm" color="text-primary">
                   {name}
                 </Text>
                 <HStack spacing={4}>
@@ -107,8 +107,8 @@ const LeaveRulesApprovalFlowPage = () => {
                   <Box
                     as="button"
                     fontSize="sm"
-                    color="gray.500"
-                    _hover={{ color: "gray.700" }}
+                    color="text-muted"
+                    _hover={{ color: "text-primary" }}
                   >
                     👁
                   </Box>
@@ -116,7 +116,7 @@ const LeaveRulesApprovalFlowPage = () => {
                   <Box
                     as="button"
                     fontSize="sm"
-                    color="gray.500"
+                    color="text-muted"
                     _hover={{ color: "red.500" }}
                     onClick={() => handleDelete(name)}
                   >

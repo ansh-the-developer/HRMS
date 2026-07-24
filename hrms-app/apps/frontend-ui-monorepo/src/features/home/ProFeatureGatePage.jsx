@@ -33,8 +33,8 @@ export function ProFeatureGatePage() {
           <Box
             p={5}
             borderRadius="full"
-            bg="#7152F312"
-            color="#7152F3"
+            bg="rgba(99, 102, 241, 0.07)"
+            color="accent"
             display="flex"
             alignItems="center"
             justifyContent="center"
@@ -44,16 +44,16 @@ export function ProFeatureGatePage() {
           </Box>
 
           <VStack spacing={2}>
-            <Text fontSize="2xl" fontWeight="bold" color="#0F172A">
+            <Text fontSize="2xl" fontWeight="bold" color="text-primary">
               Pro Feature subscription gate
             </Text>
-            <Text fontSize="sm" color="#64748B" lineHeight="tall">
+            <Text fontSize="sm" color="text-secondary" lineHeight="tall">
               The <strong>{featureName}</strong> is a premium add-on feature. Please upgrade your platform subscription plan to unlock access for your organization.
             </Text>
           </VStack>
 
           <Button
-            bg="#7152F3"
+            bg="accent"
             color="white"
             borderRadius="xl"
             px={8}

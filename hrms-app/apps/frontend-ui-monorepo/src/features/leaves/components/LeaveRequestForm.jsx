@@ -23,8 +23,8 @@ const LeaveTypeChip = ({ label, isSelected, onClick }) => (
     borderRadius="full"
     fontSize="xs"
     fontWeight="medium"
-    bg={isSelected ? "blue.500" : "gray.200"}
-    color={isSelected ? "white" : "gray.600"}
+    bg={isSelected ? "accent" : "border-color"}
+    color={isSelected ? "white" : "text-secondary"}
     bgGradient={isSelected ? "linear(to-r, blue.400, blue.600)" : "none"}
     _hover={{ opacity: 0.9 }}
     transition="all 0.2s"
@@ -105,14 +105,14 @@ const LeaveRequestForm = ({ onCancel, onSubmit: parentOnSubmit }) => {
             <Flex align="center">
               <Text w="60px" fontWeight="bold" fontSize="xs">From</Text>
               <Input 
-                type="date" size="xs" bg="gray.50" border="none" fontWeight="semibold"
+                type="date" size="xs" bg="app-bg-secondary" border="none" fontWeight="semibold"
                 value={fromDate} onChange={(e) => setFromDate(e.target.value)}
               />
             </Flex>
             <Flex align="center">
               <Text w="60px" fontWeight="bold" fontSize="xs">To</Text>
               <Input 
-                type="date" size="xs" bg="gray.50" border="none" fontWeight="semibold"
+                type="date" size="xs" bg="app-bg-secondary" border="none" fontWeight="semibold"
                 value={toDate} onChange={(e) => setToDate(e.target.value)}
               />
             </Flex>
@@ -120,7 +120,7 @@ const LeaveRequestForm = ({ onCancel, onSubmit: parentOnSubmit }) => {
           <VStack spacing={1} flex="1" align="stretch">
             <Text fontWeight="bold" fontSize="xs" textDecoration="underline">Reason</Text>
             <Textarea 
-              rows={3} bg="gray.50" border="1px solid" borderColor="gray.100" resize="none" size="xs"
+              rows={3} bg="app-bg-secondary" border="1px solid" borderColor="border-color" resize="none" size="xs"
               value={reason} onChange={(e) => setReason(e.target.value)}
             />
           </VStack>
@@ -143,7 +143,7 @@ const LeaveRequestForm = ({ onCancel, onSubmit: parentOnSubmit }) => {
                 UPLOAD
               </HRMSButton>
             ) : (
-              <HStack spacing={2} bg="purple.50" px={2} py={1} borderRadius="md" border="1px dashed" borderColor="purple.300">
+              <HStack spacing={2} bg="rgba(99, 102, 241, 0.12)" px={2} py={1} borderRadius="md" border="1px dashed" borderColor="purple.300">
                 <Text fontSize="10px" color="purple.700" maxW="100px" isTruncated>
                   📎 {attachedFile.name}
                 </Text>

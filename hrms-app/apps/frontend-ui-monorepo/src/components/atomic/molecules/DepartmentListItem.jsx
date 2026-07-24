@@ -17,14 +17,14 @@ const DepartmentListItem = ({
     py={3}
     px={3}
     // Add a light divider between rows except the last one.
-    _notLast={{ borderBottomWidth: "1px", borderColor: "gray.100" }}
+    _notLast={{ borderBottomWidth: "1px", borderColor: "border-color" }}
   >
     {/* Left side: name + members info */}
     <Box>
       <Text fontSize="sm" fontWeight="semibold">
         {name}
       </Text>
-      <Text fontSize="xs" color="gray.500">
+      <Text fontSize="xs" color="text-muted">
         {membersLabel}
       </Text>
     </Box>
@@ -54,7 +54,7 @@ const DepartmentListItem = ({
         size="xs"
         variant="ghost"
         color="red.500"
-        _hover={{ bg: "red.50" }}
+        _hover={{ bg: "rgba(239, 68, 68, 0.15)" }}
         onClick={onDelete}
       />
     </HStack>

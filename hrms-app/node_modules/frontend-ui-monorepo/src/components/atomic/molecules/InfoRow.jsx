@@ -1,14 +1,14 @@
 import { Flex, Text, Box } from "@chakra-ui/react";
 
 const InfoRow = ({ left, right, status = "upcoming" }) => {
-  const color = status === "upcoming" ? "#7152F3" : "gray.300";
+  const color = status === "upcoming" ? "accent" : "text-muted";
 
   return (
     <Flex
       align="center"
       py={2}
       borderBottomWidth="1px"
-      borderColor="gray.100"
+      borderColor="border-color"
       _last={{ borderBottomWidth: 0 }}
     >
       {/* Vertical status bar */}
@@ -25,7 +25,7 @@ const InfoRow = ({ left, right, status = "upcoming" }) => {
         <Text fontSize="sm" color="blue.600" textDecor="underline">
           {left}
         </Text>
-        <Text fontSize="sm" color="gray.700">
+        <Text fontSize="sm" color="text-secondary">
           {right}
         </Text>
       </Flex>

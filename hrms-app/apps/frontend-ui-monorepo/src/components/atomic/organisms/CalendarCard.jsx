@@ -134,7 +134,7 @@ const CalendarCard = ({ minH }) => {
           key={day}
           size="xs"
           variant={isToday ? "solid" : "ghost"}
-          colorScheme={isToday ? "purple" : "gray"}
+          colorScheme={isToday ? "purple" : undefined}
           borderRadius="full"
           minH="32px"
           fontSize="xs"
@@ -142,7 +142,7 @@ const CalendarCard = ({ minH }) => {
           p={0}
           position="relative"
           overflow="hidden"
-          _hover={{ bg: isToday ? "purple.500" : "gray.100" }}
+          _hover={{ bg: isToday ? "purple.500" : "hover-bg" }}
         >
           <Text>{day}</Text>
 
@@ -189,10 +189,10 @@ const CalendarCard = ({ minH }) => {
           size="sm"
           variant="ghost"
           leftIcon={<FiCalendar />}
-          bg="#7152F31A"
+          bg="rgba(99, 102, 241, 0.10)"
           borderRadius="full"
-          color="#7152F3"
-          _hover={{ bg: "#7152F333" }}
+          color="accent"
+          _hover={{ bg: "rgba(99, 102, 241, 0.20)" }}
           onClick={goToToday}
         >
           Today
@@ -209,7 +209,7 @@ const CalendarCard = ({ minH }) => {
 
       <SimpleGrid columns={7} spacing={1} mb={2}>
         {days.map((d) => (
-          <Text key={d} fontSize="xs" textAlign="center" color="gray.500" fontWeight="medium">
+          <Text key={d} fontSize="xs" textAlign="center" color="text-muted" fontWeight="medium">
             {d}
           </Text>
         ))}

@@ -11,7 +11,7 @@ const ActionCard = ({ title, subtitle, onProceed }) => (
     align="center"
     justify="space-between"
     borderWidth="1px"
-    borderColor="gray.200"
+    borderColor="border-color"
     borderRadius="lg"
     px={6}
     py={4}
@@ -22,7 +22,7 @@ const ActionCard = ({ title, subtitle, onProceed }) => (
       <Text fontWeight="semibold" fontSize="sm">
         {title}
       </Text>
-      <Text fontSize="xs" color="gray.500" mt={0.5}>
+      <Text fontSize="xs" color="text-muted" mt={0.5}>
         {subtitle}
       </Text>
     </Box>
@@ -56,7 +56,7 @@ const PerformanceDashboardPage = () => {
   if (isLoading) {
     return (
       <DashboardLayout pageTitle="Performance">
-        <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+        <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
           <Flex justify="center" py={16}>
             <Spinner size="lg" />
           </Flex>
@@ -68,7 +68,7 @@ const PerformanceDashboardPage = () => {
   if (error) {
     return (
       <DashboardLayout pageTitle="Performance">
-        <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+        <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
           <Text color="red.500" textAlign="center" py={12}>
             Error loading reviews: {error.message}
           </Text>
@@ -104,7 +104,7 @@ const PerformanceDashboardPage = () => {
 
   return (
     <DashboardLayout pageTitle="Performance">
-      <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+      <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
         <VStack align="stretch" spacing={6}>
           {latestReview ? (
             <>
@@ -123,7 +123,7 @@ const PerformanceDashboardPage = () => {
                   <Box bg="#D4A017" color="white" px={4} py={2} fontWeight="semibold">
                     Knowledge of job skills
                   </Box>
-                  <Box bg="gray.100" px={4} py={2} fontWeight="semibold" color="gray.700">
+                  <Box bg="app-bg-secondary" px={4} py={2} fontWeight="semibold" color="text-secondary">
                     Rating
                   </Box>
                 </Grid>
@@ -134,8 +134,8 @@ const PerformanceDashboardPage = () => {
                         px={4}
                         py={3}
                         borderBottomWidth="1px"
-                        borderColor="gray.100"
-                        bg="white"
+                        borderColor="border-color"
+                        bg="card-bg"
                         fontSize="sm"
                       >
                         {row.criteria}
@@ -144,8 +144,8 @@ const PerformanceDashboardPage = () => {
                         px={4}
                         py={3}
                         borderBottomWidth="1px"
-                        borderColor="gray.100"
-                        bg="white"
+                        borderColor="border-color"
+                        bg="card-bg"
                         fontSize="sm"
                       >
                         <Badge
@@ -169,7 +169,7 @@ const PerformanceDashboardPage = () => {
                   <Box bg="#4CAF50" color="white" px={4} py={2} fontWeight="semibold">
                     Quality/quantity of work
                   </Box>
-                  <Box bg="gray.100" px={4} py={2} fontWeight="semibold" color="gray.700">
+                  <Box bg="app-bg-secondary" px={4} py={2} fontWeight="semibold" color="text-secondary">
                     Rating
                   </Box>
                 </Grid>
@@ -180,8 +180,8 @@ const PerformanceDashboardPage = () => {
                         px={4}
                         py={3}
                         borderBottomWidth="1px"
-                        borderColor="gray.100"
-                        bg="white"
+                        borderColor="border-color"
+                        bg="card-bg"
                         fontSize="sm"
                       >
                         {row.criteria}
@@ -190,8 +190,8 @@ const PerformanceDashboardPage = () => {
                         px={4}
                         py={3}
                         borderBottomWidth="1px"
-                        borderColor="gray.100"
-                        bg="white"
+                        borderColor="border-color"
+                        bg="card-bg"
                         fontSize="sm"
                       >
                         <Badge
@@ -214,15 +214,15 @@ const PerformanceDashboardPage = () => {
                 <Box bg="#E07B54" color="white" px={4} py={2} fontWeight="semibold">
                   Comments
                 </Box>
-                <Box bg="white" px={4} py={4} borderWidth="1px" borderColor="gray.100" minH="80px">
-                  <Text fontSize="sm" color="gray.800" lineHeight="tall">
+                <Box bg="card-bg" px={4} py={4} borderWidth="1px" borderColor="border-color" minH="80px">
+                  <Text fontSize="sm" color="text-primary" lineHeight="tall">
                     {reviewData.comments}
                   </Text>
                 </Box>
               </Box>
             </>
           ) : (
-            <Box textAlign="center" py={16} color="gray.500">
+            <Box textAlign="center" py={16} color="text-muted">
               <Text fontSize="lg" fontWeight="medium" mb={2}>
                 No performance reviews yet
               </Text>

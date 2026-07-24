@@ -17,17 +17,17 @@ const EmployeeExportPage = () => {
           Export Employees
         </Heading>
 
-        <Text fontSize="sm" color="gray.500" mb={8}>
+        <Text fontSize="sm" color="text-muted" mb={8}>
           Download employee records for reporting, payroll, or compliance.
         </Text>
 
         <Box
           maxW="420px"
-          bg="white"
+          bg="card-bg"
           borderRadius="lg"
           boxShadow="sm"
           borderWidth="1px"
-          borderColor="gray.100"
+          borderColor="border-color"
           p={6}
         >
           <Stack spacing={4}>
@@ -35,7 +35,7 @@ const EmployeeExportPage = () => {
               Export all employee records
             </Text>
 
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text-muted">
               The export will include employee details such as name, ID,
               department, designation, status, and location.
             </Text>

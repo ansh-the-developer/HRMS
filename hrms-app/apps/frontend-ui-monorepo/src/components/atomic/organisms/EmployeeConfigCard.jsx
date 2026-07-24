@@ -5,11 +5,11 @@ import EmployeeConfigItem from "@/components/atomic/molecules/EmployeeConfigItem
 const EmployeeConfigCard = () => (
   <Box
     mt={8}
-    bg="white"
+    bg="card-bg"
     borderRadius="lg"
     boxShadow="sm"
     borderWidth="1px"
-    borderColor="gray.100"
+    borderColor="border-color"
     p={4}
   >
     <EmployeeConfigItem

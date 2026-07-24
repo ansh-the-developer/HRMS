@@ -106,8 +106,8 @@ export default function PermissionsManagerPage() {
         {/* Header */}
         <Flex justify="space-between" align="center" mb={6}>
           <Box>
-            <Text fontSize="xl" fontWeight="bold" color="gray.800">Permissions Manager</Text>
-            <Text fontSize="sm" color="gray.500">Change what users/groups can do and can not</Text>
+            <Text fontSize="xl" fontWeight="bold" color="text-primary">Permissions Manager</Text>
+            <Text fontSize="sm" color="text-muted">Change what users/groups can do and can not</Text>
           </Box>
           <HStack spacing={3}>
             <HRMSButton variant="outline" onClick={handleReset}>Reset</HRMSButton>
@@ -127,11 +127,11 @@ export default function PermissionsManagerPage() {
               fontSize="sm"
               fontWeight="medium"
               transition="all 0.2s"
-              bg={activeRole === role ? '#6b46c1' : 'white'}
-              color={activeRole === role ? 'white' : 'gray.600'}
+              bg={activeRole === role ? 'accent' : 'card-bg'}
+              color={activeRole === role ? 'white' : 'text-secondary'}
               border="1px solid"
-              borderColor={activeRole === role ? '#6b46c1' : 'gray.200'}
-              _hover={{ borderColor: '#6b46c1', color: activeRole === role ? 'white' : '#6b46c1' }}
+              borderColor={activeRole === role ? 'accent' : 'border-color'}
+              _hover={{ borderColor: 'accent', color: activeRole === role ? 'white' : 'accent' }}
             >
               {role}
             </Box>
@@ -140,20 +140,20 @@ export default function PermissionsManagerPage() {
 
         {/* Active Role Badge */}
         <Flex align="center" gap={2} mb={4}>
-          <Text fontSize="sm" color="gray.500">Editing permissions for:</Text>
+          <Text fontSize="sm" color="text-muted">Editing permissions for:</Text>
           <Badge colorScheme={roleColors[activeRole]} px={3} py={1} borderRadius="full" fontSize="xs">
             {activeRole}
           </Badge>
         </Flex>
 
         {/* Permissions Table */}
-        <Box bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100" overflow="hidden">
+        <Box bg="card-bg" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="border-color" overflow="hidden">
 
           {/* Table Header */}
-          <Grid templateColumns="2fr 1fr 1fr 1fr 1fr" px={6} py={3} bg="gray.50" borderBottom="1px solid" borderColor="gray.100">
-            <Text fontSize="xs" fontWeight="semibold" color="gray.500" textTransform="uppercase" letterSpacing="wide">Module</Text>
+          <Grid templateColumns="2fr 1fr 1fr 1fr 1fr" px={6} py={3} bg="app-bg-secondary" borderBottom="1px solid" borderColor="border-color">
+            <Text fontSize="xs" fontWeight="semibold" color="text-muted" textTransform="uppercase" letterSpacing="wide">Module</Text>
             {['View', 'Create', 'Edit', 'Delete'].map((a) => (
-              <Text key={a} fontSize="xs" fontWeight="semibold" color="gray.500" textTransform="uppercase" letterSpacing="wide" textAlign="center">
+              <Text key={a} fontSize="xs" fontWeight="semibold" color="text-muted" textTransform="uppercase" letterSpacing="wide" textAlign="center">
                 {a}
               </Text>
             ))}
@@ -168,11 +168,11 @@ export default function PermissionsManagerPage() {
                   <Grid
                     templateColumns="2fr 1fr 1fr 1fr 1fr"
                     px={6} py={4}
-                    _hover={{ bg: 'gray.50' }}
+                    _hover={{ bg: "hover-bg" }}
                     transition="all 0.2s"
                     align="center"
                   >
-                    <Text fontSize="sm" fontWeight="medium" color="gray.700">{mod.label}</Text>
+                    <Text fontSize="sm" fontWeight="medium" color="text-secondary">{mod.label}</Text>
                     {mod.actions.map((action) => (
                       <Flex key={action} justify="center">
                         <Switch
@@ -184,7 +184,7 @@ export default function PermissionsManagerPage() {
                       </Flex>
                     ))}
                   </Grid>
-                  {idx < MODULES.length - 1 && <Divider borderColor="gray.100" />}
+                  {idx < MODULES.length - 1 && <Divider borderColor="border-color" />}
                 </Box>
               );
             })}

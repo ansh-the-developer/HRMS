@@ -369,7 +369,7 @@ function LeaveRequestListPage() {
           gap={3}
         >
           <Spinner size="xl" color="purple.500" thickness="4px" />
-          <Text fontSize="md" fontWeight="medium" color="gray.600">
+          <Text fontSize="md" fontWeight="medium" color="text-secondary">
             Processing request...
           </Text>
         </Box>
@@ -378,49 +378,49 @@ function LeaveRequestListPage() {
       <VStack spacing={6} align="stretch" w="full" px={1}>
         {/* Page Header (Plain, no box) */}
         <Box mb={2}>
-          <Text fontSize="2xl" fontWeight="bold" color="#1E293B">
+          <Text fontSize="2xl" fontWeight="bold" color="text-primary">
             Leave Requests
           </Text>
-          <Text fontSize="sm" color="#64748B" fontStyle="italic">
+          <Text fontSize="sm" color="text-secondary" fontStyle="italic">
             Leave Verification & Management
           </Text>
         </Box>
 
         {/* Leaves Summary Card */}
         <Box
-          bg="white"
+          bg="card-bg"
           p={6}
           borderRadius="2xl"
           borderWidth="1px"
-          borderColor="#E2E8F0"
+          borderColor="border-color"
           shadow="sm"
         >
-          <Text fontSize="md" fontWeight="bold" color="#1E293B" mb={1}>
+          <Text fontSize="md" fontWeight="bold" color="text-primary" mb={1}>
             Leaves Summary
           </Text>
-          <Text fontSize="xs" color="#64748B" mb={6}>
+          <Text fontSize="xs" color="text-secondary" mb={6}>
             Overview of request statuses
           </Text>
 
           <Flex direction="row" align="center" justify="space-around" py={2}>
             {/* Pending Segment */}
             <VStack spacing={1} flex="1" align="center">
-              <Text fontSize="xs" fontWeight="semibold" color="#94A3B8" letterSpacing="wider">
+              <Text fontSize="xs" fontWeight="semibold" color="text-muted" letterSpacing="wider">
                 PENDING
               </Text>
               <HStack spacing={2} align="center">
                 <Box w="8px" h="8px" borderRadius="full" bg="#E28743" />
-                <Text fontSize="2xl" fontWeight="bold" color="#0F172A">
+                <Text fontSize="2xl" fontWeight="bold" color="text-primary">
                   {pendingCount.toString().padStart(2, "0")}
                 </Text>
               </HStack>
             </VStack>
 
-            <Box w="1px" h="40px" bg="#E2E8F0" />
+            <Box w="1px" h="40px" bg="border-color" />
 
             {/* Approved Segment */}
             <VStack spacing={1} flex="1" align="center">
-              <Text fontSize="xs" fontWeight="semibold" color="#94A3B8" letterSpacing="wider">
+              <Text fontSize="xs" fontWeight="semibold" color="text-muted" letterSpacing="wider">
                 APPROVED
               </Text>
               <Text fontSize="2xl" fontWeight="bold" color="#38A169">
@@ -428,11 +428,11 @@ function LeaveRequestListPage() {
               </Text>
             </VStack>
 
-            <Box w="1px" h="40px" bg="#E2E8F0" />
+            <Box w="1px" h="40px" bg="border-color" />
 
             {/* Rejected Segment */}
             <VStack spacing={1} flex="1" align="center">
-              <Text fontSize="xs" fontWeight="semibold" color="#94A3B8" letterSpacing="wider">
+              <Text fontSize="xs" fontWeight="semibold" color="text-muted" letterSpacing="wider">
                 REJECTED
               </Text>
               <Text fontSize="2xl" fontWeight="bold" color="#E53E3E">
@@ -444,22 +444,22 @@ function LeaveRequestListPage() {
 
         {/* Application Workspace Card */}
         <Box
-          bg="white"
+          bg="card-bg"
           p={6}
           borderRadius="2xl"
           borderWidth="1px"
-          borderColor="#E2E8F0"
+          borderColor="border-color"
           shadow="sm"
         >
           {/* Workspace Header */}
           <Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={4}>
-            <Text fontSize="lg" fontWeight="bold" color="#1E293B">
+            <Text fontSize="lg" fontWeight="bold" color="text-primary">
               Application Workspace
             </Text>
 
             <HStack spacing={3}>
-              {/* Status Filters */}
-              <HStack spacing={1} bg="#F1F5F9" p={1} borderRadius="lg">
+              {/* Status Filters Segmented Control */}
+              <HStack spacing={1} bg="app-bg-secondary" border="1px solid" borderColor="border-color" p={1} borderRadius="xl">
                 {["All", "Pending", "Approved", "Rejected"].map((tab) => {
                   const isSelected = activeTab === tab;
                   return (
@@ -467,15 +467,14 @@ function LeaveRequestListPage() {
                       key={tab}
                       size="sm"
                       variant="ghost"
-                      borderRadius="md"
+                      borderRadius="lg"
                       px={4}
-                      py={1}
                       h="32px"
                       fontSize="xs"
                       fontWeight="semibold"
-                      bg={isSelected ? "#7152F3" : "transparent"}
-                      color={isSelected ? "white" : "#64748B"}
-                      _hover={isSelected ? { bg: "#5F33E1" } : { bg: "#E2E8F0", color: "#1E293B" }}
+                      bg={isSelected ? "accent" : "transparent"}
+                      color={isSelected ? "white" : "text-secondary"}
+                      _hover={isSelected ? { bg: "accent-hover" } : { bg: "hover-bg", color: "text-primary" }}
                       onClick={() => {
                         setActiveTab(tab);
                         setVisibleCount(3); // Reset page count on filter switch
@@ -492,13 +491,13 @@ function LeaveRequestListPage() {
                 size="sm"
                 variant="outline"
                 leftIcon={<FiDownload />}
-                borderColor="#CBD5E1"
-                color="#475569"
+                borderColor="border-color"
+                color="text-secondary"
                 borderRadius="lg"
-                h="32px"
+                h="34px"
                 fontSize="xs"
                 fontWeight="semibold"
-                _hover={{ bg: "#F8FAFC" }}
+                _hover={{ bg: "hover-bg", color: "text-primary" }}
                 onClick={handleExportCSV}
               >
                 Export CSV
@@ -510,23 +509,23 @@ function LeaveRequestListPage() {
           <Box overflowX="auto">
             <Table variant="simple" size="sm">
               <Thead>
-                <Tr borderBottomWidth="2px" borderColor="#F1F5F9">
-                  <Th fontSize="10px" color="#94A3B8" fontWeight="bold" letterSpacing="wider" py={4}>
+                <Tr borderBottomWidth="1px" borderColor="border-color">
+                  <Th fontSize="10px" color="text-muted" fontWeight="bold" letterSpacing="wider" py={4}>
                     EMPLOYEE
                   </Th>
-                  <Th fontSize="10px" color="#94A3B8" fontWeight="bold" letterSpacing="wider" py={4}>
+                  <Th fontSize="10px" color="text-muted" fontWeight="bold" letterSpacing="wider" py={4}>
                     TYPE & DURATION
                   </Th>
-                  <Th fontSize="10px" color="#94A3B8" fontWeight="bold" letterSpacing="wider" py={4}>
+                  <Th fontSize="10px" color="text-muted" fontWeight="bold" letterSpacing="wider" py={4}>
                     REASON
                   </Th>
-                  <Th fontSize="10px" color="#94A3B8" fontWeight="bold" letterSpacing="wider" py={4}>
+                  <Th fontSize="10px" color="text-muted" fontWeight="bold" letterSpacing="wider" py={4}>
                     SUBMITTED ON
                   </Th>
-                  <Th fontSize="10px" color="#94A3B8" fontWeight="bold" letterSpacing="wider" py={4}>
+                  <Th fontSize="10px" color="text-muted" fontWeight="bold" letterSpacing="wider" py={4}>
                     EVIDENCE
                   </Th>
-                  <Th fontSize="10px" color="#94A3B8" fontWeight="bold" letterSpacing="wider" py={4} textAlign="center">
+                  <Th fontSize="10px" color="text-muted" fontWeight="bold" letterSpacing="wider" py={4} textAlign="center">
                     ACTION
                   </Th>
                 </Tr>
@@ -536,20 +535,20 @@ function LeaveRequestListPage() {
                 {paginatedRequests.map((req) => (
                   <Tr
                     key={req.id}
-                    _hover={{ bg: "#F8FAFC" }}
+                    _hover={{ bg: "hover-bg" }}
                     transition="background-color 0.2s"
                     borderBottomWidth="1px"
-                    borderColor="#F1F5F9"
+                    borderColor="border-color"
                   >
                     {/* Employee Info */}
                     <Td py={4}>
                       <HStack spacing={3}>
                         <Avatar size="sm" name={req.name} />
                         <VStack align="flex-start" spacing={0.5}>
-                          <Text fontSize="sm" fontWeight="bold" color="#1A202C">
+                          <Text fontSize="sm" fontWeight="bold" color="text-primary">
                             {req.name}
                           </Text>
-                          <Text fontSize="xs" color="#94A3B8">
+                          <Text fontSize="xs" color="text-muted">
                             #{req.emp_code}
                           </Text>
                         </VStack>
@@ -562,18 +561,18 @@ function LeaveRequestListPage() {
                         <Badge
                           fontSize="9px"
                           fontWeight="bold"
-                          px={2}
+                          px={2.5}
                           py={0.5}
                           borderRadius="full"
-                          bg={req.type.toLowerCase().includes("sick") ? "#FED7D7" : "#FEEBC8"}
-                          color={req.type.toLowerCase().includes("sick") ? "#C53030" : "#C05621"}
+                          colorScheme={req.type.toLowerCase().includes("sick") ? "red" : "orange"}
+                          variant="subtle"
                         >
                           {req.type.toUpperCase()}
                         </Badge>
-                        <Text fontSize="xs" fontWeight="semibold" color="#1A202C">
+                        <Text fontSize="xs" fontWeight="semibold" color="text-primary">
                           {req.leaveOn}
                         </Text>
-                        <Text fontSize="10px" color="#94A3B8" fontStyle="italic">
+                        <Text fontSize="10px" color="text-muted" fontStyle="italic">
                           {req.days} {req.days === 1 ? "Day" : "Days"} total
                         </Text>
                       </VStack>
@@ -581,7 +580,7 @@ function LeaveRequestListPage() {
 
                     {/* Reason */}
                     <Td py={4}>
-                      <Text fontSize="xs" color="#334155">
+                      <Text fontSize="xs" color="text-secondary">
                         {req.reason}
                       </Text>
                     </Td>
@@ -589,10 +588,10 @@ function LeaveRequestListPage() {
                     {/* Submitted On */}
                     <Td py={4}>
                       <VStack align="flex-start" spacing={0.5}>
-                        <Text fontSize="xs" color="#1A202C">
+                        <Text fontSize="xs" color="text-primary">
                           {req.submitted_date}
                         </Text>
-                        <Text fontSize="10px" color="#94A3B8">
+                        <Text fontSize="10px" color="text-muted">
                           {req.submitted_time}
                         </Text>
                       </VStack>
@@ -602,7 +601,7 @@ function LeaveRequestListPage() {
                     <Td py={4}>
                       <HStack
                         spacing={1}
-                        color="#7152F3"
+                        color="accent"
                         cursor="pointer"
                         _hover={{ textDecoration: "underline" }}
                         onClick={() => handleViewDoc(req)}
@@ -622,11 +621,11 @@ function LeaveRequestListPage() {
                             <Badge
                               fontSize="9px"
                               fontWeight="bold"
-                              px={2}
-                              py={1}
+                              px={2.5}
+                              py={0.5}
                               borderRadius="full"
-                              bg="#C6F6D5"
-                              color="#2F855A"
+                              colorScheme="green"
+                              variant="subtle"
                             >
                               APPROVED
                             </Badge>
@@ -634,11 +633,11 @@ function LeaveRequestListPage() {
                               size="xs"
                               variant="link"
                               leftIcon={<FiRotateCcw size={10} />}
-                              color="#718096"
+                              color="text-muted"
                               fontSize="10px"
                               fontWeight="medium"
                               onClick={() => handleOpenResetModal(req.id)}
-                              _hover={{ color: "#4A5568" }}
+                              _hover={{ color: "text-primary" }}
                               py={1}
                             >
                               Reset to Pending
@@ -710,7 +709,7 @@ function LeaveRequestListPage() {
         {hasMore && (
           <Flex justify="center" mt={8}>
             <Button
-              bg="#7152F3"
+              bg="accent"
               color="white"
               borderRadius="full"
               px={8}
@@ -750,10 +749,10 @@ function LeaveRequestListPage() {
               </Box>
 
               <VStack align="flex-start" spacing={1}>
-                <Text fontSize="md" fontWeight="bold" color="#0F172A">
+                <Text fontSize="md" fontWeight="bold" color="text-primary">
                   Confirm Action
                 </Text>
-                <Text fontSize="xs" color="#64748B" lineHeight="tall">
+                <Text fontSize="xs" color="text-secondary" lineHeight="tall">
                   Reset this decision back to Pending? Admin note will be cleared.
                 </Text>
               </VStack>
@@ -767,8 +766,8 @@ function LeaveRequestListPage() {
               borderRadius="xl"
               fontSize="xs"
               fontWeight="semibold"
-              borderColor="#CBD5E1"
-              color="#475569"
+              borderColor="border-color"
+              color="text-secondary"
               onClick={handleCloseResetModal}
               h="36px"
             >
@@ -813,10 +812,10 @@ function LeaveRequestListPage() {
               </Box>
 
               <VStack align="flex-start" spacing={1}>
-                <Text fontSize="md" fontWeight="bold" color="#0F172A">
+                <Text fontSize="md" fontWeight="bold" color="text-primary">
                   No Document
                 </Text>
-                <Text fontSize="xs" color="#64748B" lineHeight="tall">
+                <Text fontSize="xs" color="text-secondary" lineHeight="tall">
                   No document uploaded.
                 </Text>
               </VStack>
@@ -827,7 +826,7 @@ function LeaveRequestListPage() {
             <Button
               size="sm"
               colorScheme="purple"
-              bg="#7152F3"
+              bg="accent"
               borderRadius="xl"
               fontSize="xs"
               fontWeight="semibold"

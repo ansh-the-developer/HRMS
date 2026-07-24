@@ -74,14 +74,14 @@ export default function UserManagementPage() {
   return (
     <DashboardLayout>
       <Box px={{ base: 4, md: 8 }} py={6} maxW="6xl" mx="auto">
-        <Text fontSize="xl" fontWeight="bold" color="gray.800" mb={6}>
+        <Text fontSize="xl" fontWeight="bold" color="text-primary" mb={6}>
           Add New Employee/User
         </Text>
 
-        <Box bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100" p={8}>
+        <Box bg="card-bg" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="border-color" p={8}>
           
           {/* Tabs Navigation */}
-          <Flex borderBottom="1px solid" borderColor="gray.200" mb={8} overflowX="auto" pb={2}>
+          <Flex borderBottom="1px solid" borderColor="border-color" mb={8} overflowX="auto" pb={2}>
             {TABS.map((tab) => {
               const isActive = activeTab === tab.id;
               const TabIcon = tab.icon;
@@ -93,8 +93,8 @@ export default function UserManagementPage() {
                   py={2}
                   cursor="pointer"
                   borderBottom={isActive ? '2px solid' : '2px solid transparent'}
-                  borderColor={isActive ? '#6b46c1' : 'transparent'} // Matching the purple from Figma
-                  color={isActive ? '#6b46c1' : 'gray.500'}
+                  borderColor={isActive ? 'accent' : 'transparent'}
+                  color={isActive ? 'accent' : 'text-muted'}
                   fontWeight={isActive ? 'bold' : 'medium'}
                   onClick={() => setActiveTab(tab.id)}
                   transition="all 0.2s"
@@ -117,7 +117,7 @@ export default function UserManagementPage() {
 
           {/* Action Buttons */}
           <Flex justify="flex-end" gap={4} mt={10}>
-            <HRMSButton variant="outline" borderColor="gray.200" color="gray.600">
+            <HRMSButton variant="outline" borderColor="border-color" color="text-secondary">
               Cancel
             </HRMSButton>
             <HRMSButton bg="#6b46c1" color="white" _hover={{ bg: '#553c9a' }} onClick={handleSave}>
@@ -135,8 +135,8 @@ export default function UserManagementPage() {
 function PersonalTab() {
   return (
     <VStack align="stretch" spacing={6}>
-      <Box w="80px" h="80px" bg="gray.50" borderRadius="md" border="1px dashed" borderColor="gray.300" display="flex" alignItems="center" justifyContent="center" cursor="pointer" _hover={{ bg: "gray.100" }}>
-         <Icon as={UserIcon} color="gray.400" />
+      <Box w="80px" h="80px" bg="app-bg-secondary" borderRadius="md" border="1px dashed" borderColor="border-color" display="flex" alignItems="center" justifyContent="center" cursor="pointer" _hover={{ bg: "hover-bg" }}>
+         <Icon as={UserIcon} color="text-muted" />
       </Box>
       <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={6}>
         <HRMSInput placeholder="First Name" />
@@ -146,20 +146,20 @@ function PersonalTab() {
         <HRMSInput placeholder="Father's Name" />
         <HRMSInput placeholder="Highest Degree" />
         <HRMSInput type="date" placeholder="Date of Birth" />
-        <Select placeholder="Marital Status" fontSize="sm" color="gray.600" borderColor="gray.200">
+        <Select placeholder="Marital Status" fontSize="sm" color="text-secondary" borderColor="border-color">
           <option>Single</option>
           <option>Married</option>
         </Select>
-        <Select placeholder="Gender" fontSize="sm" color="gray.600" borderColor="gray.200">
+        <Select placeholder="Gender" fontSize="sm" color="text-secondary" borderColor="border-color">
           <option>Male</option>
           <option>Female</option>
           <option>Other</option>
         </Select>
-        <Select placeholder="Nationality" fontSize="sm" color="gray.600" borderColor="gray.200">
+        <Select placeholder="Nationality" fontSize="sm" color="text-secondary" borderColor="border-color">
           <option>Indian</option>
           <option>Other</option>
         </Select>
-        <Select placeholder="Blood Group" fontSize="sm" color="gray.600" borderColor="gray.200">
+        <Select placeholder="Blood Group" fontSize="sm" color="text-secondary" borderColor="border-color">
           <option>A+</option><option>O+</option><option>B+</option><option>AB+</option>
         </Select>
         <HRMSInput placeholder="PAN No." />
@@ -177,35 +177,35 @@ function ProfessionalTab() {
   return (
     <Grid templateColumns={{ base: '1fr', md: '1fr 1fr' }} gap={6}>
       <HRMSInput placeholder="Employee ID" />
-      <Select placeholder="Select Employment Status" fontSize="sm" color="gray.600" borderColor="gray.200">
+      <Select placeholder="Select Employment Status" fontSize="sm" color="text-secondary" borderColor="border-color">
         <option>Full-Time</option>
         <option>Part-Time</option>
         <option>Contract</option>
       </Select>
-      <Select placeholder="Select Employee Type" fontSize="sm" color="gray.600" borderColor="gray.200">
+      <Select placeholder="Select Employee Type" fontSize="sm" color="text-secondary" borderColor="border-color">
         <option>Permanent</option>
         <option>Probation</option>
       </Select>
       <HRMSInput placeholder="Official Email" />
-      <Select placeholder="Select Department" fontSize="sm" color="gray.600" borderColor="gray.200">
+      <Select placeholder="Select Department" fontSize="sm" color="text-secondary" borderColor="border-color">
         <option>Engineering</option>
         <option>HR</option>
         <option>Design</option>
       </Select>
       <HRMSInput placeholder="Enter Designation" />
-      <Select placeholder="Select Team" fontSize="sm" color="gray.600" borderColor="gray.200">
+      <Select placeholder="Select Team" fontSize="sm" color="text-secondary" borderColor="border-color">
         <option>Frontend</option>
         <option>Backend</option>
       </Select>
-      <Select placeholder="Select Salary structure" fontSize="sm" color="gray.600" borderColor="gray.200">
+      <Select placeholder="Select Salary structure" fontSize="sm" color="text-secondary" borderColor="border-color">
         <option>Standard Tier 1</option>
       </Select>
-      <Select placeholder="Select Working Days" fontSize="sm" color="gray.600" borderColor="gray.200">
+      <Select placeholder="Select Working Days" fontSize="sm" color="text-secondary" borderColor="border-color">
         <option>5 Days</option>
         <option>6 Days</option>
       </Select>
       <HRMSInput type="date" placeholder="Select Joining Date" />
-      <Select placeholder="Select Office Location" fontSize="sm" color="gray.600" borderColor="gray.200" gridColumn={{ md: 'span 2' }}>
+      <Select placeholder="Select Office Location" fontSize="sm" color="text-secondary" borderColor="border-color" gridColumn={{ md: 'span 2' }}>
         <option>Headquarters</option>
         <option>Branch Office</option>
       </Select>
@@ -217,15 +217,15 @@ function ProfessionalTab() {
 function DocumentsTab() {
   const DocumentDropzone = ({ label }) => (
     <Box>
-      <Text fontSize="sm" fontWeight="medium" color="gray.600" mb={3}>{label}</Text>
-      <Flex direction="column" align="center" justify="center" p={8} border="1px dashed" borderColor="gray.300" borderRadius="xl" bg="white" _hover={{ bg: "gray.50" }} cursor="pointer" transition="all 0.2s">
+      <Text fontSize="sm" fontWeight="medium" color="text-secondary" mb={3}>{label}</Text>
+      <Flex direction="column" align="center" justify="center" p={8} border="1px dashed" borderColor="border-color" borderRadius="xl" bg="card-bg" _hover={{ bg: "hover-bg" }} cursor="pointer" transition="all 0.2s">
         <Flex bg="#6b46c1" color="white" p={3} borderRadius="md" mb={4}>
           <UploadIcon boxSize={5} />
         </Flex>
-        <Text fontSize="sm" color="gray.700" fontWeight="medium">
+        <Text fontSize="sm" color="text-secondary" fontWeight="medium">
           Drag & Drop or <Box as="span" color="#6b46c1">choose file</Box> to upload
         </Text>
-        <Text fontSize="xs" color="gray.400" mt={1}>Supported formats : Jpeg, pdf</Text>
+        <Text fontSize="xs" color="text-muted" mt={1}>Supported formats : Jpeg, pdf</Text>
       </Flex>
     </Box>
   );

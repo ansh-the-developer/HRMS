@@ -1022,13 +1022,13 @@ const AttendanceDashboardPage = () => {
               <HStack spacing={4}>
                 <Avatar size="md" name={selectedEmployeeForLogs.name} />
                 <VStack align="start" spacing={0}>
-                  <Heading as="h1" size="md" fontWeight="800" color="#0F172A">
+                  <Heading as="h1" size="md" fontWeight="800" color="text-primary">
                     {selectedEmployeeForLogs.name}
                   </Heading>
-                  <Text fontSize="xs" color="gray.400" fontWeight="600">
+                  <Text fontSize="xs" color="text-muted" fontWeight="600">
                     {selectedEmployeeForLogs.department || "—"} · {selectedEmployeeForLogs.designation || "—"}
                   </Text>
-                  <Text fontSize="xs" color="gray.400" mt={1}>
+                  <Text fontSize="xs" color="text-muted" mt={1}>
                     Check attendance logs for {selectedEmployeeForLogs.name}
                   </Text>
                 </VStack>
@@ -1037,14 +1037,14 @@ const AttendanceDashboardPage = () => {
               {/* Action row */}
               <Flex wrap="wrap" align="center" gap={3} justify={{ base: "stretch", xl: "flex-end" }}>
                 {/* Today's Status */}
-                <HStack bg="white" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="gray.100" shadow="sm">
+                <HStack bg="card-bg" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="border-color" shadow="sm">
                   <VStack align="start" spacing={0} pr={3}>
-                    <Text fontSize="9px" fontWeight="800" color="gray.400">
+                    <Text fontSize="9px" fontWeight="800" color="text-muted">
                       Today's Status
                     </Text>
                     <HStack spacing={1}>
                       <Box w="6px" h="6px" borderRadius="full" bg={todayDotColor} />
-                      <Text fontSize="xs" fontWeight="700" color="gray.500">
+                      <Text fontSize="xs" fontWeight="700" color="text-muted">
                         {todayStatusLabel}
                       </Text>
                     </HStack>
@@ -1052,8 +1052,8 @@ const AttendanceDashboardPage = () => {
                 </HStack>
 
                 {/* VIEW filter */}
-                <HStack bg="white" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="gray.100" shadow="sm">
-                  <Text fontSize="xs" fontWeight="700" color="gray.400">
+                <HStack bg="card-bg" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="border-color" shadow="sm">
+                  <Text fontSize="xs" fontWeight="700" color="text-muted">
                     VIEW
                   </Text>
                   <Select
@@ -1099,8 +1099,8 @@ const AttendanceDashboardPage = () => {
                 </HStack>
 
                 {/* FY filter */}
-                <HStack bg="white" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="gray.100" shadow="sm">
-                  <Text fontSize="xs" fontWeight="700" color="gray.400">
+                <HStack bg="card-bg" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="border-color" shadow="sm">
+                  <Text fontSize="xs" fontWeight="700" color="text-muted">
                     FY
                   </Text>
                   <Select
@@ -1154,7 +1154,7 @@ const AttendanceDashboardPage = () => {
             {/* PRESENT */}
             <HRMSCard flex={1} _hover={{ shadow: "md" }} transition="all 0.2s">
               <Flex direction="column" align="center" justify="center" py={2}>
-                <Text fontSize="xs" fontWeight="700" color="gray.400" mb={1}>
+                <Text fontSize="xs" fontWeight="700" color="text-muted" mb={1}>
                   Present
                 </Text>
                 <Text fontSize="4xl" fontWeight="800" color="#10B981" mb={2}>
@@ -1169,7 +1169,7 @@ const AttendanceDashboardPage = () => {
             {/* ABSENT */}
             <HRMSCard flex={1} _hover={{ shadow: "md" }} transition="all 0.2s">
               <Flex direction="column" align="center" justify="center" py={2}>
-                <Text fontSize="xs" fontWeight="700" color="gray.400" mb={1}>
+                <Text fontSize="xs" fontWeight="700" color="text-muted" mb={1}>
                   Absent
                 </Text>
                 <Text fontSize="4xl" fontWeight="800" color="#F59E0B" mb={2}>
@@ -1184,7 +1184,7 @@ const AttendanceDashboardPage = () => {
             {/* ON LEAVE */}
             <HRMSCard flex={1} _hover={{ shadow: "md" }} transition="all 0.2s">
               <Flex direction="column" align="center" justify="center" py={2}>
-                <Text fontSize="xs" fontWeight="700" color="gray.400" mb={1}>
+                <Text fontSize="xs" fontWeight="700" color="text-muted" mb={1}>
                   On Leave
                 </Text>
                 <Text fontSize="4xl" fontWeight="800" color="#6366F1" mb={2}>
@@ -1199,7 +1199,7 @@ const AttendanceDashboardPage = () => {
             {/* OFF DAY */}
             <HRMSCard flex={1} _hover={{ shadow: "md" }} transition="all 0.2s">
               <Flex direction="column" align="center" justify="center" py={2}>
-                <Text fontSize="xs" fontWeight="700" color="gray.400" mb={1}>
+                <Text fontSize="xs" fontWeight="700" color="text-muted" mb={1}>
                   Off Day
                 </Text>
                 <Text fontSize="4xl" fontWeight="800" color="#8B5CF6" mb={2}>
@@ -1213,35 +1213,35 @@ const AttendanceDashboardPage = () => {
           </Flex>
 
           {/* DAILY PUNCH RECORDS TABLE */}
-          <Box bg="white" borderRadius="2xl" border="1px solid" borderColor="gray.100" shadow="sm" p={6}>
+          <Box bg="card-bg" borderRadius="2xl" border="1px solid" borderColor="border-color" shadow="sm" p={6}>
             <VStack align="start" spacing={1} mb={6}>
-              <Text fontSize="md" fontWeight="800" color="#1E293B">
+              <Text fontSize="md" fontWeight="800" color="text-primary">
                 Daily Punch Records
               </Text>
-              <Text fontSize="xs" color="gray.400">
+              <Text fontSize="xs" color="text-muted">
                 Showing records for {empSelectedMonth} {empSelectedYear}
               </Text>
             </VStack>
 
             <HRMSTable>
               <Thead>
-                <Tr borderBottomWidth="1.5px" borderColor="gray.100">
-                  <Th fontSize="10px" fontWeight="700" color="#64748B" py={4}>
+                <Tr borderBottomWidth="1.5px" borderColor="border-color">
+                  <Th fontSize="10px" fontWeight="700" color="text-secondary" py={4}>
                     DATE
                   </Th>
-                  <Th fontSize="10px" fontWeight="700" color="#64748B" py={4}>
+                  <Th fontSize="10px" fontWeight="700" color="text-secondary" py={4}>
                     IN TIME
                   </Th>
-                  <Th fontSize="10px" fontWeight="700" color="#64748B" py={4}>
+                  <Th fontSize="10px" fontWeight="700" color="text-secondary" py={4}>
                     OUT TIME
                   </Th>
-                  <Th fontSize="10px" fontWeight="700" color="#64748B" py={4}>
+                  <Th fontSize="10px" fontWeight="700" color="text-secondary" py={4}>
                     WORK HOURS
                   </Th>
-                  <Th fontSize="10px" fontWeight="700" color="#64748B" py={4}>
+                  <Th fontSize="10px" fontWeight="700" color="text-secondary" py={4}>
                     STATUS
                   </Th>
-                  <Th fontSize="10px" fontWeight="700" color="#64748B" py={4}>
+                  <Th fontSize="10px" fontWeight="700" color="text-secondary" py={4}>
                     ACTION
                   </Th>
                 </Tr>
@@ -1249,7 +1249,7 @@ const AttendanceDashboardPage = () => {
               <Tbody>
                 {employeeCalendarRows.length === 0 ? (
                   <Tr>
-                    <Td colSpan={6} textAlign="center" py={12} color="gray.400">
+                    <Td colSpan={6} textAlign="center" py={12} color="text-muted">
                       No records to display.
                     </Td>
                   </Tr>
@@ -1260,28 +1260,28 @@ const AttendanceDashboardPage = () => {
                       <Tr key={row.date} borderBottomWidth="1px" borderColor="gray.50">
                         {/* DATE */}
                         <Td py={3}>
-                          <Text fontSize="sm" fontWeight="600" color="#1E293B">
+                          <Text fontSize="sm" fontWeight="600" color="text-primary">
                             {formatDateDisplay(row.date)}
                           </Text>
                         </Td>
 
                         {/* IN TIME */}
                         <Td py={3}>
-                          <Text fontSize="sm" color="gray.600" fontWeight="500">
+                          <Text fontSize="sm" color="text-secondary" fontWeight="500">
                             {row.in_time || "--:--"}
                           </Text>
                         </Td>
 
                         {/* OUT TIME */}
                         <Td py={3}>
-                          <Text fontSize="sm" color="gray.600" fontWeight="500">
+                          <Text fontSize="sm" color="text-secondary" fontWeight="500">
                             {row.out_time || "--:--"}
                           </Text>
                         </Td>
 
                         {/* WORK HOURS */}
                         <Td py={3}>
-                          <Text fontSize="sm" color="gray.600" fontWeight="500">
+                          <Text fontSize="sm" color="text-secondary" fontWeight="500">
                             {calculateWorkHours(row.in_time, row.out_time) || "—"}
                           </Text>
                         </Td>
@@ -1326,7 +1326,7 @@ const AttendanceDashboardPage = () => {
                                 bg="red.50"
                                 color="red.500"
                                 borderRadius="full"
-                                _hover={{ bg: "red.100" }}
+                                _hover={{ bg: "rgba(239, 68, 68, 0.25)" }}
                                 onClick={() => handleDeleteSingleLog(row.date)}
                               />
                             )}
@@ -1351,7 +1351,7 @@ const AttendanceDashboardPage = () => {
             gap={4}
             pb={2}
           >
-            <Heading as="h1" size="lg" fontWeight="800" color="#0F172A">
+            <Heading as="h1" size="lg" fontWeight="800" color="text-primary">
               Attendance Board
             </Heading>
 
@@ -1378,8 +1378,8 @@ const AttendanceDashboardPage = () => {
               </HRMSButton>
 
               {/* VIEW (Date filter) */}
-              <HStack bg="white" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="gray.100" shadow="sm">
-                <Text fontSize="xs" fontWeight="700" color="gray.400">
+              <HStack bg="card-bg" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="border-color" shadow="sm">
+                <Text fontSize="xs" fontWeight="700" color="text-muted">
                   VIEW
                 </Text>
                 <Input
@@ -1407,8 +1407,8 @@ const AttendanceDashboardPage = () => {
               </HStack>
 
               {/* FY (Fiscal Year filter) */}
-              <HStack bg="white" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="gray.100" shadow="sm">
-                <Text fontSize="xs" fontWeight="700" color="gray.400">
+              <HStack bg="card-bg" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="border-color" shadow="sm">
+                <Text fontSize="xs" fontWeight="700" color="text-muted">
                   FY
                 </Text>
                 <Select
@@ -1437,8 +1437,8 @@ const AttendanceDashboardPage = () => {
               </HStack>
 
               {/* MONTH filter */}
-              <HStack bg="white" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="gray.100" shadow="sm">
-                <Text fontSize="xs" fontWeight="700" color="gray.400">
+              <HStack bg="card-bg" px={3} py={1.5} borderRadius="xl" border="1px solid" borderColor="border-color" shadow="sm">
+                <Text fontSize="xs" fontWeight="700" color="text-muted">
                   MONTH
                 </Text>
                 <Select
@@ -1523,11 +1523,11 @@ const AttendanceDashboardPage = () => {
                       <Box bg="#E8F8F0" p={2} borderRadius="full">
                         <Icon as={FiCheckCircle} color="#10B981" boxSize={4} />
                       </Box>
-                      <Text fontSize="2xs" fontWeight="800" color="gray.400" letterSpacing="widest">
+                      <Text fontSize="2xs" fontWeight="800" color="text-muted" letterSpacing="widest">
                         PRESENT
                       </Text>
                     </HStack>
-                    <Text fontSize="4xl" fontWeight="800" color="#1E293B">
+                    <Text fontSize="4xl" fontWeight="800" color="text-primary">
                       {presentCount}
                     </Text>
                   </VStack>
@@ -1545,7 +1545,7 @@ const AttendanceDashboardPage = () => {
                   </Box>
                 </Flex>
                 <HStack mt={6} spacing={2} borderLeft="3px solid" borderColor="#10B981" pl={2}>
-                  <Text fontSize="xs" color="gray.400" fontStyle="italic" fontWeight="500">
+                  <Text fontSize="xs" color="text-muted" fontStyle="italic" fontWeight="500">
                     Employees checked in today.
                   </Text>
                 </HStack>
@@ -1570,11 +1570,11 @@ const AttendanceDashboardPage = () => {
                       <Box bg="#FFF3E0" p={2} borderRadius="full">
                         <Icon as={FiAlertTriangle} color="#F59E0B" boxSize={4} />
                       </Box>
-                      <Text fontSize="2xs" fontWeight="800" color="gray.400" letterSpacing="widest">
+                      <Text fontSize="2xs" fontWeight="800" color="text-muted" letterSpacing="widest">
                         ABSENCES
                       </Text>
                     </HStack>
-                    <Text fontSize="4xl" fontWeight="800" color="#1E293B">
+                    <Text fontSize="4xl" fontWeight="800" color="text-primary">
                       {absentCount}
                     </Text>
                   </VStack>
@@ -1592,7 +1592,7 @@ const AttendanceDashboardPage = () => {
                   </Box>
                 </Flex>
                 <HStack mt={6} spacing={2} borderLeft="3px solid" borderColor="#F59E0B" pl={2}>
-                  <Text fontSize="xs" color="gray.400" fontStyle="italic" fontWeight="500">
+                  <Text fontSize="xs" color="text-muted" fontStyle="italic" fontWeight="500">
                     Employees with no check-in.
                   </Text>
                 </HStack>
@@ -1617,11 +1617,11 @@ const AttendanceDashboardPage = () => {
                       <Box bg="#EEF2F6" p={2} borderRadius="full">
                         <Icon as={FiClock} color="#6366F1" boxSize={4} />
                       </Box>
-                      <Text fontSize="2xs" fontWeight="800" color="gray.400" letterSpacing="widest">
+                      <Text fontSize="2xs" fontWeight="800" color="text-muted" letterSpacing="widest">
                         ON LEAVE
                       </Text>
                     </HStack>
-                    <Text fontSize="4xl" fontWeight="800" color="#1E293B">
+                    <Text fontSize="4xl" fontWeight="800" color="text-primary">
                       {leaveCount}
                     </Text>
                   </VStack>
@@ -1641,7 +1641,7 @@ const AttendanceDashboardPage = () => {
                   </Box>
                 </Flex>
                 <HStack mt={6} spacing={2} borderLeft="3px solid" borderColor="#6366F1" pl={2}>
-                  <Text fontSize="xs" color="gray.400" fontStyle="italic" fontWeight="500">
+                  <Text fontSize="xs" color="text-muted" fontStyle="italic" fontWeight="500">
                     Employees with approved leave request.
                   </Text>
                 </HStack>
@@ -1666,11 +1666,11 @@ const AttendanceDashboardPage = () => {
                       <Box bg="#F3E8FF" p={2} borderRadius="full">
                         <Icon as={FiCalendar} color="#8B5CF6" boxSize={4} />
                       </Box>
-                      <Text fontSize="2xs" fontWeight="800" color="gray.400" letterSpacing="widest">
+                      <Text fontSize="2xs" fontWeight="800" color="text-muted" letterSpacing="widest">
                         OFF DAY
                       </Text>
                     </HStack>
-                    <Text fontSize="4xl" fontWeight="800" color="#1E293B">
+                    <Text fontSize="4xl" fontWeight="800" color="text-primary">
                       {offDayCount}
                     </Text>
                   </VStack>
@@ -1688,7 +1688,7 @@ const AttendanceDashboardPage = () => {
                   </Box>
                 </Flex>
                 <HStack mt={6} spacing={2} borderLeft="3px solid" borderColor="#8B5CF6" pl={2}>
-                  <Text fontSize="xs" color="gray.400" fontStyle="italic" fontWeight="500">
+                  <Text fontSize="xs" color="text-muted" fontStyle="italic" fontWeight="500">
                     Employees marked as off today.
                   </Text>
                 </HStack>
@@ -1713,7 +1713,7 @@ const AttendanceDashboardPage = () => {
         <ModalOverlay />
         <ModalContent borderRadius="2xl" p={4}>
           <ModalHeader pb={0}>
-            <Text fontSize="lg" fontWeight="800" color="#1E293B">
+            <Text fontSize="lg" fontWeight="800" color="text-primary">
               Import Attendance CSV
             </Text>
             <Text fontSize="10px" fontWeight="800" color="#6366F1" letterSpacing="widest" mt={1}>
@@ -1724,13 +1724,13 @@ const AttendanceDashboardPage = () => {
           <ModalBody pt={4}>
             <VStack spacing={4} align="stretch">
               {/* CSV Instructions Box */}
-              <Box bg="#F8FAFC" border="1px solid" borderColor="gray.100" borderRadius="xl" p={4}>
+              <Box bg="app-bg-secondary" border="1px solid" borderColor="border-color" borderRadius="xl" p={4}>
                 <Flex justify="space-between" align="center">
                   <VStack align="start" spacing={1}>
-                    <Text fontSize="xs" fontWeight="700" color="#1E293B">
+                    <Text fontSize="xs" fontWeight="700" color="text-primary">
                       CSV Format
                     </Text>
-                    <Text fontSize="10px" color="gray.400">
+                    <Text fontSize="10px" color="text-muted">
                       emp_id, date (YYYY-MM-DD), in_time (HH:MM), out_time (HH:MM)
                     </Text>
                   </VStack>
@@ -1757,7 +1757,7 @@ const AttendanceDashboardPage = () => {
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleFileDrop}
                 border="2px dashed"
-                borderColor={dragOver ? "#6366F1" : "gray.200"}
+                borderColor={dragOver ? "#6366F1" : "border-color"}
                 bg={dragOver ? "#F5F3FF" : "white"}
                 borderRadius="xl"
                 py={10}
@@ -1776,11 +1776,11 @@ const AttendanceDashboardPage = () => {
                 <VStack spacing={2}>
                   <Icon as={FiUpload} color="#6366F1" boxSize={6} />
                   {importedFileName ? (
-                    <Text fontSize="sm" fontWeight="700" color="#1E293B">
+                    <Text fontSize="sm" fontWeight="700" color="text-primary">
                       {importedFileName}
                     </Text>
                   ) : (
-                    <Text fontSize="sm" color="gray.500">
+                    <Text fontSize="sm" color="text-muted">
                       Drag & drop your CSV here, or <span style={{ color: "#6366F1", fontWeight: "700" }}>browse file</span>
                     </Text>
                   )}
@@ -1799,7 +1799,7 @@ const AttendanceDashboardPage = () => {
               variant="ghost"
               size="md"
               fontWeight="700"
-              color="gray.400"
+              color="text-muted"
               onClick={() => {
                 setIsImportModalOpen(false);
                 setImportedLogsToConfirm(null);
@@ -1832,7 +1832,7 @@ const AttendanceDashboardPage = () => {
         <ModalOverlay />
         <ModalContent borderRadius="2xl" p={4}>
           <ModalHeader pb={0}>
-            <Text fontSize="lg" fontWeight="800" color="#1E293B">
+            <Text fontSize="lg" fontWeight="800" color="text-primary">
               Edit Log
             </Text>
             <Text fontSize="10px" fontWeight="800" color="#6366F1" letterSpacing="widest" mt={1}>
@@ -1843,34 +1843,34 @@ const AttendanceDashboardPage = () => {
           <ModalBody pt={6}>
             <VStack spacing={4} align="stretch">
               <VStack align="start" spacing={1}>
-                <Text fontSize="xs" fontWeight="700" color="gray.400">
+                <Text fontSize="xs" fontWeight="700" color="text-muted">
                   IN TIME (HH:MM)
                 </Text>
                 <Input
                   type="time"
                   size="md"
                   borderRadius="xl"
-                  bg="#F8FAFC"
+                  bg="app-bg-secondary"
                   value={editInTime}
                   onChange={(e) => setEditInTime(e.target.value)}
                   fontWeight="700"
-                  color="#1E293B"
+                  color="text-primary"
                 />
               </VStack>
 
               <VStack align="start" spacing={1}>
-                <Text fontSize="xs" fontWeight="700" color="gray.400">
+                <Text fontSize="xs" fontWeight="700" color="text-muted">
                   OUT TIME (HH:MM)
                 </Text>
                 <Input
                   type="time"
                   size="md"
                   borderRadius="xl"
-                  bg="#F8FAFC"
+                  bg="app-bg-secondary"
                   value={editOutTime}
                   onChange={(e) => setEditOutTime(e.target.value)}
                   fontWeight="700"
-                  color="#1E293B"
+                  color="text-primary"
                 />
               </VStack>
             </VStack>
@@ -1880,7 +1880,7 @@ const AttendanceDashboardPage = () => {
               variant="ghost"
               size="md"
               fontWeight="700"
-              color="gray.400"
+              color="text-muted"
               onClick={() => {
                 setIsEditLogOpen(false);
                 setEditingLogTarget(null);

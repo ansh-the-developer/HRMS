@@ -38,16 +38,16 @@ import { useAuth } from "@/hooks/useAuth";
 
 const Card = ({ children, title, icon }) => (
   <Box
-    bg="white"
+    bg="card-bg"
     border="1px solid"
-    borderColor="gray.200"
+    borderColor="border-color"
     borderRadius="2xl"
     p={5}
     shadow="sm"
   >
     <HStack spacing={3} mb={4}>
       {icon}
-      <Text fontSize="sm" fontWeight="bold" color="gray.800">
+      <Text fontSize="sm" fontWeight="bold" color="text-primary">
         {title}
       </Text>
     </HStack>
@@ -61,17 +61,17 @@ const Row = ({ label, value }) => (
     align="start"
     py={2}
     borderBottom="1px solid"
-    borderColor="gray.100"
+    borderColor="border-color"
   >
     <Text
       fontSize="xs"
-      color="gray.500"
+      color="text-muted"
       textTransform="uppercase"
       letterSpacing="wider"
     >
       {label}
     </Text>
-    <Text fontSize="sm" color="gray.800" textAlign="right" maxW="60%">
+    <Text fontSize="sm" color="text-primary" textAlign="right" maxW="60%">
       {value || "—"}
     </Text>
   </HStack>
@@ -227,14 +227,14 @@ export default function EmployeeProfilePage() {
 
   return (
     <DashboardLayout>
-      <Box px={{ base: 4, md: 8 }} py={6} bg="gray.50" minH="100vh">
+      <Box px={{ base: 4, md: 8 }} py={6} bg="transparent" minH="100vh">
         <Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={3}>
           {/* Back button only for HR/Manager looking at list */}
           {!isEmployee ? (
             <Button
               leftIcon={<FiArrowLeft />}
               variant="ghost"
-              color="gray.600"
+              color="text-secondary"
               fontWeight="medium"
               onClick={() => navigate("/employees")}
             >
@@ -313,11 +313,11 @@ export default function EmployeeProfilePage() {
         )}
 
         <Box
-          bg="white"
+          bg="card-bg"
           borderRadius="2xl"
           p={6}
           border="1px solid"
-          borderColor="gray.200"
+          borderColor="border-color"
           mb={6}
           shadow="sm"
         >
@@ -328,7 +328,7 @@ export default function EmployeeProfilePage() {
               src={employee.documents?.photo_url || ""}
             />
             <Box flex="1">
-              <Heading size="lg" color="gray.900">
+              <Heading size="lg" color="text-primary">
                 {name || employee.name || "Unnamed Employee"}
               </Heading>
               <HStack spacing={1} mt={1} mb={3} wrap="wrap">
@@ -343,15 +343,15 @@ export default function EmployeeProfilePage() {
                 </Badge>
               </HStack>
               <HStack spacing={5} wrap="wrap">
-                <HStack spacing={1} color="gray.500">
+                <HStack spacing={1} color="text-muted">
                   <FiMail size={13} />
                   <Text fontSize="sm">{employee.email || "—"}</Text>
                 </HStack>
-                <HStack spacing={1} color="gray.500">
+                <HStack spacing={1} color="text-muted">
                   <FiPhone size={13} />
                   <Text fontSize="sm">{personalNumber || employee.personal_number || "—"}</Text>
                 </HStack>
-                <HStack spacing={1} color="gray.500">
+                <HStack spacing={1} color="text-muted">
                   <FiMapPin size={13} />
                   <Text fontSize="sm">{workLocation || employee.work_location || "—"}</Text>
                 </HStack>
@@ -521,7 +521,7 @@ export default function EmployeeProfilePage() {
                   <Row label="Account Number" value={employee.banking?.primary_bank?.account_number} />
                   <Row label="IFSC" value={employee.banking?.primary_bank?.ifsc_code} />
                   <Divider my={4} />
-                  <Text fontSize="xs" fontWeight="bold" color="gray.500" textTransform="uppercase" letterSpacing="wider" mb={2}>
+                  <Text fontSize="xs" fontWeight="bold" color="text-muted" textTransform="uppercase" letterSpacing="wider" mb={2}>
                     Secondary (Reimbursements)
                   </Text>
                   <Row label="Bank Name" value={employee.banking?.secondary_bank?.bank_name} />
@@ -530,7 +530,7 @@ export default function EmployeeProfilePage() {
                 </>
               )
             ) : (
-              <Text fontSize="sm" color="gray.500">
+              <Text fontSize="sm" color="text-muted">
                 Banking details are restricted to HR and the employee who owns this profile.
               </Text>
             )}

@@ -66,12 +66,12 @@ const EmployeeBranchesPage = () => {
         <Heading size="md" mb={1}>
           Locations/Branches
         </Heading>
-        <Text fontSize="sm" color="gray.500" mb={6}>
+        <Text fontSize="sm" color="text-muted" mb={6}>
           Manage physical office locations.
         </Text>
 
         {!isHR && (
-          <Text fontSize="sm" color="gray.500" mb={6}>
+          <Text fontSize="sm" color="text-muted" mb={6}>
             You have view-only access. Only HR can add branches and sites.
           </Text>
         )}
@@ -108,10 +108,10 @@ const EmployeeBranchesPage = () => {
 
             <Box
               mt={8}
-              bg="white"
+              bg="card-bg"
               borderRadius="lg"
               borderWidth="1px"
-              borderColor="gray.100"
+              borderColor="border-color"
             >
               {branches.map((b) => (
                 <DepartmentListItem
@@ -157,10 +157,10 @@ const EmployeeBranchesPage = () => {
 
             <Box
               mt={8}
-              bg="white"
+              bg="card-bg"
               borderRadius="lg"
               borderWidth="1px"
-              borderColor="gray.100"
+              borderColor="border-color"
             >
               {sites.map((s) => (
                 <DepartmentListItem

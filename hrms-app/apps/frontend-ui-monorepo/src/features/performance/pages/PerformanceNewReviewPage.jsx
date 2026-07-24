@@ -91,7 +91,7 @@ const PerformanceNewReviewPage = () => {
   if (employeesLoading) {
     return (
       <DashboardLayout pageTitle="Performance">
-        <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+        <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
           <Flex justify="center" py={16}>
             <Spinner size="lg" />
           </Flex>
@@ -102,7 +102,7 @@ const PerformanceNewReviewPage = () => {
 
   return (
     <DashboardLayout pageTitle="Performance">
-      <Box bg="white" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
+      <Box bg="card-bg" p={8} borderRadius="xl" shadow="sm" borderWidth="1px">
         <form onSubmit={handleSubmit}>
           <VStack align="stretch" spacing={8}>
             <VStack align="flex-start" spacing={4}>
@@ -115,7 +115,7 @@ const PerformanceNewReviewPage = () => {
                   onChange={(e) => setPeriod(e.target.value)}
                   size="sm"
                   maxW="220px"
-                  bg="gray.50"
+                  bg="app-bg-secondary"
                   border="none"
                 >
                   <option>Q1 2026</option>
@@ -134,7 +134,7 @@ const PerformanceNewReviewPage = () => {
                   placeholder="Choose employee"
                   size="sm"
                   maxW="220px"
-                  bg="gray.50"
+                  bg="app-bg-secondary"
                   border="none"
                   value={employeeId}
                   onChange={(e) => setEmployeeId(e.target.value)}
@@ -182,7 +182,7 @@ const PerformanceNewReviewPage = () => {
                     min={1}
                     max={5}
                     size="sm"
-                    bg="white"
+                    bg="card-bg"
                     placeholder="1-5"
                     value={knowledgeScore}
                     onChange={(e) => setKnowledgeScore(e.target.value)}
@@ -226,7 +226,7 @@ const PerformanceNewReviewPage = () => {
                     min={1}
                     max={5}
                     size="sm"
-                    bg="white"
+                    bg="card-bg"
                     placeholder="1-5"
                     value={qualityScore}
                     onChange={(e) => setQualityScore(e.target.value)}
@@ -255,7 +255,7 @@ const PerformanceNewReviewPage = () => {
                   as="textarea"
                   rows={4}
                   size="sm"
-                  bg="white"
+                  bg="card-bg"
                   placeholder="Write overall comments about performance..."
                   value={comments}
                   onChange={(e) => setComments(e.target.value)}

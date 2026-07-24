@@ -66,16 +66,16 @@ export default function RecordPaymentPage() {
           onClick={() => navigate('/payroll')}
           mb={4}
           alignSelf="flex-start"
-          _hover={{ bg: 'gray.100' }}
+          _hover={{ bg: "hover-bg" }}
         >
           Back to Payroll Dashboard
         </Button>
         <Flex justify="space-between" align="center" mb={5}>
           <Box>
-            <Text fontSize="lg" fontWeight="semibold" color="gray.800">
+            <Text fontSize="lg" fontWeight="semibold" color="text-primary">
               Payout Payout Logs (Paid)
             </Text>
-            <Text fontSize="xs" color="gray.400">
+            <Text fontSize="xs" color="text-muted">
               View and audit all successfully disbursed employee monthly payouts.
             </Text>
           </Box>
@@ -84,13 +84,13 @@ export default function RecordPaymentPage() {
         {/* Search */}
         <InputGroup mb={5} maxW="320px">
           <InputLeftElement pointerEvents="none">
-            <Text color="gray.400" fontSize="sm">🔍</Text>
+            <Text color="text-muted" fontSize="sm">🔍</Text>
           </InputLeftElement>
           <Input
             placeholder="Search employee..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            bg="white"
+            bg="card-bg"
             fontSize="sm"
           />
         </InputGroup>
@@ -99,42 +99,42 @@ export default function RecordPaymentPage() {
         {isLoading ? (
           <Flex justify="center" py={12}><Spinner size="lg" color="blue.500" /></Flex>
         ) : (
-          <Box bg="white" borderRadius="lg" boxShadow="sm" border="1px solid" borderColor="gray.200" overflow="hidden">
+          <Box bg="card-bg" borderRadius="lg" boxShadow="sm" border="1px solid" borderColor="border-color" overflow="hidden">
             {filteredSlips.length === 0 ? (
               <Flex justify="center" align="center" py={16}>
-                <Text color="gray.400" fontSize="sm">No recorded payments yet.</Text>
+                <Text color="text-muted" fontSize="sm">No recorded payments yet.</Text>
               </Flex>
             ) : (
               <Table variant="simple" size="md">
-                <Thead bg="gray.50">
+                <Thead bg="app-bg-secondary">
                   <Tr>
-                    <Th color="gray.500" fontWeight="semibold" fontSize="xs">Employee Name</Th>
-                    <Th color="gray.500" fontWeight="semibold" fontSize="xs" textAlign="center">Month</Th>
-                    <Th color="gray.500" fontWeight="semibold" fontSize="xs" textAlign="right">Net Salary</Th>
-                    <Th color="gray.500" fontWeight="semibold" fontSize="xs" textAlign="center">Paid</Th>
-                    <Th color="gray.500" fontWeight="semibold" fontSize="xs" textAlign="center">Action</Th>
+                    <Th color="text-muted" fontWeight="semibold" fontSize="xs">Employee Name</Th>
+                    <Th color="text-muted" fontWeight="semibold" fontSize="xs" textAlign="center">Month</Th>
+                    <Th color="text-muted" fontWeight="semibold" fontSize="xs" textAlign="right">Net Salary</Th>
+                    <Th color="text-muted" fontWeight="semibold" fontSize="xs" textAlign="center">Paid</Th>
+                    <Th color="text-muted" fontWeight="semibold" fontSize="xs" textAlign="center">Action</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
                   {filteredSlips.map((slip) => (
-                    <Tr key={slip.id} _hover={{ bg: 'gray.50' }}>
+                    <Tr key={slip.id} _hover={{ bg: "hover-bg" }}>
                       {/* Name */}
                       <Td py={3}>
                         <Flex align="center" gap={3}>
                           <Avatar size="xs" name={slip.employees?.name} />
-                          <Text fontWeight="semibold" fontSize="sm" color="gray.700">
+                          <Text fontWeight="semibold" fontSize="sm" color="text-secondary">
                             {slip.employees?.name}
                           </Text>
                         </Flex>
                       </Td>
 
                       {/* Month */}
-                      <Td textAlign="center" fontSize="sm" color="gray.600">
+                      <Td textAlign="center" fontSize="sm" color="text-secondary">
                         {slip.month}
                       </Td>
 
                       {/* Net Salary */}
-                      <Td textAlign="right" fontWeight="semibold" fontSize="sm" color="gray.700">
+                      <Td textAlign="right" fontWeight="semibold" fontSize="sm" color="text-secondary">
                         {formatRs(slip.net_salary)}
                       </Td>
 
@@ -175,7 +175,7 @@ export default function RecordPaymentPage() {
 
         {/* Count */}
         {!isLoading && (
-          <Text mt={3} fontSize="xs" color="gray.400">
+          <Text mt={3} fontSize="xs" color="text-muted">
             {filteredSlips.length} recorded payout{filteredSlips.length !== 1 ? 's' : ''}
           </Text>
         )}

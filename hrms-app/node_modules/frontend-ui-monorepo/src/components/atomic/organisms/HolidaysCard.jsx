@@ -163,7 +163,7 @@ const HolidaysCard = () => {
         <Box py={8}>
           <Flex align="center" justify="center" gap={3}>
             <Spinner size="sm" />
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text-muted">
               Loading holidays...
             </Text>
           </Flex>
@@ -187,11 +187,11 @@ const HolidaysCard = () => {
         <Box mb={4}>
           {holidays.length === 0 ? (
             <Box py={8} textAlign="center">
-              <Text fontSize="sm" color="gray.500">
+              <Text fontSize="sm" color="text-muted">
                 No holidays yet
               </Text>
               {isHR && (
-                <Text fontSize="xs" color="gray.400" mt={1}>
+                <Text fontSize="xs" color="text-muted" mt={1}>
                   Add your first holiday above
                 </Text>
               )}

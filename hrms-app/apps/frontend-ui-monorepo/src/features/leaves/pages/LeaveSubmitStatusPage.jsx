@@ -33,9 +33,9 @@ import { useLeaveRequests } from "@/hooks/useLeaves";
 // Custom Step Component
 const StatusStep = ({ label, status, isLast }) => {
   // Status: 'completed', 'current', 'pending', 'failed'
-  let bg = "gray.100";
+  let bg = "app-bg-secondary";
   let icon = null;
-  let labelColor = "gray.400";
+  let labelColor = "text-muted";
 
   if (status === "completed") {
     bg = "purple.100";
@@ -48,7 +48,7 @@ const StatusStep = ({ label, status, isLast }) => {
   } else if (status === "current") {
     bg = "purple.500";
     labelColor = "purple.600";
-    icon = <Box w="8px" h="8px" borderRadius="full" bg="white" />;
+    icon = <Box w="8px" h="8px" borderRadius="full" bg="card-bg" />;
   } else if (status === "failed") {
     bg = "red.100";
     labelColor = "red.500";
@@ -84,7 +84,7 @@ const StatusStep = ({ label, status, isLast }) => {
         <Box 
           flex="1" 
           h="2px" 
-          bg={status === "completed" ? "purple.300" : "gray.200"}
+          bg={status === "completed" ? "purple.300" : "border-color"}
           mt="-20px" 
           mx="-15px" 
           position="relative"
@@ -164,10 +164,10 @@ const LeaveSubmitStatusPage = () => {
         <Button
           variant="ghost"
           leftIcon={<FiArrowLeft />}
-          color="gray.600"
+          color="text-secondary"
           w="fit-content"
           onClick={() => navigate("/leaves")}
-          _hover={{ bg: "gray.100" }}
+          _hover={{ bg: "hover-bg" }}
         >
           Back to Leaves
         </Button>
@@ -179,29 +179,29 @@ const LeaveSubmitStatusPage = () => {
         ) : (
           <Flex direction={{ base: "column", xl: "row" }} gap={6} align="stretch">
             {/* Left Box: History Table */}
-            <Box bg="white" p={6} borderRadius="2xl" shadow="sm" borderWidth="1px" flex="1.5">
+            <Box bg="card-bg" p={6} borderRadius="2xl" shadow="sm" borderWidth="1px" flex="1.5">
               <VStack align="stretch" spacing={4}>
-                <Heading size="sm" color="gray.800">
+                <Heading size="sm" color="text-primary">
                   Request Logs
                 </Heading>
                 {myRequests.length === 0 ? (
                   <Flex py={10} justify="center" align="center" direction="column" gap={2}>
-                    <Icon as={FiInfo} color="gray.300" boxSize={8} />
-                    <Text color="gray.400" fontSize="sm">
+                    <Icon as={FiInfo} color="text-muted" boxSize={8} />
+                    <Text color="text-muted" fontSize="sm">
                       No leave requests found.
                     </Text>
                   </Flex>
                 ) : (
                   <Box overflowX="auto">
                     <Table variant="simple" size="sm">
-                      <Thead bg="gray.50">
+                      <Thead bg="app-bg-secondary">
                         <Tr>
-                          <Th color="gray.500" fontSize="10px">Leave Duration</Th>
-                          <Th color="gray.500" fontSize="10px">Type</Th>
-                          <Th color="gray.500" fontSize="10px">Reason</Th>
-                          <Th color="gray.500" fontSize="10px">Status</Th>
-                          <Th color="gray.500" fontSize="10px">Doc</Th>
-                          <Th color="gray.500" fontSize="10px" textAlign="right">Action</Th>
+                          <Th color="text-muted" fontSize="10px">Leave Duration</Th>
+                          <Th color="text-muted" fontSize="10px">Type</Th>
+                          <Th color="text-muted" fontSize="10px">Reason</Th>
+                          <Th color="text-muted" fontSize="10px">Status</Th>
+                          <Th color="text-muted" fontSize="10px">Doc</Th>
+                          <Th color="text-muted" fontSize="10px" textAlign="right">Action</Th>
                         </Tr>
                       </Thead>
                       <Tbody>
@@ -211,10 +211,10 @@ const LeaveSubmitStatusPage = () => {
                             <Tr 
                               key={req.id} 
                               bg={isSelected ? "purple.50" : "transparent"} 
-                              _hover={{ bg: "gray.50", cursor: "pointer" }}
+                              _hover={{ bg: "hover-bg", cursor: "pointer" }}
                               onClick={() => setSelectedRequest(req)}
                             >
-                              <Td py={3} fontWeight="600" color="gray.700" fontSize="xs">
+                              <Td py={3} fontWeight="600" color="text-secondary" fontSize="xs">
                                 {formatDate(req.start_date)} – {formatDate(req.end_date)}
                               </Td>
                               <Td py={3} fontSize="xs">
@@ -222,7 +222,7 @@ const LeaveSubmitStatusPage = () => {
                                   {req.type}
                                 </Badge>
                               </Td>
-                              <Td py={3} color="gray.600" fontSize="xs" maxW="200px" isTruncated>
+                              <Td py={3} color="text-secondary" fontSize="xs" maxW="200px" isTruncated>
                                 {req.reason || "—"}
                               </Td>
                               <Td py={3}>
@@ -276,24 +276,24 @@ const LeaveSubmitStatusPage = () => {
             </Box>
 
             {/* Right Box: Timeline Details Panel */}
-            <Box bg="white" p={6} borderRadius="2xl" shadow="sm" borderWidth="1px" flex="1">
+            <Box bg="card-bg" p={6} borderRadius="2xl" shadow="sm" borderWidth="1px" flex="1">
               {selectedRequest ? (
                 <VStack align="stretch" spacing={6}>
-                  <Box pb={4} borderBottom="1px solid" borderColor="gray.100">
+                  <Box pb={4} borderBottom="1px solid" borderColor="border-color">
                     <Text fontSize="xs" fontWeight="800" color="purple.500" letterSpacing="wider" mb={1}>
                       SELECTED REQUEST STATUS
                     </Text>
-                    <Heading size="md" color="gray.800">
+                    <Heading size="md" color="text-primary">
                       {selectedRequest.type} Leave
                     </Heading>
-                    <Text fontSize="xs" color="gray.400" mt={1}>
+                    <Text fontSize="xs" color="text-muted" mt={1}>
                       Period: {formatDate(selectedRequest.start_date)} to {formatDate(selectedRequest.end_date)}
                     </Text>
                   </Box>
 
                   {/* Visual Timeline Stepper */}
                   <Box py={4}>
-                    <Text fontSize="xs" fontWeight="bold" color="gray.500" mb={4}>
+                    <Text fontSize="xs" fontWeight="bold" color="text-muted" mb={4}>
                       Approval Timeline
                     </Text>
                     <HStack spacing={0} justify="space-between" align="flex-start">
@@ -309,28 +309,28 @@ const LeaveSubmitStatusPage = () => {
                   </Box>
 
                   {/* Summary Block */}
-                  <Card variant="unstyled" bg="gray.50" borderRadius="xl">
+                  <Card variant="unstyled" bg="app-bg-secondary" borderRadius="xl">
                     <CardBody p={4}>
                       <VStack align="stretch" spacing={3}>
                         <Box>
-                          <Text fontSize="9px" fontWeight="800" color="gray.400" textTransform="uppercase">
+                          <Text fontSize="9px" fontWeight="800" color="text-muted" textTransform="uppercase">
                             Submission Date
                           </Text>
-                          <Text fontSize="xs" fontWeight="700" color="gray.700">
+                          <Text fontSize="xs" fontWeight="700" color="text-secondary">
                             {selectedRequest.created_at ? formatDate(selectedRequest.created_at) : "—"}
                           </Text>
                         </Box>
                         <Box>
-                          <Text fontSize="9px" fontWeight="800" color="gray.400" textTransform="uppercase">
+                          <Text fontSize="9px" fontWeight="800" color="text-muted" textTransform="uppercase">
                             Reason / Statement
                           </Text>
-                          <Text fontSize="xs" color="gray.600">
+                          <Text fontSize="xs" color="text-secondary">
                             {selectedRequest.reason || "No statement provided."}
                           </Text>
                         </Box>
                         {selectedRequest.document_url && (
                           <Box>
-                            <Text fontSize="9px" fontWeight="800" color="gray.400" textTransform="uppercase" mb={1}>
+                            <Text fontSize="9px" fontWeight="800" color="text-muted" textTransform="uppercase" mb={1}>
                               Supporting Evidence
                             </Text>
                             <Button
@@ -352,8 +352,8 @@ const LeaveSubmitStatusPage = () => {
                 </VStack>
               ) : (
                 <Flex h="full" minH="300px" justify="center" align="center" direction="column" gap={2}>
-                  <Icon as={FiInfo} color="gray.300" boxSize={10} />
-                  <Text color="gray.400" fontSize="sm" textAlign="center">
+                  <Icon as={FiInfo} color="text-muted" boxSize={10} />
+                  <Text color="text-muted" fontSize="sm" textAlign="center">
                     Select a request from the list to view its approval stepper timeline.
                   </Text>
                 </Flex>

@@ -153,7 +153,7 @@ const LeaveUploadOverlay = ({ onClose, onFileSelected }) => {
             </svg>
           </Center>
 
-          <Text fontSize="sm" fontWeight="medium" color="gray.700">
+          <Text fontSize="sm" fontWeight="medium" color="text-secondary">
             {isDragging ? "Drop file here" : "Drag & Drop or "}
             {!isDragging && (
               <Text as="span" color="purple.500" textDecoration="underline">
@@ -162,7 +162,7 @@ const LeaveUploadOverlay = ({ onClose, onFileSelected }) => {
             )}
           </Text>
 
-          <Text fontSize="xs" color="gray.400">
+          <Text fontSize="xs" color="text-muted">
             Supported formats : Jpeg, pdf
           </Text>
         </VStack>

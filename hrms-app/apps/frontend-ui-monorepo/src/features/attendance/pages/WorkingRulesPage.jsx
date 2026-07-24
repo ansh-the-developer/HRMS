@@ -36,9 +36,9 @@ const mockWorkingRules = [
 const RuleItem = ({ item, onEye, onEdit, onDelete }) => (
   <Flex 
     p={3} 
-    bg="white" 
+    bg="card-bg" 
     border="1px solid"
-    borderColor="gray.200"
+    borderColor="border-color"
     borderRadius="md" 
     align="center" 
     justify="space-between"
@@ -49,7 +49,7 @@ const RuleItem = ({ item, onEye, onEdit, onDelete }) => (
       <Text fontWeight="500" fontSize="md" mr={2}>
         {item.name}
       </Text>
-      <Text fontSize="sm" color="gray.500" bg="gray.50" px={2} py={0.5} borderRadius="md">
+      <Text fontSize="sm" color="text-muted" bg="app-bg-secondary" px={2} py={0.5} borderRadius="md">
         {item.ruleType}
       </Text>
     </Flex>
@@ -137,8 +137,8 @@ const handleEditClick = (item) => {
 
         <Flex direction={{ base: 'column', lg: 'row' }} gap={6}>
           {/* LEFT: Create */}
-          <Box flex={1} bg="white" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="gray.100">
-            <Heading size="md" mb={4} color="gray.800">Define New Rule</Heading>
+          <Box flex={1} bg="card-bg" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="border-color">
+            <Heading size="md" mb={4} color="text-primary">Define New Rule</Heading>
             <Input
               placeholder="Rule name (e.g. Overtime)"
               value={ruleName}
@@ -146,7 +146,7 @@ const handleEditClick = (item) => {
               mb={4}
               size="lg"
             />
-            <Text mb={2} fontWeight="500" color="gray.700">Rule Type:</Text>
+            <Text mb={2} fontWeight="500" color="text-secondary">Rule Type:</Text>
             <Select
               value={ruleType}
               onChange={(e) => setRuleType(e.target.value)}
@@ -162,20 +162,17 @@ const handleEditClick = (item) => {
             <HRMSButton
               onClick={handleAddRule}
               w="full"
-              h={12}
-              bgGradient="linear(to-r, #307DC7, #C1B9B8)"
-              color="white"
-              borderRadius="full"
+              h="42px"
+              borderRadius="12px"
               leftIcon={<FiPlus />}
-              fontSize="lg"
             >
               Add
             </HRMSButton>
           </Box>
 
           {/* RIGHT: List */}
-          <Box flex={1} bg="white" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="gray.100">
-            <Heading size="md" mb={4} color="gray.800">Working Rules List</Heading>
+          <Box flex={1} bg="card-bg" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="border-color">
+            <Heading size="md" mb={4} color="text-primary">Working Rules List</Heading>
             <VStack spacing={0} align="stretch">
               {workingRules.map(rule => (
                 <RuleItem

@@ -64,16 +64,16 @@ const StatusBadge = ({ status }) => {
 };
 
 const StatCard = ({ icon, label, value, color }) => (
-  <Box bg="white" borderRadius="xl" p={5} shadow="sm" border="1px solid" borderColor="gray.100">
+  <Box bg="card-bg" borderRadius="xl" p={5} shadow="sm" border="1px solid" borderColor="border-color">
     <HStack spacing={3} mb={2}>
       <Center w="36px" h="36px" borderRadius="lg" bg={color + "15"}>
         <Box as={icon} fontSize="17px" color={color} />
       </Center>
-      <Text fontSize="xs" fontWeight="600" color="gray.500" textTransform="uppercase" letterSpacing="wide">
+      <Text fontSize="xs" fontWeight="600" color="text-muted" textTransform="uppercase" letterSpacing="wide">
         {label}
       </Text>
     </HStack>
-    <Text fontSize="2xl" fontWeight="800" color="gray.800">{value}</Text>
+    <Text fontSize="2xl" fontWeight="800" color="text-primary">{value}</Text>
   </Box>
 );
 
@@ -178,12 +178,12 @@ export default function EmployeeAttendanceDashboard() {
     return (
       <DashboardLayout pageTitle="Attendance">
         <Center minH="400px" flexDir="column" gap={4}>
-          <Center w="72px" h="72px" borderRadius="full" bg="purple.50">
+          <Center w="72px" h="72px" borderRadius="full" bg="rgba(99, 102, 241, 0.12)">
             <Box as={FiCalendar} fontSize="32px" color="#6366F1" />
           </Center>
           <VStack spacing={1}>
-            <Text fontSize="lg" fontWeight="700" color="gray.700">No Attendance Record Found</Text>
-            <Text fontSize="sm" color="gray.500" textAlign="center" maxW="340px">
+            <Text fontSize="lg" fontWeight="700" color="text-secondary">No Attendance Record Found</Text>
+            <Text fontSize="sm" color="text-muted" textAlign="center" maxW="340px">
               Your account does not have a linked employee profile yet. Please contact HR to set up your attendance tracking.
             </Text>
           </VStack>
@@ -237,18 +237,18 @@ export default function EmployeeAttendanceDashboard() {
         </SimpleGrid>
 
         {/* Log Table */}
-        <Box bg="white" borderRadius="2xl" shadow="sm" border="1px solid" borderColor="gray.100" overflow="hidden">
-          <Flex px={6} py={4} align="center" justify="space-between" borderBottom="1px solid" borderColor="gray.100">
+        <Box bg="card-bg" borderRadius="2xl" shadow="sm" border="1px solid" borderColor="border-color" overflow="hidden">
+          <Flex px={6} py={4} align="center" justify="space-between" borderBottom="1px solid" borderColor="border-color">
             <HStack spacing={2}>
               <Box as={FiCalendar} color="#6366F1" fontSize="18px" />
-              <Text fontWeight="700" fontSize="md" color="gray.800">Monthly Attendance Log</Text>
+              <Text fontWeight="700" fontSize="md" color="text-primary">Monthly Attendance Log</Text>
             </HStack>
             <HStack spacing={2}>
               <Tooltip label="Previous Month">
                 <IconButton icon={<FiChevronLeft />} size="sm" variant="ghost" borderRadius="lg"
                   onClick={prevMonth} aria-label="Previous month" />
               </Tooltip>
-              <Box px={4} py={1.5} bg="purple.50" borderRadius="lg" minW="150px" textAlign="center">
+              <Box px={4} py={1.5} bg="rgba(99, 102, 241, 0.12)" borderRadius="lg" minW="150px" textAlign="center">
                 <Text fontWeight="700" fontSize="sm" color="#6366F1">
                   {MONTHS[viewMonth]} {viewYear}
                 </Text>
@@ -265,7 +265,7 @@ export default function EmployeeAttendanceDashboard() {
           ) : (
             <TableContainer>
               <Table size="sm" variant="simple">
-                <Thead bg="gray.50">
+                <Thead bg="app-bg-secondary">
                   <Tr>
                     <Th py={3} fontSize="11px">Date</Th>
                     <Th py={3} fontSize="11px">Day</Th>
@@ -282,44 +282,46 @@ export default function EmployeeAttendanceDashboard() {
                     return (
                       <Tr key={row.date}
                         bg={isToday ? "purple.50" : row.isWeekend ? "gray.50" : "white"}
-                        _hover={{ bg: "gray.50" }}
+                        _hover={{ bg: "hover-bg" }}
                         opacity={row.isFuture ? 0.35 : 1}
                         transition="background 0.15s"
                       >
                         <Td py={3}>
                           <HStack spacing={1}>
                             {isToday && <Badge colorScheme="purple" fontSize="9px" px={1.5} borderRadius="md">TODAY</Badge>}
-                            <Text fontSize="sm" fontWeight={isToday ? "700" : "500"} color="gray.700">
+                            <Text fontSize="sm" fontWeight={isToday ? "700" : "500"} color="text-secondary">
                               {formatDate(row.date)}
                             </Text>
                           </HStack>
                         </Td>
                         <Td py={3}>
-                          <Text fontSize="sm" color={row.isWeekend ? "orange.400" : "gray.500"} fontWeight="500">
+                          <Text fontSize="sm" color={row.isWeekend ? "warning" : "text-muted"} fontWeight="500">
                             {getDayName(row.date)}
                           </Text>
                         </Td>
                         <Td py={3}>
-                          <Text fontSize="sm" color={row.in_time ? "gray.700" : "gray.300"} fontWeight="500">
-                            {row.in_time || "—"}
+                          <Text fontSize="sm" color={row.in_time ? "text-primary" : "text-muted"} fontWeight="500">
+                            {row.in_time || "â€”"}
                           </Text>
                         </Td>
                         <Td py={3}>
-                          <Text fontSize="sm" color={row.out_time ? "gray.700" : "gray.300"} fontWeight="500">
-                            {row.out_time || "—"}
+                          <Text fontSize="sm" color={row.out_time ? "text-primary" : "text-muted"} fontWeight="500">
+                            {row.out_time || "â€”"}
                           </Text>
                         </Td>
                         <Td py={3}>
-                          <HStack spacing={1}>
-                            {hours && <Box as={FiClock} color="#6366F1" fontSize="12px" />}
-                            <Text fontSize="sm" color={hours ? "#6366F1" : "gray.300"} fontWeight={hours ? "600" : "400"}>
-                              {hours || "—"}
-                            </Text>
-                          </HStack>
+                          {(() => {
+                            const hours = calcWorkingHours(row.in_time, row.out_time);
+                            return (
+                              <Text fontSize="sm" color={hours ? "accent" : "text-muted"} fontWeight={hours ? "600" : "400"}>
+                                {hours ? `${hours} hrs` : "â€”"}
+                              </Text>
+                            );
+                          })()}
                         </Td>
                         <Td py={3}>
                           {row.isFuture
-                            ? <Text fontSize="xs" color="gray.300">—</Text>
+                            ? <Text fontSize="xs" color="text-muted">â€”</Text>
                             : <StatusBadge status={row.status || "Absent"} />
                           }
                         </Td>
@@ -332,20 +334,20 @@ export default function EmployeeAttendanceDashboard() {
           )}
 
           {!loading && (
-            <Flex px={6} py={4} borderTop="1px solid" borderColor="gray.100" justify="flex-end" gap={6}>
+            <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4} mt={6} pt={4} borderTop="1px solid" borderColor="border-color">
               {[
-                { label: "Working Days", value: pastRows.filter(r => !r.isWeekend).length, color: "gray.700" },
-                { label: "Present",      value: presentCount, color: "#10B981" },
-                { label: "Absent",       value: absentCount,  color: "#EF4444" },
+                { label: "Working Days", value: pastRows.filter(r => !r.isWeekend).length, color: "text-primary" },
+                { label: "Present",      value: presentCount, color: "success" },
+                { label: "Absent",       value: absentCount,  color: "error" },
               ].map(({ label, value, color }) => (
                 <VStack key={label} spacing={0} align="center">
-                  <Text fontSize="xs" color="gray.400" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
+                  <Text fontSize="xs" color="text-muted" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
                     {label}
                   </Text>
                   <Text fontSize="lg" fontWeight="800" color={color}>{value}</Text>
                 </VStack>
               ))}
-            </Flex>
+              </SimpleGrid>
           )}
         </Box>
       </VStack>

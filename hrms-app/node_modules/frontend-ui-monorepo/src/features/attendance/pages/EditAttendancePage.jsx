@@ -128,9 +128,9 @@ const EditAttendancePage = () => {
         </Flex>
 
         {/* Attendance Table */}
-        <Box bg="white" borderRadius="lg" overflow="hidden" boxShadow="md">
+        <Box bg="card-bg" borderRadius="lg" overflow="hidden" boxShadow="md">
           <Table variant="simple">
-            <Thead bg="gray.50">
+            <Thead bg="app-bg-secondary">
               <Tr>
                 <Th>Employee Name</Th>
                 <Th>Designation</Th>
@@ -142,7 +142,7 @@ const EditAttendancePage = () => {
             </Thead>
             <Tbody>
               {filteredData.map((record) => (
-                <Tr key={record.id} _hover={{ bg: 'gray.50' }}>
+                <Tr key={record.id} _hover={{ bg: "hover-bg" }}>
                   <Td>
                     <HStack spacing={3}>
                       <Avatar size="sm" name={record.employee.avatar} bg="blue.400" color="white" fontSize="xs" />

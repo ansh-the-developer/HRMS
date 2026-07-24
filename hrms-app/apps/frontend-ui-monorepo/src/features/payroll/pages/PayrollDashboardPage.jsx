@@ -184,12 +184,12 @@ export default function PayrollDashboardPage() {
     return (
       <DashboardLayout>
         <Flex direction="column" gap="6" p="4">
-          <Heading size="lg" color="gray.800">HR Payroll Dashboard</Heading>
+          <Heading size="lg" color="text-primary">HR Payroll Dashboard</Heading>
           
           {latestMonth ? (
-            <Box bg="white" p="4" borderRadius="lg" border="1px solid" borderColor="gray.200" boxShadow="sm">
+            <Box bg="card-bg" p="4" borderRadius="lg" border="1px solid" borderColor="border-color" boxShadow="sm">
               <Flex justify="space-between" align="center" mb={4}>
-                <Text fontWeight="bold" color="gray.700" fontSize="md">
+                <Text fontWeight="bold" color="text-secondary" fontSize="md">
                   Latest Processed Month: {latestMonth}
                 </Text>
                 <Badge colorScheme={runs[0].status === 'paid' ? 'green' : 'yellow'} fontSize="sm" px={3} py={1} borderRadius="full">
@@ -198,9 +198,9 @@ export default function PayrollDashboardPage() {
               </Flex>
               
               {/* Employee Table */}
-              <Box border="1px solid" borderColor="gray.200" borderRadius="md" overflow="hidden">
+              <Box border="1px solid" borderColor="border-color" borderRadius="md" overflow="hidden">
                 {/* Header Row */}
-                <Flex px="4" py="3" bg="gray.50" color="gray.500" fontSize="xs" fontWeight="bold" textTransform="uppercase">
+                <Flex px="4" py="3" bg="app-bg-secondary" color="text-muted" fontSize="xs" fontWeight="bold" textTransform="uppercase">
                   <Text flex="2">Employee Name</Text>
                   <Text flex="1.5" textAlign="right">Gross Pay</Text>
                   <Text flex="1.5" textAlign="right">PF Deduction</Text>
@@ -216,18 +216,18 @@ export default function PayrollDashboardPage() {
                       px="4" py="3"
                       align="center"
                       borderBottom={i < runSlips.length - 1 ? '1px dashed' : 'none'}
-                      borderColor="gray.100"
-                      _hover={{ bg: 'gray.50' }}
+                      borderColor="border-color"
+                      _hover={{ bg: "hover-bg" }}
                       fontSize="sm"
                     >
                       <HStack flex="2" spacing="3">
                         <Avatar size="xs" name={slip.employees?.name} />
-                        <Text fontWeight="medium" color="gray.700">{slip.employees?.name}</Text>
+                        <Text fontWeight="medium" color="text-secondary">{slip.employees?.name}</Text>
                       </HStack>
 
-                      <Text flex="1.5" textAlign="right" color="gray.700">{formatRs(slip.gross_salary)}</Text>
-                      <Text flex="1.5" textAlign="right" color="gray.700">{formatRs(slip.pf + slip.esi + slip.tds)}</Text>
-                      <Text flex="1.5" textAlign="right" fontWeight="semibold" color="gray.800">{formatRs(slip.net_salary)}</Text>
+                      <Text flex="1.5" textAlign="right" color="text-secondary">{formatRs(slip.gross_salary)}</Text>
+                      <Text flex="1.5" textAlign="right" color="text-secondary">{formatRs(slip.pf + slip.esi + slip.tds)}</Text>
+                      <Text flex="1.5" textAlign="right" fontWeight="semibold" color="text-primary">{formatRs(slip.net_salary)}</Text>
                       
                       <Box flex="1" textAlign="center">
                         <Box
@@ -237,8 +237,8 @@ export default function PayrollDashboardPage() {
                           borderRadius="full"
                           fontSize="xs"
                           fontWeight="semibold"
-                          bg={statusColors[slip.payment_status]?.bg || 'gray.100'}
-                          color={statusColors[slip.payment_status]?.color || 'gray.700'}
+                          bg={statusColors[slip.payment_status]?.bg || 'app-bg-secondary'}
+                          color={statusColors[slip.payment_status]?.color || 'text-secondary'}
                         >
                           {slip.payment_status === 'paid' ? 'Paid' : 'Pending'}
                         </Box>
@@ -246,20 +246,20 @@ export default function PayrollDashboardPage() {
                     </Flex>
                   ))
                 ) : (
-                  <Flex justify="center" py={6}><Text fontSize="sm" color="gray.400">No payslips found for {latestMonth}</Text></Flex>
+                  <Flex justify="center" py={6}><Text fontSize="sm" color="text-muted">No payslips found for {latestMonth}</Text></Flex>
                 )}
               </Box>
             </Box>
           ) : (
-            <Box bg="white" p="6" borderRadius="lg" border="1px solid" borderColor="gray.200" textAlign="center">
-              <Text color="gray.500" fontSize="sm" mb={4}>No payroll logs generated yet.</Text>
+            <Box bg="card-bg" p="6" borderRadius="lg" border="1px solid" borderColor="border-color" textAlign="center">
+              <Text color="text-muted" fontSize="sm" mb={4}>No payroll logs generated yet.</Text>
               <HRMSButton onClick={() => navigate('/payroll/overview')}>Go to Payroll Console</HRMSButton>
             </Box>
           )}
 
           {/* Action List */}
-          <Heading size="md" color="gray.700" mt={2}>Quick Console Links</Heading>
-          <Flex direction="column" bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" overflow="hidden">
+          <Heading size="md" color="text-secondary" mt={2}>Quick Console Links</Heading>
+          <Flex direction="column" bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" overflow="hidden">
             {actionRows.map((row, i) => (
               <Flex
                 key={i}
@@ -267,12 +267,12 @@ export default function PayrollDashboardPage() {
                 justify="space-between"
                 px="6" py="4"
                 borderBottom={i < actionRows.length - 1 ? "1px solid" : "none"}
-                borderColor="gray.100"
-                _hover={{ bg: 'gray.50' }}
+                borderColor="border-color"
+                _hover={{ bg: "hover-bg" }}
               >
                 <Box>
-                  <Text fontWeight="bold" fontSize="sm" color="gray.700">{row.title}</Text>
-                  <Text fontSize="xs" color="gray.400">{row.sub}</Text>
+                  <Text fontWeight="bold" fontSize="sm" color="text-secondary">{row.title}</Text>
+                  <Text fontSize="xs" color="text-muted">{row.sub}</Text>
                 </Box>
                 <HRMSButton
                   size="sm"
@@ -297,59 +297,59 @@ export default function PayrollDashboardPage() {
   return (
     <DashboardLayout>
       <Box px={{ base: 4, md: 6 }} py={6}>
-        <Heading size="lg" mb={6} color="gray.800">My Salary Dashboard</Heading>
+        <Heading size="lg" mb={6} color="text-primary">My Salary Dashboard</Heading>
 
         <SimpleGrid columns={{ base: 1, md: 3 }} gap={6} mb={8}>
           {/* Main Card */}
-          <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={5} boxShadow="sm">
-            <Text fontSize="xs" fontWeight="semibold" color="gray.400" textTransform="uppercase" mb={1}>Current Monthly CTC</Text>
+          <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={5} boxShadow="sm">
+            <Text fontSize="xs" fontWeight="semibold" color="text-muted" textTransform="uppercase" mb={1}>Current Monthly CTC</Text>
             <Text fontSize="2xl" fontWeight="bold" color="blue.600">
               Rs. {empProfile?.monthly_ctc?.toLocaleString('en-IN') || '0'}
             </Text>
             <Divider my={3} />
-            <Text fontSize="xs" color="gray.500">Designation: {empProfile?.designation}</Text>
-            <Text fontSize="xs" color="gray.500">Department: {empProfile?.department}</Text>
+            <Text fontSize="xs" color="text-muted">Designation: {empProfile?.designation}</Text>
+            <Text fontSize="xs" color="text-muted">Department: {empProfile?.department}</Text>
           </Box>
           
           {/* Earnings card */}
-          <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={5} boxShadow="sm">
-            <Text fontSize="xs" fontWeight="semibold" color="gray.400" textTransform="uppercase" mb={2}>Standard Earnings Breakdown</Text>
+          <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={5} boxShadow="sm">
+            <Text fontSize="xs" fontWeight="semibold" color="text-muted" textTransform="uppercase" mb={2}>Standard Earnings Breakdown</Text>
             <Flex justify="space-between" mb={1} fontSize="sm">
-              <Text color="gray.600">Basic:</Text>
-              <Text fontWeight="semibold" color="gray.700">{formatRs(baseSalary)}</Text>
+              <Text color="text-secondary">Basic:</Text>
+              <Text fontWeight="semibold" color="text-secondary">{formatRs(baseSalary)}</Text>
             </Flex>
             <Flex justify="space-between" mb={1} fontSize="sm">
-              <Text color="gray.600">HRA:</Text>
-              <Text fontWeight="semibold" color="gray.700">{formatRs(hraVal)}</Text>
+              <Text color="text-secondary">HRA:</Text>
+              <Text fontWeight="semibold" color="text-secondary">{formatRs(hraVal)}</Text>
             </Flex>
             <Flex justify="space-between" fontSize="sm">
-              <Text color="gray.600">Allowances:</Text>
-              <Text fontWeight="semibold" color="gray.700">{formatRs(allowancesVal + daVal)}</Text>
+              <Text color="text-secondary">Allowances:</Text>
+              <Text fontWeight="semibold" color="text-secondary">{formatRs(allowancesVal + daVal)}</Text>
             </Flex>
           </Box>
 
           {/* Deductions card */}
-          <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={5} boxShadow="sm">
-            <Text fontSize="xs" fontWeight="semibold" color="gray.400" textTransform="uppercase" mb={2}>Standard Deductions</Text>
+          <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={5} boxShadow="sm">
+            <Text fontSize="xs" fontWeight="semibold" color="text-muted" textTransform="uppercase" mb={2}>Standard Deductions</Text>
             <Flex justify="space-between" mb={1} fontSize="sm">
-              <Text color="gray.600">PF %:</Text>
-              <Text fontWeight="semibold" color="gray.700">{empStruct?.pf_percent || 12}%</Text>
+              <Text color="text-secondary">PF %:</Text>
+              <Text fontWeight="semibold" color="text-secondary">{empStruct?.pf_percent || 12}%</Text>
             </Flex>
             <Flex justify="space-between" mb={1} fontSize="sm">
-              <Text color="gray.600">ESI %:</Text>
-              <Text fontWeight="semibold" color="gray.700">{empStruct?.esi_percent || 0.75}%</Text>
+              <Text color="text-secondary">ESI %:</Text>
+              <Text fontWeight="semibold" color="text-secondary">{empStruct?.esi_percent || 0.75}%</Text>
             </Flex>
             <Flex justify="space-between" fontSize="sm">
-              <Text color="gray.600">TDS %:</Text>
-              <Text fontWeight="semibold" color="gray.700">{empStruct?.tds_percent || 0}%</Text>
+              <Text color="text-secondary">TDS %:</Text>
+              <Text fontWeight="semibold" color="text-secondary">{empStruct?.tds_percent || 0}%</Text>
             </Flex>
           </Box>
         </SimpleGrid>
 
         {/* Payslips History */}
-        <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={6} boxShadow="sm">
+        <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={6} boxShadow="sm">
           <Flex justify="space-between" align="center" mb={4}>
-            <Heading size="md" color="gray.700">Salary Payout History</Heading>
+            <Heading size="md" color="text-secondary">Salary Payout History</Heading>
             <HRMSButton size="sm" onClick={() => navigate('/payroll/payslips')}>Go to Payslips Hub</HRMSButton>
           </Flex>
 
@@ -367,10 +367,10 @@ export default function PayrollDashboardPage() {
             <Tbody>
               {empSlips && empSlips.length > 0 ? (
                 empSlips.map((slip) => (
-                  <Tr key={slip.id} _hover={{ bg: 'gray.50' }}>
-                    <Td fontWeight="medium" color="gray.700">{slip.month}</Td>
-                    <Td textAlign="right" color="gray.700">{formatRs(slip.gross_salary)}</Td>
-                    <Td textAlign="right" color="gray.700">{formatRs(slip.pf + slip.esi + slip.tds + slip.other_deductions)}</Td>
+                  <Tr key={slip.id} _hover={{ bg: "hover-bg" }}>
+                    <Td fontWeight="medium" color="text-secondary">{slip.month}</Td>
+                    <Td textAlign="right" color="text-secondary">{formatRs(slip.gross_salary)}</Td>
+                    <Td textAlign="right" color="text-secondary">{formatRs(slip.pf + slip.esi + slip.tds + slip.other_deductions)}</Td>
                     <Td textAlign="right" fontWeight="semibold" color="gray.850">{formatRs(slip.net_salary)}</Td>
                     <Td textAlign="center">
                       <Badge colorScheme={slip.payment_status === 'paid' ? 'green' : 'yellow'} px={2} py={0.5} borderRadius="full">
@@ -386,7 +386,7 @@ export default function PayrollDashboardPage() {
                 ))
               ) : (
                 <Tr>
-                  <Td colSpan={6} textAlign="center" py={6} color="gray.400">
+                  <Td colSpan={6} textAlign="center" py={6} color="text-muted">
                     No payslips records found.
                   </Td>
                 </Tr>

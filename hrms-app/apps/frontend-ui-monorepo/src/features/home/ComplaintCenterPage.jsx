@@ -160,24 +160,24 @@ export function ComplaintCenterPage() {
         <Flex direction={{ base: "column", lg: "row" }} gap={8} mt={6} align="stretch">
           
           {/* Submission Form */}
-          <Box flex="1" bg="white" p={8} borderRadius="2xl" borderWidth="1px" borderColor="#E2E8F0" shadow="sm">
+          <Box flex="1" bg="card-bg" p={8} borderRadius="2xl" borderWidth="1px" borderColor="border-color" shadow="sm">
             <VStack spacing={6} align="stretch">
               <Box>
-                <Heading size="md" color="#0F172A">
+                <Heading size="md" color="text-primary">
                   Submit Anonymous Complaint
                 </Heading>
-                <Text fontSize="xs" color="#64748B" mt={1}>
+                <Text fontSize="xs" color="text-secondary" mt={1}>
                   Submit feedback or complaints securely. Your identity remains strictly anonymous.
                 </Text>
               </Box>
 
               {generatedCaseId && (
-                <Box p={4} bg="purple.50" borderLeftWidth="4px" borderColor="#7152F3" borderRadius="lg">
-                  <Text fontSize="10px" fontWeight="semibold" color="#7152F3">
+                <Box p={4} bg="rgba(99, 102, 241, 0.12)" borderLeftWidth="4px" bordercolor="accent" borderRadius="lg">
+                  <Text fontSize="10px" fontWeight="semibold" color="accent">
                     SAVE YOUR CASE ID FOR REFERENCE (STAYS VISIBLE HERE)
                   </Text>
                   <HStack justify="space-between" mt={1}>
-                    <Text fontSize="sm" fontWeight="bold" color="#0F172A">
+                    <Text fontSize="sm" fontWeight="bold" color="text-primary">
                       {generatedCaseId}
                     </Text>
                     <Button
@@ -196,7 +196,7 @@ export function ComplaintCenterPage() {
               <form onSubmit={handleSubmit}>
                 <VStack spacing={4} align="stretch">
                   <FormControl isRequired>
-                    <FormLabel fontSize="xs" fontWeight="bold" color="#334155">
+                    <FormLabel fontSize="xs" fontWeight="bold" color="text-secondary">
                       Subject
                     </FormLabel>
                     <Input
@@ -208,7 +208,7 @@ export function ComplaintCenterPage() {
                   </FormControl>
 
                   <FormControl isRequired>
-                    <FormLabel fontSize="xs" fontWeight="bold" color="#334155">
+                    <FormLabel fontSize="xs" fontWeight="bold" color="text-secondary">
                       Description
                     </FormLabel>
                     <Textarea
@@ -223,7 +223,7 @@ export function ComplaintCenterPage() {
                   <Button
                     type="submit"
                     isLoading={createMutation.isPending || submitting}
-                    bg="#7152F3"
+                    bg="accent"
                     color="white"
                     borderRadius="xl"
                     h="44px"
@@ -239,13 +239,13 @@ export function ComplaintCenterPage() {
           </Box>
 
           {/* Search & Track Section */}
-          <Box flex="1" bg="white" p={8} borderRadius="2xl" borderWidth="1px" borderColor="#E2E8F0" shadow="sm">
+          <Box flex="1" bg="card-bg" p={8} borderRadius="2xl" borderWidth="1px" borderColor="border-color" shadow="sm">
             <VStack spacing={6} align="stretch">
               <Box>
-                <Heading size="md" color="#0F172A">
+                <Heading size="md" color="text-primary">
                   Track Complaint Status
                 </Heading>
-                <Text fontSize="xs" color="#64748B" mt={1}>
+                <Text fontSize="xs" color="text-secondary" mt={1}>
                   Enter your CASE-XXXXXX code to check review progress.
                 </Text>
               </Box>
@@ -280,7 +280,7 @@ export function ComplaintCenterPage() {
               {submittedTrackId && !loadingTrack && (
                 <Box>
                   {trackedComplaint ? (
-                    <Box p={5} bg="gray.50" borderRadius="2xl" border="1px solid" borderColor="gray.100">
+                    <Box p={5} bg="app-bg-secondary" borderRadius="2xl" border="1px solid" borderColor="border-color">
                       <VStack align="stretch" spacing={3}>
                         <HStack justify="space-between">
                           <Badge colorScheme="purple">{trackedComplaint.case_id}</Badge>
@@ -297,32 +297,32 @@ export function ComplaintCenterPage() {
                           </Badge>
                         </HStack>
                         <Box>
-                          <Text fontSize="xs" fontWeight="700" color="gray.400" textTransform="uppercase">
+                          <Text fontSize="xs" fontWeight="700" color="text-muted" textTransform="uppercase">
                             Subject
                           </Text>
-                          <Text fontSize="sm" fontWeight="800" color="gray.800">
+                          <Text fontSize="sm" fontWeight="800" color="text-primary">
                             {trackedComplaint.subject}
                           </Text>
                         </Box>
                         <Box>
-                          <Text fontSize="xs" fontWeight="700" color="gray.400" textTransform="uppercase">
+                          <Text fontSize="xs" fontWeight="700" color="text-muted" textTransform="uppercase">
                             Details
                           </Text>
-                          <Text fontSize="xs" color="gray.600">
+                          <Text fontSize="xs" color="text-secondary">
                             {trackedComplaint.description}
                           </Text>
                         </Box>
                         <Box>
-                          <Text fontSize="xs" fontWeight="700" color="gray.400" textTransform="uppercase">
+                          <Text fontSize="xs" fontWeight="700" color="text-muted" textTransform="uppercase">
                             Created On
                           </Text>
-                          <Text fontSize="xs" color="gray.600">
+                          <Text fontSize="xs" color="text-secondary">
                             {formatDate(trackedComplaint.created_at)}
                           </Text>
                         </Box>
                         {trackedComplaint.resolved_at && (
                           <Box>
-                            <Text fontSize="xs" fontWeight="700" color="gray.400" textTransform="uppercase">
+                            <Text fontSize="xs" fontWeight="700" color="text-muted" textTransform="uppercase">
                               Resolved On
                             </Text>
                             <Text fontSize="xs" color="green.600" fontWeight="bold">
@@ -354,10 +354,10 @@ export function ComplaintCenterPage() {
     <DashboardLayout pageTitle="Complaint Center">
       <Box p={2}>
         <Box mb={6}>
-          <Heading size="lg" color="#1E293B">
+          <Heading size="lg" color="text-primary">
             Complaint Center
           </Heading>
-          <Text fontSize="xs" color="#64748B" mt={1}>
+          <Text fontSize="xs" color="text-secondary" mt={1}>
             Manage anonymously submitted feedback and complaints from employees
           </Text>
         </Box>
@@ -373,23 +373,23 @@ export function ComplaintCenterPage() {
               <Tab fontWeight="semibold">Archive ({archivedComplaints.length})</Tab>
             </TabList>
 
-            <TabPanels bg="white" borderBottomRadius="2xl" borderLeftWidth="1px" borderRightWidth="1px" borderBottomWidth="1px" borderColor="#E2E8F0" p={6}>
+            <TabPanels bg="card-bg" borderBottomRadius="2xl" borderLeftWidth="1px" borderRightWidth="1px" borderBottomWidth="1px" borderColor="border-color" p={6}>
               {/* Active Complaints */}
               <TabPanel p={0}>
                 {activeComplaints.length === 0 ? (
                   <Box py={8} textAlign="center">
-                    <Text color="#64748B" fontSize="sm">No active complaints found.</Text>
+                    <Text color="text-secondary" fontSize="sm">No active complaints found.</Text>
                   </Box>
                 ) : (
                   <Box overflowX="auto">
                     <Table variant="simple" size="sm">
-                      <Thead bg="gray.50">
+                      <Thead bg="app-bg-secondary">
                         <Tr>
-                          <Th color="gray.500" fontSize="10px">CASE ID</Th>
-                          <Th color="gray.500" fontSize="10px">DATE</Th>
-                          <Th color="gray.500" fontSize="10px">SUBJECT</Th>
-                          <Th color="gray.500" fontSize="10px">DESCRIPTION</Th>
-                          <Th color="gray.500" fontSize="10px" textAlign="center">ACTIONS</Th>
+                          <Th color="text-muted" fontSize="10px">CASE ID</Th>
+                          <Th color="text-muted" fontSize="10px">DATE</Th>
+                          <Th color="text-muted" fontSize="10px">SUBJECT</Th>
+                          <Th color="text-muted" fontSize="10px">DESCRIPTION</Th>
+                          <Th color="text-muted" fontSize="10px" textAlign="center">ACTIONS</Th>
                         </Tr>
                       </Thead>
                       <Tbody>
@@ -398,13 +398,13 @@ export function ComplaintCenterPage() {
                             <Td py={4} whiteSpace="nowrap" fontSize="xs">
                               <Badge colorScheme="purple">{c.case_id}</Badge>
                             </Td>
-                            <Td py={4} whiteSpace="nowrap" fontSize="xs" color="#64748B">
+                            <Td py={4} whiteSpace="nowrap" fontSize="xs" color="text-secondary">
                               {formatDate(c.created_at)}
                             </Td>
-                            <Td py={4} fontWeight="semibold" fontSize="xs" color="#0F172A">
+                            <Td py={4} fontWeight="semibold" fontSize="xs" color="text-primary">
                               {c.subject}
                             </Td>
-                            <Td py={4} fontSize="xs" color="#334155" maxW="400px" whiteSpace="normal">
+                            <Td py={4} fontSize="xs" color="text-secondary" maxW="400px" whiteSpace="normal">
                               {c.description}
                             </Td>
                             <Td py={4} textAlign="center">
@@ -429,19 +429,19 @@ export function ComplaintCenterPage() {
               <TabPanel p={0}>
                 {archivedComplaints.length === 0 ? (
                   <Box py={8} textAlign="center">
-                    <Text color="#64748B" fontSize="sm">Archive is empty.</Text>
+                    <Text color="text-secondary" fontSize="sm">Archive is empty.</Text>
                   </Box>
                 ) : (
                   <Box overflowX="auto">
                     <Table variant="simple" size="sm">
-                      <Thead bg="gray.50">
+                      <Thead bg="app-bg-secondary">
                         <Tr>
-                          <Th color="gray.500" fontSize="10px">CASE ID</Th>
-                          <Th color="gray.500" fontSize="10px">DATE</Th>
-                          <Th color="gray.500" fontSize="10px">SUBJECT</Th>
-                          <Th color="gray.500" fontSize="10px">DESCRIPTION</Th>
-                          <Th color="gray.500" fontSize="10px">RESOLVED AT</Th>
-                          <Th color="gray.500" fontSize="10px">STATUS</Th>
+                          <Th color="text-muted" fontSize="10px">CASE ID</Th>
+                          <Th color="text-muted" fontSize="10px">DATE</Th>
+                          <Th color="text-muted" fontSize="10px">SUBJECT</Th>
+                          <Th color="text-muted" fontSize="10px">DESCRIPTION</Th>
+                          <Th color="text-muted" fontSize="10px">RESOLVED AT</Th>
+                          <Th color="text-muted" fontSize="10px">STATUS</Th>
                         </Tr>
                       </Thead>
                       <Tbody>
@@ -450,16 +450,16 @@ export function ComplaintCenterPage() {
                             <Td py={4} whiteSpace="nowrap" fontSize="xs">
                               <Badge colorScheme="gray">{c.case_id}</Badge>
                             </Td>
-                            <Td py={4} whiteSpace="nowrap" fontSize="xs" color="#64748B">
+                            <Td py={4} whiteSpace="nowrap" fontSize="xs" color="text-secondary">
                               {formatDate(c.created_at)}
                             </Td>
-                            <Td py={4} fontWeight="semibold" fontSize="xs" color="#0F172A">
+                            <Td py={4} fontWeight="semibold" fontSize="xs" color="text-primary">
                               {c.subject}
                             </Td>
-                            <Td py={4} fontSize="xs" color="#334155" maxW="400px" whiteSpace="normal">
+                            <Td py={4} fontSize="xs" color="text-secondary" maxW="400px" whiteSpace="normal">
                               {c.description}
                             </Td>
-                            <Td py={4} fontSize="xs" color="#64748B">
+                            <Td py={4} fontSize="xs" color="text-secondary">
                               {formatDate(c.resolved_at)}
                             </Td>
                             <Td py={4}>

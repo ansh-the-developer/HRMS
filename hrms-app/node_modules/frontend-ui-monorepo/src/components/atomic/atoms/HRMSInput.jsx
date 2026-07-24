@@ -1,9 +1,8 @@
-// src/components/atomic/atoms/HRMSInput.jsx
 import { Input } from "@chakra-ui/react";
 
 const HRMSInput = ({
-  h = "56px",
-  borderRadius = "10px",
+  h = "44px",
+  borderRadius = "12px",
   ...props
 }) => {
   return (
@@ -11,15 +10,20 @@ const HRMSInput = ({
       h={h}
       borderRadius={borderRadius}
       fontSize="sm"
-      bg="white"
-      borderColor="gray.200"
+      bg="card-bg"
+      backdropFilter="blur(20px)"
+      color="text-primary"
+      borderColor="border-color"
+      _placeholder={{ color: "text-muted" }}
       _hover={{
-        borderColor: "gray.300",
+        borderColor: "accent",
+        bg: "hover-bg",
       }}
       _focus={{
-        borderColor: "purple.500",
-        boxShadow: "none",
+        borderColor: "accent",
+        boxShadow: "0 0 0 3px rgba(99, 102, 241, 0.25)",
       }}
+      transition="all 180ms cubic-bezier(0.16, 1, 0.3, 1)"
       {...props}
     />
   );

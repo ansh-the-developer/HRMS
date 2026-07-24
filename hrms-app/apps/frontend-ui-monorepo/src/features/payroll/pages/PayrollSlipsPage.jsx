@@ -53,19 +53,19 @@ export default function PayrollSlipsPage() {
           onClick={() => navigate('/payroll')}
           mb={4}
           alignSelf="flex-start"
-          _hover={{ bg: 'gray.100' }}
+          _hover={{ bg: "hover-bg" }}
         >
           Back to Payroll Dashboard
         </Button>
-        <Heading size="lg" mb={2} color="gray.800">Payslips Hub</Heading>
-        <Text fontSize="sm" color="gray.400" mb={6}>
+        <Heading size="lg" mb={2} color="text-primary">Payslips Hub</Heading>
+        <Text fontSize="sm" color="text-muted" mb={6}>
           {isHR ? 'Select an employee to view and download their historical payslips.' : 'View and download your official monthly payslip PDFs.'}
         </Text>
 
         {/* HR dropdown choice */}
         {isHR && (
-          <Box bg="white" borderRadius="lg" border="1px solid" borderColor="gray.200" p={5} mb={6} maxW="400px">
-            <Text fontWeight="semibold" fontSize="sm" color="gray.600" mb={2}>Select Employee</Text>
+          <Box bg="card-bg" borderRadius="lg" border="1px solid" borderColor="border-color" p={5} mb={6} maxW="400px">
+            <Text fontWeight="semibold" fontSize="sm" color="text-secondary" mb={2}>Select Employee</Text>
             {loadingEmployees ? (
               <Spinner size="sm" />
             ) : (
@@ -73,8 +73,8 @@ export default function PayrollSlipsPage() {
                 placeholder="Choose an employee..."
                 value={selectedEmpId}
                 onChange={(e) => setSelectedEmpId(e.target.value)}
-                bg="white"
-                borderColor="gray.300"
+                bg="card-bg"
+                borderColor="border-color"
               >
                 {employees?.map(emp => (
                   <option key={emp.id} value={emp.id}>{emp.name} ({emp.department})</option>
@@ -90,13 +90,13 @@ export default function PayrollSlipsPage() {
         ) : (
           <>
             {targetEmpId ? (
-              <Box bg="white" border="1px solid" borderColor="gray.200" borderRadius="lg" p={6} boxShadow="sm">
-                <Heading size="md" mb={4} color="gray.700">
+              <Box bg="card-bg" border="1px solid" borderColor="border-color" borderRadius="lg" p={6} boxShadow="sm">
+                <Heading size="md" mb={4} color="text-secondary">
                   Payslip Records: {selectedEmpName}
                 </Heading>
 
                 <Table variant="simple" size="md">
-                  <Thead bg="gray.50">
+                  <Thead bg="app-bg-secondary">
                     <Tr>
                       <Th>Month</Th>
                       <Th textAlign="right">Gross Salary</Th>
@@ -109,11 +109,11 @@ export default function PayrollSlipsPage() {
                   <Tbody>
                     {slips && slips.length > 0 ? (
                       slips.map((slip) => (
-                        <Tr key={slip.id} _hover={{ bg: 'gray.50' }}>
-                          <Td fontWeight="medium" color="gray.700">{slip.month}</Td>
-                          <Td textAlign="right" color="gray.700">{formatRs(slip.gross_salary)}</Td>
-                          <Td textAlign="right" color="gray.700">{formatRs(slip.pf + slip.esi + slip.tds + slip.other_deductions)}</Td>
-                          <Td textAlign="right" fontWeight="semibold" color="gray.800">{formatRs(slip.net_salary)}</Td>
+                        <Tr key={slip.id} _hover={{ bg: "hover-bg" }}>
+                          <Td fontWeight="medium" color="text-secondary">{slip.month}</Td>
+                          <Td textAlign="right" color="text-secondary">{formatRs(slip.gross_salary)}</Td>
+                          <Td textAlign="right" color="text-secondary">{formatRs(slip.pf + slip.esi + slip.tds + slip.other_deductions)}</Td>
+                          <Td textAlign="right" fontWeight="semibold" color="text-primary">{formatRs(slip.net_salary)}</Td>
                           <Td textAlign="center">
                             <Badge colorScheme={slip.payment_status === 'paid' ? 'green' : 'yellow'} px={2} py={0.5} borderRadius="full">
                               {slip.payment_status.toUpperCase()}
@@ -128,7 +128,7 @@ export default function PayrollSlipsPage() {
                       ))
                     ) : (
                       <Tr>
-                        <Td colSpan={6} textAlign="center" py={8} color="gray.400">
+                        <Td colSpan={6} textAlign="center" py={8} color="text-muted">
                           No payslips records found for this employee.
                         </Td>
                       </Tr>
@@ -137,8 +137,8 @@ export default function PayrollSlipsPage() {
                 </Table>
               </Box>
             ) : (
-              <Box bg="white" borderRadius="lg" border="1px solid" borderColor="gray.200" p={8} textAlign="center">
-                <Text color="gray.400" fontSize="sm">
+              <Box bg="card-bg" borderRadius="lg" border="1px solid" borderColor="border-color" p={8} textAlign="center">
+                <Text color="text-muted" fontSize="sm">
                   {isHR ? 'Please select an employee from the dropdown above to view records.' : 'No profile associated with this account. Contact HR.'}
                 </Text>
               </Box>

@@ -28,7 +28,7 @@ export default function SettingsDashboardPage() {
   return (
     <DashboardLayout>
       <Box px={{ base: 4, md: 8 }} py={6}>
-        <Box bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100" p={2}>
+        <Box bg="card-bg" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="border-color" p={2}>
           <VStack align="stretch" spacing={0}>
             {settingsItems.map((item, index) => (
               <Flex
@@ -38,15 +38,15 @@ export default function SettingsDashboardPage() {
                 px={6}
                 py={5}
                 borderBottom={index !== settingsItems.length - 1 ? '1px solid' : 'none'}
-                borderColor="gray.100"
-                _hover={{ bg: 'gray.50' }}
+                borderColor="border-color"
+                _hover={{ bg: "hover-bg" }}
                 transition="all 0.2s"
               >
                 <Box>
-                  <Text fontWeight="bold" fontSize="sm" color="gray.800" mb={1}>
+                  <Text fontWeight="bold" fontSize="sm" color="text-primary" mb={1}>
                     {item.title}
                   </Text>
-                  <Text fontSize="xs" color="gray.500">
+                  <Text fontSize="xs" color="text-muted">
                     {item.description}
                   </Text>
                 </Box>

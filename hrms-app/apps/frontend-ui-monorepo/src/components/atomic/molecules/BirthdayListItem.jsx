@@ -9,13 +9,13 @@ const BirthdayListItem = ({ name, role, date, avatarUrl }) => (
       <Text fontSize="sm" fontWeight="semibold">
         {name}
       </Text>
-      <Text fontSize="xs" color="gray.500">
+      <Text fontSize="xs" color="text-muted">
         {date}
       </Text>
     </VStack>
 
     {/* Role on the right */}
-    <Text fontSize="xs" color="gray.500">
+    <Text fontSize="xs" color="text-muted">
       {role}
     </Text>
   </HStack>

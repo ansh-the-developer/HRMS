@@ -113,7 +113,7 @@ const ResetPasswordPage = () => {
 
           <VStack spacing={6} align="stretch">
             <Box textAlign="center">
-              <Text fontSize="sm" color="gray.600">Almost there!</Text>
+              <Text fontSize="sm" color="text-secondary">Almost there!</Text>
               <Heading
                 bgGradient="linear(to-r, #307DC5, #BDBBB9)"
                 bgClip="text"
@@ -146,7 +146,7 @@ const ResetPasswordPage = () => {
                   variant="ghost"
                   size="md"
                   w="100%"
-                  color="gray.500"
+                  color="text-muted"
                   onClick={() => navigate("/login")}
                 >
                   ← Back to Login
@@ -179,7 +179,7 @@ const ResetPasswordPage = () => {
                         <Button
                           size="xs"
                           variant="ghost"
-                          color="gray.500"
+                          color="text-muted"
                           onClick={() => setShowPass(!showPass)}
                           tabIndex={-1}
                         >
@@ -233,7 +233,7 @@ const ResetPasswordPage = () => {
                         <Button
                           size="xs"
                           variant="ghost"
-                          color="gray.500"
+                          color="text-muted"
                           onClick={() => setShowConfirm(!showConfirm)}
                           tabIndex={-1}
                         >
@@ -284,7 +284,7 @@ const ResetPasswordPage = () => {
                     variant="ghost"
                     size="md"
                     w="100%"
-                    color="gray.500"
+                    color="text-muted"
                     onClick={() => navigate("/login")}
                   >
                     ← Back to Login

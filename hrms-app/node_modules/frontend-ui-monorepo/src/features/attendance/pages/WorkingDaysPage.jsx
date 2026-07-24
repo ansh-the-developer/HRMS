@@ -48,9 +48,9 @@ const PatternItem = ({ pattern, onDelete }) => {
   return (
     <Flex 
       p={3} 
-      bg="white" 
+      bg="card-bg" 
       border="1px solid"
-      borderColor="gray.200"
+      borderColor="border-color"
       borderRadius="md" 
       align="center" 
       justify="space-between"
@@ -143,8 +143,8 @@ const WorkingDaysPage = () => {
         <Flex direction={{ base: 'column', lg: 'row' }} gap={6}>
           
           {/* LEFT: Input + Weekdays + Add */}
-          <Box flex={1} bg="white" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="gray.100">
-            <Heading size="md" mb={4} color="gray.800">Create Working Days</Heading>
+          <Box flex={1} bg="card-bg" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="border-color">
+            <Heading size="md" mb={4} color="text-primary">Create Working Days</Heading>
             
             <Input
               placeholder="Working days name (e.g. Monday to Friday)"
@@ -154,7 +154,7 @@ const WorkingDaysPage = () => {
               size="lg"
             />
             
-            <Text mb={3} fontWeight="500" color="gray.700">Select weekdays:</Text>
+            <Text mb={3} fontWeight="500" color="text-secondary">Select weekdays:</Text>
             <Grid templateColumns="repeat(4, 1fr)" gap={2} mb={6}>
               {weekdays.map(day => (
                 <Checkbox
@@ -173,20 +173,17 @@ const WorkingDaysPage = () => {
             <HRMSButton
               onClick={handleAddPattern}
               w="full"
-              h={12}
-              bgGradient="linear(to-r, #307DC7, #C1B9B8)"
-              color="white"
-              borderRadius="full"
+              h="42px"
+              borderRadius="12px"
               leftIcon={<FiPlus />}
-              fontSize="lg"
             >
               Add
             </HRMSButton>
           </Box>
 
           {/* RIGHT: List (Edit + Delete only) */}
-          <Box flex={1} bg="white" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="gray.100">
-            <Heading size="md" mb={4} color="gray.800">Working Days List</Heading>
+          <Box flex={1} bg="card-bg" borderRadius="lg" p={6} boxShadow="md" borderWidth={1} borderColor="border-color">
+            <Heading size="md" mb={4} color="text-primary">Working Days List</Heading>
             <VStack spacing={0} align="stretch">
               {workingPatterns.map(pattern => (
                 <PatternItem

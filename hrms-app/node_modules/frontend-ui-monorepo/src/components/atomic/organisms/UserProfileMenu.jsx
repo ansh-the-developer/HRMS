@@ -46,7 +46,7 @@ const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
         aria-label="User menu"
         // shared
         cursor="pointer"
-        bg="white"
+        bg="card-bg"
         _hover={{ boxShadow: "md" }}
         // icon-only style
         icon={
@@ -62,7 +62,7 @@ const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
         // pill style
         borderRadius={isIcon ? "full" : "lg"}
         borderWidth={isIcon ? 0 : 1}
-        borderColor="gray.200"
+        borderColor="border-color"
         px={isIcon ? 0 : 2}
         py={isIcon ? 0 : 1}
         display="inline-flex"
@@ -90,7 +90,7 @@ const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
               </Text>
               <Text
                 fontSize="xs"
-                color="gray.500"
+                color="text-muted"
                 lineHeight="short"
                 noOfLines={1}
               >
@@ -100,7 +100,7 @@ const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
             <Icon
               as={FiChevronDown}
               boxSize={4}
-              color="gray.500"
+              color="text-muted"
               ml="auto"
               flexShrink={0}
             />
@@ -108,12 +108,13 @@ const UserProfileMenu = ({ role = "HR Executive", variant = "pill" }) => {
         )}
       </MenuButton>
 
-      <MenuList minW="40" borderRadius="lg" py={1}>
+      <MenuList bg="card-bg" borderColor="border-color" minW="40" borderRadius="lg" py={1}>
         <MenuItem
           icon={<FiLogOut />}
           fontSize="sm"
           py={2}
           color="red.500"
+          _hover={{ bg: "hover-bg" }}
           onClick={handleLogout}
         >
           Logout

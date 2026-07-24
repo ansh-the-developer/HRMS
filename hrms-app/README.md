@@ -5427,6 +5427,274 @@ hrms-app/
 └── README.md
 ```
 
+---
+
+------------------------------
+25-07-2026
+------------------------------
+
+# 🌸 HappyHRMS v3 — Product-Wide Japanese Atmospheric Glass Migration
+
+## 🎯 Summary of Work Completed Today
+
+- **Product-Wide Visual Migration (50+ Files across 8 Feature Modules)**:
+  - Executed a complete visual skin migration across all pages, components, modals, tables, drawers, forms, and navigation controls.
+  - Retained **100% of existing functionality**, business logic, Supabase queries, RBAC rules, form validations, and React hooks without any breaking changes.
+  - Eliminated all legacy hardcoded Chakra colors (`gray.50`–`gray.900`, hardcoded hex strings `#7152F3`, `#6b46c1`, etc.) in favor of centralized semantic tokens (`card-bg`, `glass-bg`, `border-color`, `text-primary`, `text-secondary`, `text-muted`, `hover-bg`, `accent`).
+
+- **Japanese Atmospheric Glass Engine**:
+  - Created `SakuraGlassEffect.jsx` background canvas engine featuring soft Mt. Fuji / pagoda dusk silhouette with drifting Sakura petal physics and `prefers-reduced-motion` compliance.
+  - Updated `designTokens.js` to enforce **36px glass backdrop blur**, **76%–82% glass card opacity**, and multi-layered specular edge highlights (`inset 0 1px 0 0 rgba(255, 255, 255, 0.20)`).
+
+- **Architectural Dashboard Refinement (`HomePage.jsx`)**:
+  - Rebuilt the main Dashboard into a 3-column architectural glass layout matching the v3 reference screenshot:
+    - **5 Top KPI Cards**: Total Employees (128), Present Today (96), On Leave (18), Absentees (14), New Joiners (8) with mini SVG trend sparklines.
+    - **Leave Requests Glass Sheet Table**: Status badges (*Approved* in muted jade, *Pending* in muted amber) and pagination controls.
+    - **Bottom Grid**: Attendance Overview donut chart (75% present), Payroll Summary (`₹24,58,340` with trend line), Announcements list, and 4 Quick Action cards (*Add Employee, Mark Attendance, Apply Leave, Generate Payslip*).
+    - **Right Column**: Frosted Calendar widget and Upcoming Birthdays list.
+
+- **Navigation & Header Upgrades**:
+  - Updated `HRMSSidebar.jsx` with **"HappyHRMS - People. Process. Progress."** branding, illuminated glass active navigation pill, and **"Need Help? Contact Support"** glass card.
+  - Updated `TopBar.jsx` with global `⌘ K` search bar and `3` notification bell badge.
+
+---
+
+## 🔮 Next Day Roadmap & Objectives
+
+1. **Dashboard Gadget Functionality**:
+   - Wire interactive click handlers, real-time data filters, and modal triggers to all dashboard gadgets (*Quick Actions, Calendar date selection, Birthday detail drawer, Announcements expand, Payroll detail drill-down*).
+2. **Product-Wide Table UI Refinement**:
+   - Upgrade tables across Employee, Attendance, Leaves, and Payroll modules into floating layered glass sheets with soft zebra row transparency, animated sorting, sticky headers, and responsive mobile card transformations.
+
+---
+
+## 📁 Full Unabbreviated Directory Structure Tree
+
+```
+hrms-app/
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       │   ├── favicon.ico
+│       │   └── vite.svg
+│       ├── src/
+│       │   ├── assets/
+│       │   │   ├── ajLogo.png
+│       │   │   ├── forgetPassword.png
+│       │   │   ├── loginPagePic.jpg
+│       │   │   ├── passSucImg.png
+│       │   │   └── successIcon.png
+│       │   ├── components/
+│       │   │   ├── atomic/
+│       │   │   │   ├── atoms/
+│       │   │   │   │   ├── HRMSButton.jsx
+│       │   │   │   │   ├── HRMSInput.jsx
+│       │   │   │   │   ├── Logo.jsx
+│       │   │   │   │   ├── SectionTitle.jsx
+│       │   │   │   │   ├── SidebarToggleButton.jsx
+│       │   │   │   │   ├── StatusDot.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   ├── molecules/
+│       │   │   │   │   ├── AttendanceConfigItem.jsx
+│       │   │   │   │   ├── BirthdayListItem.jsx
+│       │   │   │   │   ├── DepartmentListItem.jsx
+│       │   │   │   │   ├── EmployeeConfigItem.jsx
+│       │   │   │   │   ├── EmployeeTableRow.jsx
+│       │   │   │   │   ├── HRMSCard.jsx
+│       │   │   │   │   ├── HRMSTable.jsx
+│       │   │   │   │   ├── InfoRow.jsx
+│       │   │   │   │   ├── LegendItem.jsx
+│       │   │   │   │   ├── LogoutButton.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   ├── organisms/
+│       │   │   │   │   ├── BirthdayTrackerCard.jsx
+│       │   │   │   │   ├── CalendarCard.jsx
+│       │   │   │   │   ├── CompanyEventsCard.jsx
+│       │   │   │   │   ├── EmployeeConfigCard.jsx
+│       │   │   │   │   ├── EmployeeTable.jsx
+│       │   │   │   │   ├── HRMSSidebar.jsx
+│       │   │   │   │   ├── HolidaysCard.jsx
+│       │   │   │   │   ├── NoticeBoardCard.jsx
+│       │   │   │   │   ├── TopBar.jsx
+│       │   │   │   │   ├── UserProfileMenu.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   └── templates/
+│       │   │   │       ├── DashboardLayout.jsx
+│       │   │   │       └── index.js
+│       │   │   └── ui/
+│       │   │       ├── RainGlassEffect.jsx
+│       │   │       └── SakuraGlassEffect.jsx
+│       │   ├── contexts/
+│       │   │   ├── CalendarContext.jsx
+│       │   │   ├── EventContext.jsx
+│       │   │   ├── HolidayContext.jsx
+│       │   │   └── NoticeContext.jsx
+│       │   ├── features/
+│       │   │   ├── attendance/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── molecules/
+│       │   │   │   │   │   ├── AttendanceSearchInput.jsx
+│       │   │   │   │   │   ├── AttendanceStatusBadge.jsx
+│       │   │   │   │   │   ├── EmployeeAvatarName.jsx
+│       │   │   │   │   │   ├── RuleField.jsx
+│       │   │   │   │   │   ├── RuleListItem.jsx
+│       │   │   │   │   │   ├── WeekdaySelector.jsx
+│       │   │   │   │   │   ├── WorkingDayItem.jsx
+│       │   │   │   │   │   └── WorkingHourItem.jsx
+│       │   │   │   │   └── organisms/
+│       │   │   │   │       ├── AttendanceConfigCard.jsx
+│       │   │   │   │       ├── AttendanceTable.jsx
+│       │   │   │   │       ├── AttendanceTableRow.jsx
+│       │   │   │   │       ├── ExportAttendanceCard.jsx
+│       │   │   │   │       ├── RuleEditCard.jsx
+│       │   │   │   │       ├── WorkingDaysForm.jsx
+│       │   │   │   │       ├── WorkingDaysList.jsx
+│       │   │   │   │       ├── WorkingHoursCard.jsx
+│       │   │   │   │       └── WorkingRulesList.jsx
+│       │   │   │   ├── constants/
+│       │   │   │   │   └── attendanceMockData.js
+│       │   │   │   └── pages/
+│       │   │   │       ├── AttendanceDashboardPage.jsx
+│       │   │   │       ├── AttendanceExportPage.jsx
+│       │   │   │       ├── EditAttendancePage.jsx
+│       │   │   │       ├── EditWorkingDaysPage.jsx
+│       │   │   │       ├── EditWorkingRulePage.jsx
+│       │   │   │       ├── EmployeeAttendanceDashboard.jsx
+│       │   │   │       ├── WorkingDaysPage.jsx
+│       │   │   │       ├── WorkingHoursPage.jsx
+│       │   │   │       └── WorkingRulesPage.jsx
+│       │   │   ├── auth/
+│       │   │   │   ├── components/
+│       │   │   │   │   └── ProtectedRoute.jsx
+│       │   │   │   ├── index.js
+│       │   │   │   └── pages/
+│       │   │   │       ├── ChangePasswordPage.jsx
+│       │   │   │       ├── ForgotPasswordPage.jsx
+│       │   │   │       ├── LoginPage.jsx
+│       │   │   │       ├── MFAEnrollPage.jsx
+│       │   │   │       ├── PasswordChangedPage.jsx
+│       │   │   │       ├── ResetPasswordPage.jsx
+│       │   │   │       ├── TwoFactorPage.jsx
+│       │   │   │       └── VerifyEmailPage.jsx
+│       │   │   ├── employee/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── DeleteEmployeeModal.jsx
+│       │   │   │   │   ├── EmployeeBulkImportModal.jsx
+│       │   │   │   │   ├── EmployeeMasterForm.jsx
+│       │   │   │   │   └── EmployeeProfilePage.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── EmployeeBranchesPage.jsx
+│       │   │   │       ├── EmployeeDepartmentsPage.jsx
+│       │   │   │       ├── EmployeeDesignationsPage.jsx
+│       │   │   │       ├── EmployeeExportPage.jsx
+│       │   │   │       ├── EmployeeListPage.jsx
+│       │   │   │       ├── EmployeeStatusesPage.jsx
+│       │   │   │       └── EmployeeTypesPage.jsx
+│       │   │   ├── home/
+│       │   │   │   ├── ComplaintCenterPage.jsx
+│       │   │   │   ├── HomePage.jsx
+│       │   │   │   └── ProFeatureGatePage.jsx
+│       │   │   ├── leaves/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── LeaveRequestForm.jsx
+│       │   │   │   │   └── LeaveUploadOverlay.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── LeaveRequestActionPage.jsx
+│       │   │   │       ├── LeaveRequestListPage.jsx
+│       │   │   │       ├── LeaveRequestUploadPage.jsx
+│       │   │   │       ├── LeaveRequiredFormPage.jsx
+│       │   │   │       ├── LeaveRulesApprovalFlowPage.jsx
+│       │   │   │       ├── LeaveRulesPage.jsx
+│       │   │   │       ├── LeaveSubmitStatusPage.jsx
+│       │   │   │       ├── LeavesDashboardPage.jsx
+│       │   │   │       └── leaveMockData.js
+│       │   │   ├── payroll/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── PaymentTable.jsx
+│       │   │   │   │   ├── ReimbursementForm.jsx
+│       │   │   │   │   └── SalaryStructureForm.jsx
+│       │   │   │   ├── constants/
+│       │   │   │   │   └── payrollMockData.js
+│       │   │   │   └── pages/
+│       │   │   │       ├── PayrollDashboardPage.jsx
+│       │   │   │       ├── PayrollOverviewPage.jsx
+│       │   │   │       ├── PayrollSlipsPage.jsx
+│       │   │   │       ├── PendingPaymentsPage.jsx
+│       │   │   │       ├── RecordPaymentPage.jsx
+│       │   │   │       ├── ReimbursementStatusPage.jsx
+│       │   │   │       └── SalaryStructurePage.jsx
+│       │   │   ├── performance/
+│       │   │   │   └── pages/
+│       │   │   │       ├── PerformanceDashboardPage.jsx
+│       │   │   │       ├── PerformanceHistoryPage.jsx
+│       │   │   │       ├── PerformanceNewReviewPage.jsx
+│       │   │   │       └── PerformanceReviewDetailPage.jsx
+│       │   │   └── settings/
+│       │   │       └── pages/
+│       │   │           ├── CompanyDetailsPage.jsx
+│       │   │           ├── PermissionsManagerPage.jsx
+│       │   │           ├── SettingsDashboardPage.jsx
+│       │   │           └── UserManagementPage.jsx
+│       │   ├── hooks/
+│       │   │   ├── index.js
+│       │   │   ├── useAuth.js
+│       │   │   ├── useComplaints.js
+│       │   │   ├── useEmployeeProfile.js
+│       │   │   ├── useEmployees.js
+│       │   │   ├── useHome.js
+│       │   │   ├── useLeaves.js
+│       │   │   ├── usePayroll.js
+│       │   │   ├── usePerformance.js
+│       │   │   └── useRole.js
+│       │   ├── lib/
+│       │   │   ├── queryClient.js
+│       │   │   ├── supabaseClient.js
+│       │   │   └── totpUtils.js
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx
+│       │   │   └── HomeRoutes.jsx
+│       │   ├── services/
+│       │   │   ├── attendanceApi.js
+│       │   │   ├── complaintApi.js
+│       │   │   ├── employeeApi.js
+│       │   │   ├── homeApi.js
+│       │   │   ├── leaveApi.js
+│       │   │   ├── payrollApi.js
+│       │   │   ├── performanceApi.js
+│       │   │   ├── profileApi.js
+│       │   │   └── useProfile.js
+│       │   ├── theme/
+│       │   │   └── designTokens.js
+│       │   ├── App.css
+│       │   ├── App.jsx
+│       │   ├── index.css
+│       │   └── main.jsx
+│       ├── .env.example
+│       ├── package.json
+│       └── vite.config.js
+│   └── shared/
+│       └── employeeFilters.js
+├── packages/
+│   └── shared/
+│       └── employeeFilters.js
+├── supabase/
+│   ├── functions/
+│   │   └── create-employee-user/
+│   │       ├── config.toml
+│   │       └── index.ts
+│   └── migrations/
+│       ├── 20260708160102_create_payroll_tables.sql
+│       ├── 20260708172232_expand_leave_and_complaints.sql
+│       ├── 20260708181624_fix_leave_requests_rls.sql
+│       └── 20260708183614_fix_leave_requests_select_rls.sql
+├── .env.local
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── package.json
+└── turbo.json
+```
+
 ## License & Usage
 
 This project is distributed under a proprietary, **All Rights Reserved** license. 

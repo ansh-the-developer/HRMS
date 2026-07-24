@@ -82,13 +82,13 @@ const ChangePasswordPage = () => {
   return (
     <Box
       minH="100vh"
-      bg="gray.50"
+      bg="app-bg-secondary"
       display="flex"
       alignItems="center"
       justifyContent="center"
     >
       <Box
-        bg="white"
+        bg="card-bg"
         p={8}
         borderRadius="xl"
         boxShadow="lg"
@@ -102,7 +102,7 @@ const ChangePasswordPage = () => {
           <VStack spacing={2} textAlign="center">
             <Logo />
             <Heading size="md" mt={2}>Set Your New Password</Heading>
-            <Text fontSize="sm" color="gray.500">
+            <Text fontSize="sm" color="text-muted">
               This is your first login. Please choose a secure password.
             </Text>
           </VStack>

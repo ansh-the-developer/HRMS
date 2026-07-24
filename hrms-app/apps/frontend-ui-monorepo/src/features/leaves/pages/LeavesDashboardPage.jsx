@@ -107,10 +107,10 @@ const LeavesDashboardPage = () => {
         <SimpleGrid columns={{ base: 1, lg: 3 }} spacing={6}>
           
           {/* 1. CALENDAR (Unchanged) */}
-          <Box bg="white" p={6} borderRadius="lg" shadow="sm" borderWidth="1px">
+          <Box bg="card-bg" p={6} borderRadius="lg" shadow="sm" borderWidth="1px">
             <Flex justify="space-between" align="center" mb={4}>
               <Text fontSize="md" fontWeight="semibold">Calendar</Text>
-              <Box w="40px" h="40px" bg="purple.50" borderRadius="lg" display="flex" alignItems="center" justifyContent="center">
+              <Box w="40px" h="40px" bg="rgba(99, 102, 241, 0.12)" borderRadius="lg" display="flex" alignItems="center" justifyContent="center">
                 📅
               </Box>
             </Flex>
@@ -120,11 +120,11 @@ const LeavesDashboardPage = () => {
               <HRMSButton size="sm" colorScheme="purple">→</HRMSButton>
             </Flex>
             <Grid templateColumns="repeat(7, 1fr)" gap={1} mb={2} textAlign="center">
-              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => <Text key={d} fontSize="xs" color="gray.500">{d}</Text>)}
+              {['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'].map(d => <Text key={d} fontSize="xs" color="text-muted">{d}</Text>)}
             </Grid>
             <Grid templateColumns="repeat(7, 1fr)" gap={1} textAlign="center">
               {Array.from({ length: 31 }, (_, i) => i + 1).map(day => (
-                <Flex key={day} h="32px" align="center" justify="center" borderRadius="full" bg={day === 8 ? "purple.500" : "transparent"} color={day === 8 ? "white" : "gray.700"} fontSize="sm" cursor="default">
+                <Flex key={day} h="32px" align="center" justify="center" borderRadius="full" bg={day === 8 ? "purple.500" : "transparent"} color={day === 8 ? "white" : "text-secondary"} fontSize="sm" cursor="default">
                   {day}
                 </Flex>
               ))}
@@ -132,7 +132,7 @@ const LeavesDashboardPage = () => {
           </Box>
 
           {/* 2. MIDDLE CARD: Toggle between Summary AND Form */}
-          <Box bg="white" p={6} borderRadius="lg" shadow="sm" borderWidth="1px">
+          <Box bg="card-bg" p={6} borderRadius="lg" shadow="sm" borderWidth="1px">
             {submitting ? (
               <Flex align="center" justify="center" h="full" minH="200px">
                 <Spinner color="purple.500" size="lg" />
@@ -154,7 +154,7 @@ const LeavesDashboardPage = () => {
                 </Flex>
                 <Divider />
                 <Box>
-                  <Text fontSize="xs" fontWeight="semibold" color="gray.600" mb={1}>
+                  <Text fontSize="xs" fontWeight="semibold" color="text-secondary" mb={1}>
                     Upcoming Leaves (Approved)
                   </Text>
                   <Text fontSize="md" fontWeight="bold">21 July</Text>
@@ -173,7 +173,7 @@ const LeavesDashboardPage = () => {
           </Box>
 
           {/* 3. TEAM MEMBERS (Unchanged) */}
-          <Box bg="white" p={6} borderRadius="lg" shadow="sm" borderWidth="1px">
+          <Box bg="card-bg" p={6} borderRadius="lg" shadow="sm" borderWidth="1px">
             <Text fontSize="md" fontWeight="semibold" mb={4}>Team Members on Leave this week</Text>
             <VStack spacing={4} align="stretch">
               {[
@@ -186,7 +186,7 @@ const LeavesDashboardPage = () => {
                     <Avatar size="sm" name={m.name} />
                     <Text fontSize="sm">{m.name}</Text>
                   </HStack>
-                  <Text fontSize="xs" color="gray.600">{m.dates}</Text>
+                  <Text fontSize="xs" color="text-secondary">{m.dates}</Text>
                 </Flex>
               ))}
             </VStack>
@@ -194,14 +194,14 @@ const LeavesDashboardPage = () => {
         </SimpleGrid>
 
         {/* BOTTOM: ACTIONS CARD */}
-        <Box bg="white" p={8} borderRadius="lg" shadow="sm" borderWidth="1px">
+        <Box bg="card-bg" p={8} borderRadius="lg" shadow="sm" borderWidth="1px">
           <VStack spacing={6} align="stretch">
             
             {/* Leave Approval Status */}
             <Flex justify="space-between" align="center">
               <Box>
                 <Text fontSize="md" fontWeight="semibold">Leave Approval Status</Text>
-                <Text fontSize="sm" color="gray.500">Check status of your leave request</Text>
+                <Text fontSize="sm" color="text-muted">Check status of your leave request</Text>
               </Box>
               <HRMSButton 
                 colorScheme="blue" 
@@ -219,7 +219,7 @@ const LeavesDashboardPage = () => {
                 <Flex justify="space-between" align="center">
                   <Box>
                     <Text fontSize="md" fontWeight="semibold">Approve Leaves</Text>
-                    <Text fontSize="sm" color="gray.500">Check requests and approve leaves</Text>
+                    <Text fontSize="sm" color="text-muted">Check requests and approve leaves</Text>
                   </Box>
                   <HRMSButton 
                     colorScheme="blue" 
@@ -239,7 +239,7 @@ const LeavesDashboardPage = () => {
                 <Flex justify="space-between" align="center">
                   <Box>
                     <Text fontSize="md" fontWeight="semibold">Define Rules</Text>
-                    <Text fontSize="sm" color="gray.400">Notice Period Before Leave, Approval Flow and more</Text>
+                    <Text fontSize="sm" color="text-muted">Notice Period Before Leave, Approval Flow and more</Text>
                   </Box>
                   <HRMSButton 
                     variant="outline" 
