@@ -23,5 +23,11 @@ dist-ssr
 *.sln
 *.sw?
 
-# auth0 creds:
-.envnode_modules/
+# environment variables & keys
+.env
+.env.*
+*.pem
+*.key
+*.crt
+build/
+coverage/

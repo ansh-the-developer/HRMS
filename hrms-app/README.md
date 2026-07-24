@@ -1,6 +1,9 @@
 ```markdown
 ## ⚓ HRMS App – Setup & Architecture (WIP)
 
+> [!IMPORTANT]
+> **Repository Notice**: This repository is published as a portfolio project and is intended solely for educational and evaluation purposes. Employers, recruiters, and prospective clients are welcome to review the source code. However, the project is distributed under a proprietary license. Commercial use, redistribution, modification, and production deployment are strictly prohibited without prior written permission.
+
 ### 1. Monorepo & Base Structure
 
 ```
@@ -5394,6 +5397,7 @@ hrms-app/
 │       │   ├── App.jsx
 │       │   ├── index.css
 │       │   └── main.jsx
+│       ├── .env.example
 │       ├── package.json
 │       └── vite.config.js
 │
@@ -5416,9 +5420,27 @@ hrms-app/
 │       └── 20260708183614_fix_leave_requests_select_rls.sql
 │
 ├── .env.local
+├── CONTRIBUTING.md
+├── LICENSE
 ├── package.json
 ├── turbo.json
 └── README.md
 ```
+
+## License & Usage
+
+This project is distributed under a proprietary, **All Rights Reserved** license. 
+
+- **Evaluation Only**: Permission is granted to view and clone the repository solely for evaluation, educational review, recruitment evaluation, or client assessment.
+- **Prohibitions**: Commercial use, redistribution, modification, and production deployment are strictly prohibited.
+- **No Derivative Works**: Modification and redistribution of the source code are prohibited.
+- **No Selling or Sublicensing**: Selling, sublicensing, or relicensing the project is prohibited.
+
+For the full legal terms and conditions, please refer to the [LICENSE](file:///c:/Users/aman/Documents/OFFICE/HRMS/hrms-app/LICENSE) file in the root of this repository.
+
+---
+
+Copyright © 2026 Aman Joshi - AJ Developments.  
+All Rights Reserved.
 
 

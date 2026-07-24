@@ -1,1 +1,11 @@
 node_modules/
+dist/
+build/
+coverage/
+logs/
+*.log
+.env
+.env.*
+*.pem
+*.key
+*.crt
