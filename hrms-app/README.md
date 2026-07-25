@@ -5468,6 +5468,63 @@ hrms-app/
 
 ---
 
+------------------------------
+25-07-2026 (Session 2 Updates)
+------------------------------
+
+# 🌿 HappyHRMS v3 — Home Dashboard Interactive Polish & Employee Mode Profile Fixes
+
+## 🎯 Summary of Work Completed Today
+
+- **Employee Dashboard Personalization & Role Views**:
+  - Implemented role-scoped dashboard rendering in `HomePage.jsx`:
+    - Employee users view strictly their own Leave Requests and Attendance statistics, hiding organization-wide metrics and Payroll Summary.
+    - Quick Action cards dynamically hide HR administrative actions (*Add Employee*, *Mark Attendance*) for Employee role users.
+
+- **Leave Requests Table Pagination**:
+  - Fixed 5-row pagination in `HomePage.jsx` with working Previous/Next controls, dynamic item range text (`Showing X to Y of Z requests`), and state reset on role changes.
+
+- **Interactive TopBar Notifications**:
+  - Converted the static notification bell icon into an interactive Chakra Menu displaying real-time unread badges, mark as read handlers, empty states, and route navigation.
+
+- **Interactive Calendar & Dashboard Synchronization**:
+  - Wired full month navigation, Today jump button, and date selection highlighting across `CalendarCard.jsx` and `HomePage.jsx`.
+  - Filtered Announcements and Upcoming Birthdays widgets dynamically when a calendar date is selected.
+
+- **Announcements CRUD & Live Search**:
+  - **Create Announcement**: Added glass UI modal for HR/Admin users (Title, Description/Content, Date, Expiry Date, Priority, Visibility, Pin state) with form validation, toast notifications, and React Query cache invalidation (`["notices"]`).
+  - **Edit Announcement**: Pre-fills values into modal and updates notice via `updateNotice`.
+  - **Delete Announcement**: Renders confirmation modal displaying announcement title and prompts confirmation before deleting via `deleteNotice`.
+  - **Live Search**: Integrated real-time, case-insensitive, whitespace-trimmed search across title and content in View All Announcements modal.
+
+- **Payroll Summary Month Selector & Custom Date Picker**:
+  - Transformed static select dropdown into a fully interactive selector (*This Month*, *Last Month*, *Last 3 Months*, *Last 6 Months*, *This FY*, *Prev FY*, *Custom Range*).
+  - Built **Custom Date Range Picker Modal** (Start/End dates) and dynamically recalculated total payroll amounts, growth percentages, and SVG mini sparklines.
+
+- **Monthly Attendance Log Japanese Glass Restyling**:
+  - Restyled the Monthly Attendance Log table on `EmployeeAttendanceDashboard.jsx` to match the dark Japanese Glass design system:
+    - Glass card container with `backdropFilter="blur(16px)"`, `bg="card-bg"`, and `borderColor="border-color"`.
+    - Header typography (`fontSize="10px"`, `color="text-muted"`, `letterSpacing="wider"`).
+    - Rows with indigo glass glow (`rgba(99, 102, 241, 0.08)`) for `isToday` and subtle background for `isWeekend`.
+    - Converted light mode pastel status badges into dark translucent glass pills (`Present`, `Absent`, `On Leave`, `Off Day`).
+
+- **5-Level Prioritized Employee Profile Lookup**:
+  - Built `resolveEmployeeRecord` in `employeeApi.js` implementing 5-level lookup priority:
+    1. `auth.users.id` / `auth_user_id`
+    2. `profiles.id` / `auth_user_id` / primary key `id`
+    3. `employees.user_id`
+    4. `employees.profile_id`
+    5. `employees.email`
+  - Handled unlinked primary Supabase administrator accounts with a friendly informational page (*"This administrator account is not linked to an employee profile"*).
+  - Auto-linked existing employee records by email without inserting duplicate rows.
+
+- **Production Stability & Code Quality**:
+  - Fixed `ReferenceError: calcWorkingHours is not defined` in `EmployeeAttendanceDashboard.jsx` using `calcHours`.
+  - Fixed React Rules of Hooks violation in `HRMSSidebar.jsx` by elevating `useColorModeValue` declarations to top-level constants.
+  - Verified clean production builds with `npm run build` (`vite build`) — 1666 modules transformed cleanly with zero errors.
+
+---
+
 ## 📁 Full Unabbreviated Directory Structure Tree
 
 ```

@@ -20,6 +20,8 @@ import {
   Input,
   Select,
   useToast,
+  Center,
+  Icon,
 } from "@chakra-ui/react";
 import {
   FiArrowLeft,
@@ -27,6 +29,7 @@ import {
   FiPhone,
   FiMapPin,
   FiFileText,
+  FiUser,
 } from "react-icons/fi";
 import { MdOutlineShield } from "react-icons/md";
 import { useParams, useNavigate, Navigate } from "react-router-dom";
@@ -85,7 +88,8 @@ export default function EmployeeProfilePage() {
   const { isHR, isManager, isEmployee } = useRole();
   const { user } = useAuth();
   
-  const { data, isLoading, isError, error } = useEmployeeProfile(id);
+  const targetId = isEmployee ? (user?.id || id) : (id || user?.id);
+  const { data, isLoading, isError, error } = useEmployeeProfile(targetId, user?.email);
   const updateMutation = useUpdateEmployee();
 
   // Edit Mode toggle
@@ -160,11 +164,37 @@ export default function EmployeeProfilePage() {
 
   const employee = data || {};
   const isOwnProfile =
-    !!user?.id &&
-    !!employee?.auth_user_id &&
-    String(user.id) === String(employee.auth_user_id);
+    (!!user?.id && String(targetId) === String(user.id)) ||
+    (!!user?.id && !!employee?.auth_user_id && String(user.id) === String(employee.auth_user_id)) ||
+    (!!user?.email && !!employee?.email && employee.email.toLowerCase() === user.email.toLowerCase());
 
-  const canViewProfile = isHR || isManager || (isEmployee && isOwnProfile);
+  // Friendly Empty State when profile record is missing for the logged-in user after all lookup fallbacks
+  if (!isLoading && !data && (isEmployee || String(targetId) === String(user?.id))) {
+    return (
+      <DashboardLayout pageTitle="My Profile">
+        <Center minH="400px" flexDir="column" gap={4}>
+          <Center w="72px" h="72px" borderRadius="full" bg="rgba(99, 102, 241, 0.12)">
+            <Icon as={FiUser} boxSize={8} color="accent" />
+          </Center>
+          <VStack spacing={2} textAlign="center">
+            <Text fontSize="lg" fontWeight="700" color="text-primary">
+              This administrator account is not linked to an employee profile.
+            </Text>
+            <Text fontSize="sm" color="text-muted" maxW="460px" lineHeight="relaxed">
+              Employee Mode requires an employee record. Create or link an employee profile to this account to access employee features.
+            </Text>
+          </VStack>
+        </Center>
+      </DashboardLayout>
+    );
+  }
+
+  // In Employee Mode, restrict viewing other employees' profiles
+  if (isEmployee && !isOwnProfile && data) {
+    return <Navigate to={`/employees/${user?.id || ""}`} replace />;
+  }
+
+  const canViewProfile = isHR || isManager || isOwnProfile || (isEmployee && String(targetId) === String(user?.id));
   const canViewSensitiveSections = isHR || isOwnProfile;
   const canOpenDocuments = isHR || isOwnProfile;
 

@@ -10,6 +10,7 @@ import { MdOutlineBeachAccess } from "react-icons/md";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
 import { supabase } from "@/lib/supabaseClient";
 import { getAttendanceForEmployee } from "@/services/attendanceApi";
+import { resolveEmployeeRecord } from "@/services/employeeApi";
 import { useAuth } from "@/hooks/useAuth";
 
 const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
@@ -47,16 +48,16 @@ const getDayName = (dateStr) => {
 };
 
 const STATUS_CONFIG = {
-  "Present":  { color: "#10B981", bg: "#D1FAE5" },
-  "Absent":   { color: "#EF4444", bg: "#FEE2E2" },
-  "On Leave": { color: "#6366F1", bg: "#EDE9FE" },
-  "Off Day":  { color: "#F59E0B", bg: "#FEF3C7" },
+  "Present":  { color: "#34D399", bg: "rgba(16, 185, 129, 0.15)" },
+  "Absent":   { color: "#F87171", bg: "rgba(239, 68, 68, 0.15)" },
+  "On Leave": { color: "#818CF8", bg: "rgba(99, 102, 241, 0.15)" },
+  "Off Day":  { color: "#FBBF24", bg: "rgba(245, 158, 11, 0.15)" },
 };
 
 const StatusBadge = ({ status }) => {
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG["Absent"];
   return (
-    <Badge px={2} py={0.5} borderRadius="full" fontSize="xs" fontWeight="700"
+    <Badge px={2.5} py={0.5} borderRadius="full" fontSize="xs" fontWeight="700"
       color={cfg.color} bg={cfg.bg} border="1px solid" borderColor={cfg.color + "40"}>
       {status || "Absent"}
     </Badge>
@@ -88,15 +89,10 @@ export default function EmployeeAttendanceDashboard() {
   const [noRecord, setNoRecord]   = useState(false);
 
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id && !user?.email) return;
     (async () => {
       try {
-        const { data, error } = await supabase
-          .from("employees")
-          .select("id, name, email, department, designation, emp_code, auth_user_id")
-          .eq("auth_user_id", user.id)
-          .maybeSingle();
-        if (error) throw error;
+        const data = await resolveEmployeeRecord(user?.id, user?.email);
         if (!data) { setNoRecord(true); setLoading(false); return; }
         setEmpRecord(data);
       } catch (e) {
@@ -105,7 +101,7 @@ export default function EmployeeAttendanceDashboard() {
         setLoading(false);
       }
     })();
-  }, [user?.id]);
+  }, [user?.id, user?.email]);
 
   useEffect(() => {
     if (!empRecord) return;
@@ -139,140 +135,112 @@ export default function EmployeeAttendanceDashboard() {
     const isFuture = dateStr > today;
     return {
       date: dateStr,
-      in_time:  log?.in_time  || "",
-      out_time: log?.out_time || "",
-      status: log?.status || (isWeekend ? "Off Day" : isFuture ? null : "Absent"),
       isWeekend,
       isFuture,
+      in_time: log?.in_time || null,
+      out_time: log?.out_time || null,
+      status: log?.status || (isFuture ? "Future" : isWeekend ? "Off Day" : "Absent"),
     };
-  }).reverse();
+  });
 
-  const pastRows = calendarRows.filter((r) => !r.isFuture);
-  const presentCount = pastRows.filter((r) => r.status === "Present").length;
-  const absentCount  = pastRows.filter((r) => r.status === "Absent").length;
-  const leaveCount   = pastRows.filter((r) => r.status === "On Leave").length;
-  const offCount     = pastRows.filter((r) => r.status === "Off Day").length;
-
-  const todayLog = logs.find((l) => l.date === today);
+  const presentCount = logs.filter((l) => l.status === "Present").length;
+  const absentCount  = calendarRows.filter((r) => !r.isFuture && !r.isWeekend && r.status === "Absent").length;
+  const leaveCount   = logs.filter((l) => l.status === "On Leave").length;
+  const offCount     = calendarRows.filter((r) => r.isWeekend).length;
 
   const prevMonth = () => {
-    if (viewMonth === 0) { setViewMonth(11); setViewYear((y) => y - 1); }
-    else setViewMonth((m) => m - 1);
+    if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
+    else { setViewMonth(viewMonth - 1); }
   };
   const nextMonth = () => {
-    if (viewYear > now.getFullYear() || (viewYear === now.getFullYear() && viewMonth >= now.getMonth())) return;
-    if (viewMonth === 11) { setViewMonth(0); setViewYear((y) => y + 1); }
-    else setViewMonth((m) => m + 1);
+    if (viewMonth === 11) { setViewMonth(0); setViewYear(viewYear + 1); }
+    else { setViewMonth(viewMonth + 1); }
   };
   const isAtCurrentMonth = viewMonth === now.getMonth() && viewYear === now.getFullYear();
 
-  if (loading && !empRecord) {
-    return (
-      <DashboardLayout pageTitle="Attendance">
-        <Center minH="400px"><Spinner size="xl" color="#6366F1" thickness="4px" /></Center>
-      </DashboardLayout>
-    );
-  }
-
   if (noRecord) {
     return (
-      <DashboardLayout pageTitle="Attendance">
-        <Center minH="400px" flexDir="column" gap={4}>
-          <Center w="72px" h="72px" borderRadius="full" bg="rgba(99, 102, 241, 0.12)">
-            <Box as={FiCalendar} fontSize="32px" color="#6366F1" />
-          </Center>
-          <VStack spacing={1}>
-            <Text fontSize="lg" fontWeight="700" color="text-secondary">No Attendance Record Found</Text>
-            <Text fontSize="sm" color="text-muted" textAlign="center" maxW="340px">
-              Your account does not have a linked employee profile yet. Please contact HR to set up your attendance tracking.
-            </Text>
-          </VStack>
+      <DashboardLayout pageTitle="My Attendance">
+        <Center minH="60vh" flexDir="column" gap={3}>
+          <Box as={FiClock} fontSize="48px" color="text-muted" />
+          <Text fontWeight="700" fontSize="lg" color="text-primary">No Employee Record Found</Text>
+          <Text fontSize="sm" color="text-muted" maxW="380px" textAlign="center">
+            Your login account is not linked to an active employee profile. Please contact HR.
+          </Text>
         </Center>
       </DashboardLayout>
     );
   }
 
   return (
-    <DashboardLayout pageTitle="Attendance">
-      <VStack spacing={6} align="stretch">
-        {/* Header Banner */}
-        <Flex
-          bgGradient="linear(to-r, #6366F1, #8B5CF6)"
-          borderRadius="2xl" p={6} align="center" justify="space-between" shadow="lg"
-        >
-          <HStack spacing={4}>
-            <Avatar name={empRecord?.name} size="md" bg="whiteAlpha.300" color="white" fontWeight="700" />
-            <VStack align="start" spacing={0}>
-              <Text color="white" fontWeight="800" fontSize="lg">{empRecord?.name}</Text>
-              <Text color="whiteAlpha.800" fontSize="sm">
-                {empRecord?.designation} &middot; {empRecord?.department}
+    <DashboardLayout pageTitle="My Attendance">
+      <Box p={{ base: 4, md: 8 }} maxW="1200px" mx="auto">
+
+        {/* Top Header */}
+        <Flex justify="space-between" align="center" mb={6} flexWrap="wrap" gap={3}>
+          <VStack align="start" spacing={0}>
+            <Text fontWeight="800" fontSize="2xl" color="text-primary">My Attendance</Text>
+            {empRecord && (
+              <Text fontSize="sm" color="text-muted">
+                {empRecord.name} &bull; {empRecord.department || "General"} &bull; {empRecord.emp_code || ""}
               </Text>
-            </VStack>
-          </HStack>
-          <Box bg="whiteAlpha.200" borderRadius="xl" px={5} py={3} textAlign="center">
-            <Text fontSize="10px" fontWeight="700" color="whiteAlpha.700" textTransform="uppercase" letterSpacing="wider" mb={1}>
-              Today
-            </Text>
-            {todayLog ? (
-              <VStack spacing={0.5}>
-                <StatusBadge status={todayLog.status} />
-                {todayLog.in_time && (
-                  <Text fontSize="11px" color="whiteAlpha.800" mt={1}>
-                    {todayLog.in_time}{todayLog.out_time ? ` ? ${todayLog.out_time}` : ""}
-                  </Text>
-                )}
-              </VStack>
-            ) : (
-              <Text fontSize="sm" fontWeight="600" color="whiteAlpha.600">Not Logged</Text>
             )}
-          </Box>
+          </VStack>
         </Flex>
 
         {/* Stats */}
-        <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4}>
+        <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4} mb={6}>
           <StatCard icon={FiCheckCircle}        label="Present"  value={presentCount} color="#10B981" />
           <StatCard icon={FiXCircle}            label="Absent"   value={absentCount}  color="#EF4444" />
           <StatCard icon={MdOutlineBeachAccess} label="On Leave" value={leaveCount}   color="#6366F1" />
           <StatCard icon={FiSun}                label="Off Days" value={offCount}     color="#F59E0B" />
         </SimpleGrid>
 
-        {/* Log Table */}
-        <Box bg="card-bg" borderRadius="2xl" shadow="sm" border="1px solid" borderColor="border-color" overflow="hidden">
+        {/* Log Table - Restyled to Japanese Glass Design System */}
+        <Box
+          bg="card-bg"
+          backdropFilter="blur(16px)"
+          borderRadius="20px"
+          shadow="lg"
+          border="1px solid"
+          borderColor="border-color"
+          overflow="hidden"
+        >
           <Flex px={6} py={4} align="center" justify="space-between" borderBottom="1px solid" borderColor="border-color">
-            <HStack spacing={2}>
-              <Box as={FiCalendar} color="#6366F1" fontSize="18px" />
+            <HStack spacing={2.5}>
+              <Box as={FiCalendar} color="accent" fontSize="18px" />
               <Text fontWeight="700" fontSize="md" color="text-primary">Monthly Attendance Log</Text>
             </HStack>
             <HStack spacing={2}>
               <Tooltip label="Previous Month">
                 <IconButton icon={<FiChevronLeft />} size="sm" variant="ghost" borderRadius="lg"
-                  onClick={prevMonth} aria-label="Previous month" />
+                  onClick={prevMonth} aria-label="Previous month" _hover={{ bg: "hover-bg" }} />
               </Tooltip>
               <Box px={4} py={1.5} bg="rgba(99, 102, 241, 0.12)" borderRadius="lg" minW="150px" textAlign="center">
-                <Text fontWeight="700" fontSize="sm" color="#6366F1">
+                <Text fontWeight="700" fontSize="sm" color="accent">
                   {MONTHS[viewMonth]} {viewYear}
                 </Text>
               </Box>
               <Tooltip label={isAtCurrentMonth ? "Already at current month" : "Next Month"}>
                 <IconButton icon={<FiChevronRight />} size="sm" variant="ghost" borderRadius="lg"
-                  onClick={nextMonth} isDisabled={isAtCurrentMonth} aria-label="Next month" />
+                  onClick={nextMonth} isDisabled={isAtCurrentMonth} aria-label="Next month" _hover={{ bg: "hover-bg" }} />
               </Tooltip>
             </HStack>
           </Flex>
 
           {loading ? (
-            <Center py={12}><Spinner color="#6366F1" size="lg" /></Center>
+            <Center py={12}><Spinner color="accent" size="lg" /></Center>
           ) : (
             <TableContainer>
               <Table size="sm" variant="simple">
                 <Thead bg="app-bg-secondary">
-                  <Tr>
-                    <Th py={3} fontSize="11px">Date</Th>
-                    <Th py={3} fontSize="11px">Day</Th>
-                    <Th py={3} fontSize="11px">Check In</Th>
-                    <Th py={3} fontSize="11px">Check Out</Th>
-                    <Th py={3} fontSize="11px">Hours</Th>
-                    <Th py={3} fontSize="11px">Status</Th>
+                  <Tr borderBottom="1px solid" borderColor="border-color">
+                    <Th py={3.5} fontSize="10px" color="text-muted" letterSpacing="wider" textTransform="uppercase" fontWeight="600">Date</Th>
+                    <Th py={3.5} fontSize="10px" color="text-muted" letterSpacing="wider" textTransform="uppercase" fontWeight="600">Day</Th>
+                    <Th py={3.5} fontSize="10px" color="text-muted" letterSpacing="wider" textTransform="uppercase" fontWeight="600">Check In</Th>
+                    <Th py={3.5} fontSize="10px" color="text-muted" letterSpacing="wider" textTransform="uppercase" fontWeight="600">Check Out</Th>
+                    <Th py={3.5} fontSize="10px" color="text-muted" letterSpacing="wider" textTransform="uppercase" fontWeight="600">Hours</Th>
+                    <Th py={3.5} fontSize="10px" color="text-muted" letterSpacing="wider" textTransform="uppercase" fontWeight="600">Status</Th>
                   </Tr>
                 </Thead>
                 <Tbody>
@@ -280,44 +248,46 @@ export default function EmployeeAttendanceDashboard() {
                     const isToday = row.date === today;
                     const hours = calcHours(row.in_time, row.out_time);
                     return (
-                      <Tr key={row.date}
-                        bg={isToday ? "purple.50" : row.isWeekend ? "gray.50" : "white"}
+                      <Tr
+                        key={row.date}
+                        bg={isToday ? "rgba(99, 102, 241, 0.08)" : row.isWeekend ? "rgba(255, 255, 255, 0.02)" : "transparent"}
                         _hover={{ bg: "hover-bg" }}
+                        borderBottom="1px solid"
+                        borderColor="border-color"
                         opacity={row.isFuture ? 0.35 : 1}
-                        transition="background 0.15s"
+                        transition="background 0.15s ease-in-out"
                       >
                         <Td py={3}>
-                          <HStack spacing={1}>
-                            {isToday && <Badge colorScheme="purple" fontSize="9px" px={1.5} borderRadius="md">TODAY</Badge>}
-                            <Text fontSize="sm" fontWeight={isToday ? "700" : "500"} color="text-secondary">
+                          <HStack spacing={2}>
+                            {isToday && (
+                              <Badge colorScheme="purple" fontSize="9px" px={1.5} py={0.5} borderRadius="md" variant="subtle">
+                                TODAY
+                              </Badge>
+                            )}
+                            <Text fontSize="xs" fontWeight={isToday ? "700" : "500"} color="text-primary">
                               {formatDate(row.date)}
                             </Text>
                           </HStack>
                         </Td>
                         <Td py={3}>
-                          <Text fontSize="sm" color={row.isWeekend ? "warning" : "text-muted"} fontWeight="500">
+                          <Text fontSize="xs" color={row.isWeekend ? "amber.400" : "text-muted"} fontWeight="500">
                             {getDayName(row.date)}
                           </Text>
                         </Td>
                         <Td py={3}>
-                          <Text fontSize="sm" color={row.in_time ? "text-primary" : "text-muted"} fontWeight="500">
+                          <Text fontSize="xs" color={row.in_time ? "text-primary" : "text-muted"} fontWeight="500">
                             {row.in_time || "—"}
                           </Text>
                         </Td>
                         <Td py={3}>
-                          <Text fontSize="sm" color={row.out_time ? "text-primary" : "text-muted"} fontWeight="500">
+                          <Text fontSize="xs" color={row.out_time ? "text-primary" : "text-muted"} fontWeight="500">
                             {row.out_time || "—"}
                           </Text>
                         </Td>
                         <Td py={3}>
-                          {(() => {
-                            const hours = calcWorkingHours(row.in_time, row.out_time);
-                            return (
-                              <Text fontSize="sm" color={hours ? "accent" : "text-muted"} fontWeight={hours ? "600" : "400"}>
-                                {hours ? `${hours} hrs` : "—"}
-                              </Text>
-                            );
-                          })()}
+                          <Text fontSize="xs" color={hours ? "accent" : "text-muted"} fontWeight={hours ? "600" : "400"}>
+                            {hours || "—"}
+                          </Text>
                         </Td>
                         <Td py={3}>
                           {row.isFuture
@@ -332,25 +302,8 @@ export default function EmployeeAttendanceDashboard() {
               </Table>
             </TableContainer>
           )}
-
-          {!loading && (
-            <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4} mt={6} pt={4} borderTop="1px solid" borderColor="border-color">
-              {[
-                { label: "Working Days", value: pastRows.filter(r => !r.isWeekend).length, color: "text-primary" },
-                { label: "Present",      value: presentCount, color: "success" },
-                { label: "Absent",       value: absentCount,  color: "error" },
-              ].map(({ label, value, color }) => (
-                <VStack key={label} spacing={0} align="center">
-                  <Text fontSize="xs" color="text-muted" fontWeight="600" textTransform="uppercase" letterSpacing="wide">
-                    {label}
-                  </Text>
-                  <Text fontSize="lg" fontWeight="800" color={color}>{value}</Text>
-                </VStack>
-              ))}
-              </SimpleGrid>
-          )}
         </Box>
-      </VStack>
+      </Box>
     </DashboardLayout>
   );
 }

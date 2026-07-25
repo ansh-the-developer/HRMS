@@ -98,34 +98,103 @@ export async function deleteEmployee(id) {
 }
 
 
+export async function resolveEmployeeRecord(userId, userEmail = null) {
+  if (!userId && !userEmail) return null;
+
+  if (userId) {
+    // Priority 1: auth.users.id / auth_user_id
+    try {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("*")
+        .eq("auth_user_id", userId)
+        .maybeSingle();
+      if (!error && data) return data;
+    } catch (e) {
+      // Ignore schema column absence
+    }
+
+    // Priority 2: profiles.id / primary key id
+    try {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("*")
+        .eq("id", userId)
+        .maybeSingle();
+      if (!error && data) return data;
+    } catch (e) {
+      // Ignore
+    }
+
+    // Priority 3: employees.user_id
+    try {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("*")
+        .eq("user_id", userId)
+        .maybeSingle();
+      if (!error && data) return data;
+    } catch (e) {
+      // Ignore if column missing
+    }
+
+    // Priority 4: employees.profile_id
+    try {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("*")
+        .eq("profile_id", userId)
+        .maybeSingle();
+      if (!error && data) return data;
+    } catch (e) {
+      // Ignore if column missing
+    }
+
+    // Priority 5a: employees.email matching userId if userId is an email address
+    if (typeof userId === "string" && userId.includes("@")) {
+      try {
+        const { data, error } = await supabase
+          .from("employees")
+          .select("*")
+          .ilike("email", userId.trim())
+          .maybeSingle();
+        if (!error && data) return data;
+      } catch (e) {
+        // Ignore
+      }
+    }
+  }
+
+  // Priority 5b: employees.email matching userEmail parameter
+  if (userEmail && typeof userEmail === "string") {
+    try {
+      const { data, error } = await supabase
+        .from("employees")
+        .select("*")
+        .ilike("email", userEmail.trim())
+        .maybeSingle();
+      if (!error && data) return data;
+    } catch (e) {
+      // Ignore
+    }
+  }
+
+  return null;
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
 // 3.1  Get full employee profile (employees + 3 extension tables)
 // ─────────────────────────────────────────────────────────────────────────────
-export async function getEmployeeProfile(id) {
+export async function getEmployeeProfile(id, userEmail = null) {
   try {
-    // Step 1: try by employee table id
-    let empResult = await supabase
-      .from("employees")
-      .select("*")
-      .eq("id", id)
-      .maybeSingle();
+    const empData = await resolveEmployeeRecord(id, userEmail);
 
-    // Step 2: if not found, try by auth user id
-    if (!empResult.data) {
-      empResult = await supabase
-        .from("employees")
-        .select("*")
-        .eq("auth_user_id", id)
-        .maybeSingle();
-    }
-
-    if (empResult.error) throw empResult.error;
-    if (!empResult.data) {
+    if (!empData) {
       // No employee record — return null gracefully (HR/Manager users may not have one)
       return null;
     }
 
-    const employeeId = empResult.data.id;
+    const employeeId = empData.id;
 
     const [compResult, bankResult, docsResult] = await Promise.all([
       supabase
@@ -150,7 +219,7 @@ export async function getEmployeeProfile(id) {
     if (docsResult.error) throw docsResult.error;
 
     return {
-      ...empResult.data,
+      ...empData,
       compliance: compResult.data ?? {},
       banking: bankResult.data ?? {},
       documents: docsResult.data ?? {},

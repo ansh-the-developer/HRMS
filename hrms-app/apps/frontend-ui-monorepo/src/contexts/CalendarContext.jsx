@@ -7,9 +7,17 @@ export const CalendarProvider = ({ children }) => {
     year: new Date().getFullYear(),
     month: new Date().getMonth(),
   });
+  const [selectedDate, setSelectedDate] = useState(null); // format "YYYY-MM-DD" or null
 
   return (
-    <CalendarContext.Provider value={{ calendarMonth, setCalendarMonth }}>
+    <CalendarContext.Provider
+      value={{
+        calendarMonth,
+        setCalendarMonth,
+        selectedDate,
+        setSelectedDate,
+      }}
+    >
       {children}
     </CalendarContext.Provider>
   );

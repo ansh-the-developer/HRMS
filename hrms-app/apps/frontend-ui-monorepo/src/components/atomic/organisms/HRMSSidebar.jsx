@@ -44,7 +44,27 @@ const HRMSSidebar = ({
   const { role, originalRole, isSwitched, isLoading } = useRole();
   const { user, signOut } = useAuth();
 
-  // All colors now driven by semantic theme tokens (card-bg, border-color, hover-bg, text-muted, accent)
+  // Elevate all useColorModeValue calls to top-level to satisfy Rules of Hooks
+  const sidebarBg = useColorModeValue(designTokens.sidebarGradientLight, designTokens.sidebarGradientDark);
+  const sidebarBorderColor = useColorModeValue("rgba(255, 255, 255, 0.80)", "rgba(255, 255, 255, 0.16)");
+  const sidebarBoxShadow = useColorModeValue(designTokens.sidebarShadowLight, designTokens.sidebarShadowDark);
+
+  const topGlowBg = useColorModeValue(
+    "radial(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%)",
+    "radial(circle, rgba(129, 140, 248, 0.22) 0%, transparent 75%)"
+  );
+  const centerGlowBg = useColorModeValue(
+    "radial(circle, rgba(186, 230, 253, 0.20) 0%, transparent 70%)",
+    "radial(circle, rgba(56, 189, 248, 0.15) 0%, transparent 75%)"
+  );
+
+  const activeItemBg = useColorModeValue("rgba(99, 102, 241, 0.16)", "rgba(99, 102, 241, 0.32)");
+  const activeItemBorder = useColorModeValue("1px solid rgba(99, 102, 241, 0.30)", "1px solid rgba(255, 255, 255, 0.30)");
+  const activeItemShadow = useColorModeValue(
+    "0 4px 18px rgba(99, 102, 241, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.80)",
+    "0 4px 20px rgba(99, 102, 241, 0.40), inset 0 1px 0 0 rgba(255, 255, 255, 0.40)"
+  );
+  const activeItemHoverBg = useColorModeValue("rgba(99, 102, 241, 0.22)", "rgba(99, 102, 241, 0.40)");
 
   const sidebarWidth = isCollapsed ? "80px" : "270px";
 
@@ -106,12 +126,12 @@ const HRMSSidebar = ({
       left="16px"
       h="calc(100vh - 32px)"
       w={sidebarWidth}
-      bg={useColorModeValue(designTokens.sidebarGradientLight, designTokens.sidebarGradientDark)}
+      bg={sidebarBg}
       backdropFilter={`blur(${designTokens.glassBlurSidebar})`}
       border="1px solid"
-      borderColor={useColorModeValue("rgba(255, 255, 255, 0.80)", "rgba(255, 255, 255, 0.16)")}
+      borderColor={sidebarBorderColor}
       borderRadius="24px"
-      boxShadow={useColorModeValue(designTokens.sidebarShadowLight, designTokens.sidebarShadowDark)}
+      boxShadow={sidebarBoxShadow}
       px={isCollapsed ? 3 : 5}
       py={7}
       display="flex"
@@ -127,10 +147,7 @@ const HRMSSidebar = ({
         left="10%"
         w="80%"
         h="140px"
-        bgGradient={useColorModeValue(
-          "radial(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%)",
-          "radial(circle, rgba(129, 140, 248, 0.22) 0%, transparent 75%)"
-        )}
+        bgGradient={topGlowBg}
         filter="blur(24px)"
         pointerEvents="none"
         borderRadius="24px"
@@ -143,10 +160,7 @@ const HRMSSidebar = ({
         left="5%"
         w="90%"
         h="180px"
-        bgGradient={useColorModeValue(
-          "radial(circle, rgba(186, 230, 253, 0.20) 0%, transparent 70%)",
-          "radial(circle, rgba(56, 189, 248, 0.15) 0%, transparent 75%)"
-        )}
+        bgGradient={centerGlowBg}
         filter="blur(28px)"
         pointerEvents="none"
         borderRadius="24px"
@@ -225,30 +239,15 @@ const HRMSSidebar = ({
                     px={isCollapsed ? 0 : 4}
                     py={2.5}
                     borderRadius="14px"
-                    bg={
-                      isActive
-                        ? useColorModeValue("rgba(99, 102, 241, 0.16)", "rgba(99, 102, 241, 0.32)")
-                        : "transparent"
-                    }
+                    bg={isActive ? activeItemBg : "transparent"}
                     backdropFilter={isActive ? "blur(16px)" : "none"}
                     color={isActive ? "text-primary" : "text-secondary"}
                     fontWeight={isActive ? "bold" : "medium"}
-                    border={
-                      isActive
-                        ? useColorModeValue("1px solid rgba(99, 102, 241, 0.30)", "1px solid rgba(255, 255, 255, 0.30)")
-                        : "1px solid transparent"
-                    }
-                    boxShadow={
-                      isActive
-                        ? useColorModeValue(
-                            "0 4px 18px rgba(99, 102, 241, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.80)",
-                            "0 4px 20px rgba(99, 102, 241, 0.40), inset 0 1px 0 0 rgba(255, 255, 255, 0.40)"
-                          )
-                        : "none"
-                    }
+                    border={isActive ? activeItemBorder : "1px solid transparent"}
+                    boxShadow={isActive ? activeItemShadow : "none"}
                     _hover={
                       isActive
-                        ? { bg: useColorModeValue("rgba(99, 102, 241, 0.22)", "rgba(99, 102, 241, 0.40)") }
+                        ? { bg: activeItemHoverBg }
                         : { bg: "hover-bg", color: "text-primary", transform: "translateY(-1px)" }
                     }
                     transition="all 0.18s ease"
