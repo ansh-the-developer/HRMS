@@ -1,5 +1,5 @@
 // apps/frontend-ui-monorepo/src/features/home/HomePage.jsx
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import {
   Box,
   SimpleGrid,
@@ -75,6 +75,7 @@ import { useCalendar } from "@/contexts/CalendarContext";
 import { useNotices } from "@/hooks/useHome";
 import { useEmployees } from "@/hooks";
 import { createNotice, updateNotice, deleteNotice } from "@/services/homeApi";
+import { supabase } from "@/lib/supabaseClient";
 
 // Dynamic Sparkline SVG Component
 const Sparkline = ({ points = [14, 16, 12, 18, 22, 20, 24], color = "#818CF8" }) => {
@@ -483,7 +484,92 @@ const HomePage = () => {
   }, [announcementsList, selectedDate]);
 
   /* ---------- BIRTHDAYS DATA ---------- */
-  const { data: employeesData } = useEmployees();
+  const { data: employeesData, isLoading: isEmployeesLoading } = useEmployees();
+
+  /* ---------- LIVE KPI METRICS ---------- */
+  const [todayAttendance, setTodayAttendance] = useState([]);
+  const [todayOnLeave, setTodayOnLeave] = useState(0);
+
+  // Fetch today's attendance records and approved leave count
+  useEffect(() => {
+    const todayStr = new Date().toISOString().slice(0, 10);
+
+    // Attendance for today
+    supabase
+      .from("attendance")
+      .select("employee_id, status")
+      .eq("date", todayStr)
+      .then(({ data, error }) => {
+        if (!error && data) setTodayAttendance(data);
+      });
+
+    // Approved leaves overlapping today
+    supabase
+      .from("leave_requests")
+      .select("id")
+      .eq("status", "Approved")
+      .lte("start_date", todayStr)
+      .gte("end_date", todayStr)
+      .then(({ data, error }) => {
+        if (!error && data) setTodayOnLeave(data.length);
+      });
+  }, []);
+
+  const kpiMetrics = useMemo(() => {
+    const employees = employeesData || [];
+    const activeEmployees = employees.filter(
+      (e) => !e.status || e.status.toLowerCase() !== "archived"
+    );
+    const totalEmployees = activeEmployees.length;
+
+    // Present today: attendance records with status Present/present/Half Day
+    const presentToday = todayAttendance.filter((a) => {
+      const s = (a.status || "").toLowerCase();
+      return s === "present" || s === "half day" || s === "half-day" || s === "late";
+    }).length;
+
+    const onLeave = todayOnLeave;
+
+    // Absentees: total - present - on leave (floor at 0)
+    const absentees = Math.max(0, totalEmployees - presentToday - onLeave);
+
+    // Attendance percentage
+    const attendancePct = totalEmployees > 0
+      ? Math.round((presentToday / totalEmployees) * 100)
+      : 0;
+
+    // On-leave percentage
+    const leavePct = totalEmployees > 0
+      ? Math.round((onLeave / totalEmployees) * 100)
+      : 0;
+
+    // Absentee percentage
+    const absenteePct = totalEmployees > 0
+      ? Math.round((absentees / totalEmployees) * 100)
+      : 0;
+
+    // New joiners this month
+    const now = new Date();
+    const thisMonth = now.getMonth();
+    const thisYear = now.getFullYear();
+    const newJoiners = activeEmployees.filter((e) => {
+      const jd = e.joining_date || e.created_at;
+      if (!jd) return false;
+      const d = new Date(jd);
+      return d.getMonth() === thisMonth && d.getFullYear() === thisYear;
+    }).length;
+
+    return {
+      totalEmployees,
+      presentToday,
+      onLeave,
+      absentees,
+      newJoiners,
+      attendancePct,
+      leavePct,
+      absenteePct,
+    };
+  }, [employeesData, todayAttendance, todayOnLeave]);
 
   const rawBirthdays = [
     { id: "b1", name: "Akhilesh", role: "Software Engineer", birthdate: "2026-07-16", date: "Jul 16" },
@@ -631,10 +717,10 @@ const HomePage = () => {
                     Total Employees
                   </Text>
                   <Text fontSize="2xl" fontWeight="bold" color="text-primary">
-                    128
+                    {kpiMetrics.totalEmployees}
                   </Text>
                   <Text fontSize="10px" color="indigo.400" fontWeight="medium">
-                    ↑ 12 this month
+                    {kpiMetrics.newJoiners > 0 ? `↑ ${kpiMetrics.newJoiners} this month` : "No new joiners"}
                   </Text>
                 </VStack>
                 <Sparkline color="#818CF8" />
@@ -654,10 +740,10 @@ const HomePage = () => {
                     Present Today
                   </Text>
                   <Text fontSize="2xl" fontWeight="bold" color="text-primary">
-                    96
+                    {kpiMetrics.presentToday}
                   </Text>
                   <Text fontSize="10px" color="emerald.400" fontWeight="medium">
-                    75% attendance
+                    {kpiMetrics.attendancePct}% attendance
                   </Text>
                 </VStack>
                 <Sparkline color="#34D399" />
@@ -677,10 +763,10 @@ const HomePage = () => {
                     On Leave
                   </Text>
                   <Text fontSize="2xl" fontWeight="bold" color="text-primary">
-                    18
+                    {kpiMetrics.onLeave}
                   </Text>
                   <Text fontSize="10px" color="amber.400" fontWeight="medium">
-                    14% of staff
+                    {kpiMetrics.leavePct}% of staff
                   </Text>
                 </VStack>
                 <Sparkline color="#FBBF24" />
@@ -700,10 +786,10 @@ const HomePage = () => {
                     Absentees
                   </Text>
                   <Text fontSize="2xl" fontWeight="bold" color="text-primary">
-                    14
+                    {kpiMetrics.absentees}
                   </Text>
                   <Text fontSize="10px" color="rose.400" fontWeight="medium">
-                    11% today
+                    {kpiMetrics.absenteePct}% today
                   </Text>
                 </VStack>
                 <Sparkline color="#F87171" />
@@ -723,7 +809,7 @@ const HomePage = () => {
                     New Joiners
                   </Text>
                   <Text fontSize="2xl" fontWeight="bold" color="text-primary">
-                    8
+                    {kpiMetrics.newJoiners}
                   </Text>
                   <Text fontSize="10px" color="purple.400" fontWeight="medium">
                     This month
