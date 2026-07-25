@@ -348,14 +348,18 @@ const theme = extendTheme({
   }
 });
 
+import { LanguageProvider } from "@/contexts/LanguageContext";
+
 function App() {
   return (
     <ChakraProvider theme={theme}>
-      <CalendarProvider>
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </CalendarProvider>
+      <LanguageProvider>
+        <CalendarProvider>
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </CalendarProvider>
+      </LanguageProvider>
     </ChakraProvider>
   );
 }

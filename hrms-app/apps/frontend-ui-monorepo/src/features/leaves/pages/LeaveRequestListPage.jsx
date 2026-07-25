@@ -312,9 +312,16 @@ function LeaveRequestListPage() {
   const handleExportCSV = () => {
     const headers = ["Emp ID", "Name", "Leave Type", "Start", "End", "Days", "Status", "Submitted", "Admin Note"];
 
+    // Sort leave requests chronologically (oldest to newest) by submission date
+    const sortedRequests = [...filteredRequests].sort((a, b) => {
+      const dateA = new Date(a.submitted_raw || a.start_date || 0);
+      const dateB = new Date(b.submitted_raw || b.start_date || 0);
+      return dateA - dateB;
+    });
+
     const csvRows = [
       headers.join(","),
-      ...filteredRequests.map((r) => {
+      ...sortedRequests.map((r) => {
         const empId = r.emp_code || "";
         const name = r.name || "";
         const type = r.type || "";
@@ -599,18 +606,24 @@ function LeaveRequestListPage() {
 
                     {/* Evidence */}
                     <Td py={4}>
-                      <HStack
-                        spacing={1}
-                        color="accent"
-                        cursor="pointer"
-                        _hover={{ textDecoration: "underline" }}
-                        onClick={() => handleViewDoc(req)}
-                      >
-                        <FiPaperclip size={12} />
-                        <Text fontSize="xs" fontWeight="medium">
-                          View Doc
+                      {req.document_url || req.evidence_url || (req.evidence && req.evidence !== "N/A" && req.evidence !== "None") ? (
+                        <HStack
+                          spacing={1}
+                          color="accent"
+                          cursor="pointer"
+                          _hover={{ textDecoration: "underline" }}
+                          onClick={() => handleViewDoc(req)}
+                        >
+                          <FiPaperclip size={12} />
+                          <Text fontSize="xs" fontWeight="medium">
+                            View Doc
+                          </Text>
+                        </HStack>
+                      ) : (
+                        <Text fontSize="xs" color="text-muted">
+                          N/A
                         </Text>
-                      </HStack>
+                      )}
                     </Td>
 
                     {/* Action */}

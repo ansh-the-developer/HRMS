@@ -28,6 +28,13 @@ import {
   Spinner,
   Icon,
   Heading,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  ModalCloseButton,
 } from "@chakra-ui/react";
 import { useRole } from "@/hooks/useRole";
 import {
@@ -103,35 +110,39 @@ export function ComplaintCenterPage() {
     }
   };
 
-  const handleResolve = async (id) => {
-    try {
-      await updateStatusMutation.mutateAsync({ id, status: "Resolved" });
-      toast({
-        title: "Complaint Resolved",
-        description: "Complaint has been archived.",
-        status: "success",
-        duration: 2000,
-        isClosable: true,
-      });
-    } catch (err) {
-      toast({
-        title: "Action Failed",
-        description: err.message,
-        status: "error",
-      });
-    }
+  // Resolution Modal State
+  const [resolutionTarget, setResolutionTarget] = useState(null); // { complaint, targetStatus }
+  const [resolutionNotes, setResolutionNotes] = useState("");
+
+  const openResolutionModal = (complaint, targetStatus) => {
+    setResolutionTarget({ complaint, targetStatus });
+    setResolutionNotes("");
   };
 
-  const handleDismiss = async (id) => {
+  const closeResolutionModal = () => {
+    setResolutionTarget(null);
+    setResolutionNotes("");
+  };
+
+  const handleConfirmResolution = async () => {
+    if (!resolutionTarget) return;
+    const { complaint, targetStatus } = resolutionTarget;
+
     try {
-      await updateStatusMutation.mutateAsync({ id, status: "Dismissed" });
+      await updateStatusMutation.mutateAsync({
+        id: complaint.id,
+        status: targetStatus,
+        resolution_notes: resolutionNotes.trim() || null,
+      });
+
       toast({
-        title: "Complaint Dismissed",
-        description: "Complaint was deleted from active dashboard.",
-        status: "info",
-        duration: 2000,
+        title: targetStatus === "Resolved" ? "Complaint Resolved" : "Complaint Dismissed",
+        description: `Case ${complaint.case_id} status updated to ${targetStatus}.`,
+        status: targetStatus === "Resolved" ? "success" : "info",
+        duration: 3000,
         isClosable: true,
       });
+      closeResolutionModal();
     } catch (err) {
       toast({
         title: "Action Failed",
@@ -406,13 +417,12 @@ export function ComplaintCenterPage() {
                             </Td>
                             <Td py={4} fontSize="xs" color="text-secondary" maxW="400px" whiteSpace="normal">
                               {c.description}
-                            </Td>
-                            <Td py={4} textAlign="center">
+                            </Td>                             <Td py={4} textAlign="center">
                               <HStack justify="center" spacing={2}>
-                                <Button size="xs" colorScheme="green" onClick={() => handleResolve(c.id)}>
+                                <Button size="xs" colorScheme="green" onClick={() => openResolutionModal(c, "Resolved")}>
                                   Resolve (Archive)
                                 </Button>
-                                <Button size="xs" colorScheme="red" variant="outline" onClick={() => handleDismiss(c.id)}>
+                                <Button size="xs" colorScheme="red" variant="outline" onClick={() => openResolutionModal(c, "Dismissed")}>
                                   Dismiss
                                 </Button>
                               </HStack>
@@ -478,6 +488,61 @@ export function ComplaintCenterPage() {
           </Tabs>
         )}
       </Box>
+
+      {/* Resolution Notes Prompt Modal */}
+      <Modal isOpen={!!resolutionTarget} onClose={closeResolutionModal} isCentered size="md">
+        <ModalOverlay bg="blackAlpha.500" backdropFilter="blur(4px)" />
+        <ModalContent borderRadius="2xl" mx={4} overflow="hidden">
+          <ModalHeader pt={6} px={6} pb={2}>
+            <Heading size="md" color="text-primary">
+              {resolutionTarget?.targetStatus === "Resolved" ? "Resolve Complaint" : "Dismiss Complaint"}
+            </Heading>
+            <Text fontSize="xs" color="text-muted" mt={1}>
+              Case ID: {resolutionTarget?.complaint?.case_id}
+            </Text>
+          </ModalHeader>
+          <ModalCloseButton />
+
+          <ModalBody px={6} py={4}>
+            <VStack spacing={4} align="stretch">
+              <Text fontSize="sm" color="text-secondary">
+                {resolutionTarget?.targetStatus === "Resolved"
+                  ? "Provide resolution details or action notes taken to address this complaint."
+                  : "State the reason for dismissing this complaint."}
+              </Text>
+              <FormControl>
+                <FormLabel fontSize="xs" fontWeight="bold" color="text-secondary">
+                  Resolution Notes / Summary
+                </FormLabel>
+                <Textarea
+                  placeholder="e.g. Discussed with team lead and updated workplace guidelines..."
+                  rows={4}
+                  borderRadius="xl"
+                  value={resolutionNotes}
+                  onChange={(e) => setResolutionNotes(e.target.value)}
+                />
+              </FormControl>
+            </VStack>
+          </ModalBody>
+
+          <ModalFooter px={6} pb={6} pt={2}>
+            <HStack spacing={3} w="full" justify="flex-end">
+              <Button variant="ghost" size="sm" onClick={closeResolutionModal}>
+                Cancel
+              </Button>
+              <Button
+                size="sm"
+                colorScheme={resolutionTarget?.targetStatus === "Resolved" ? "green" : "red"}
+                borderRadius="xl"
+                onClick={handleConfirmResolution}
+                isLoading={updateStatusMutation.isPending}
+              >
+                Confirm {resolutionTarget?.targetStatus}
+              </Button>
+            </HStack>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
     </DashboardLayout>
   );
 }

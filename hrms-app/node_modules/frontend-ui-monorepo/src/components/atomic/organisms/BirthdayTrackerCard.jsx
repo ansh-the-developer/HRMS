@@ -36,6 +36,8 @@ const BirthdayTrackerCard = ({ minH }) => {
           name: emp.name,
           role: emp.designation || emp.department || "Employee",
           date: `${birthDate.getDate()} ${birthDate.toLocaleDateString("en-GB", { month: "short" })}`,
+          avatarUrl: emp.avatar_url || emp.profile_picture,
+          birthdate: emp.birthdate,
         };
       })
       ?.slice(0, 10) || [];
@@ -59,18 +61,16 @@ const BirthdayTrackerCard = ({ minH }) => {
       <Flex direction="column" h="100%">
         <Flex justify="space-between" align="center" mb={2}>
           <SectionTitle>Birthday Tracker 🎂</SectionTitle>
-          <Badge colorScheme="green" fontSize="xs">Central Cache</Badge>
+          <Badge colorScheme="purple" fontSize="xs" px={2.5} py={0.5} borderRadius="full">
+            {monthName}
+          </Badge>
         </Flex>
-        
-        <Text fontSize="sm" color="text-muted" mb={3} fontWeight="medium">
-          {monthName}
-        </Text>
 
         <VStack align="stretch" spacing={2} flex="1">
           {birthdays.length === 0 ? (
             <Flex direction="column" align="center" py={8} gap={2}>
               <Text fontSize="sm" color="text-muted">No birthdays</Text>
-              <Text fontSize="xs" color="text-muted">in this month</Text>
+              <Text fontSize="xs" color="text-muted">in {monthName}</Text>
             </Flex>
           ) : (
             birthdays.map((b, index) => (
@@ -79,6 +79,8 @@ const BirthdayTrackerCard = ({ minH }) => {
                 name={b.name}
                 role={b.role}
                 date={b.date}
+                avatarUrl={b.avatarUrl}
+                birthdate={b.birthdate}
               />
             ))
           )}

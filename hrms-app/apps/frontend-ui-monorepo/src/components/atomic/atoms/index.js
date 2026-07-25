@@ -6,3 +6,4 @@ export { default as Logo } from './Logo.jsx';
 export { default as SectionTitle } from './SectionTitle.jsx';
 export { default as SidebarToggleButton } from './SidebarToggleButton.jsx';
 export { default as StatusDot } from './StatusDot.jsx';
+export { default as EmployeeAvatar, getAvatarUrl, isBirthdayToday } from './EmployeeAvatar.jsx';

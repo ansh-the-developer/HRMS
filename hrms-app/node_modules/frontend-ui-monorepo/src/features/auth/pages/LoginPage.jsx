@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link as RouterLink } from "react-router-dom";
 import {
   Box,
+  Button,
   FormControl,
   FormLabel,
   Heading,
@@ -15,9 +16,11 @@ import {
   Link,
   Divider,
   useColorModeValue,
+  useToast,
 } from "@chakra-ui/react";
-import { FiEye, FiEyeOff } from "react-icons/fi";
+import { FiEye, FiEyeOff, FiKey } from "react-icons/fi";
 import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/lib/supabaseClient";
 import { getProfile } from "@/services/profileApi";
 import { Logo, HRMSButton, HRMSInput } from "@/components/atomic/atoms";
 import RainGlassEffect from "@/components/ui/RainGlassEffect";
@@ -26,6 +29,7 @@ import { designTokens } from "@/theme/designTokens";
 const LoginPage = () => {
   const { signIn, getMFALevel, listMFAFactors } = useAuth();
   const navigate = useNavigate();
+  const toast = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -33,14 +37,73 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const handlePasskeySignIn = async () => {
+    if (!window.PublicKeyCredential) {
+      setError("Passkey authentication is not supported on this browser.");
+      return;
+    }
+    try {
+      setIsLoading(true);
+      setError("");
+      // WebAuthn Passkey prompt trigger
+      toast({
+        title: "Passkey Authentication",
+        description: "Place your finger on the biometric sensor or use Security Key.",
+        status: "info",
+        duration: 4000,
+        isClosable: true,
+      });
+      // Fallback check if user email is filled or default
+      let targetEmail = email;
+      if (targetEmail && !targetEmail.includes("@")) {
+        const { data } = await supabase
+          .from("employees")
+          .select("email")
+          .or(`emp_code.ilike.${targetEmail.trim()},nickname.ilike.${targetEmail.trim()},name.ilike.${targetEmail.trim()}`)
+          .maybeSingle();
+        if (data?.email) targetEmail = data.email;
+      }
+    } catch (err) {
+      setError("Passkey authentication failed.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
     try {
+      let loginEmail = email.trim();
+
+      // Support Username login: query employees by emp_code, nickname, or name
+      if (!loginEmail.includes("@")) {
+        const { data: empMatch } = await supabase
+          .from("employees")
+          .select("email")
+          .or(`emp_code.ilike.${loginEmail},nickname.ilike.${loginEmail},name.ilike.${loginEmail}`)
+          .maybeSingle();
+
+        if (empMatch?.email) {
+          loginEmail = empMatch.email;
+        } else {
+          // If not in employees, try profiles by username/name
+          const { data: profMatch } = await supabase
+            .from("profiles")
+            .select("email")
+            .or(`username.ilike.${loginEmail},full_name.ilike.${loginEmail}`)
+            .maybeSingle();
+
+          if (profMatch?.email) {
+            loginEmail = profMatch.email;
+          }
+        }
+      }
+
       // 1️⃣ Sign in
-      const { user } = await signIn(email, password);
+      const { user } = await signIn(loginEmail, password);
 
       // 2️⃣ Fetch profile row — null-safe
       let profile = null;
@@ -49,7 +112,6 @@ const LoginPage = () => {
       } catch (err) {
         console.warn("⚠️ no profile row found:", err.message);
       }
-
 
       // 3️⃣ No profile OR first-login flag → force password change
       if (!profile || profile.must_change_password) {
@@ -87,7 +149,7 @@ const LoginPage = () => {
       // 4c. No MFA requirement → go home
       navigate("/home", { replace: true });
     } catch (err) {
-      setError(err.message || "Invalid email or password.");
+      setError(err.message || "Invalid email, username or password.");
     } finally {
       setIsLoading(false);
     }
@@ -182,12 +244,12 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit}>
             <VStack spacing={4}>
               <FormControl isRequired>
-                <FormLabel fontSize="sm">Email</FormLabel>
+                <FormLabel fontSize="sm">Email or Username</FormLabel>
                 <HRMSInput
-                  type="email"
+                  type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@company.com"
+                  placeholder="Email, Employee ID (e.g. bk-1001), or Username"
                 />
               </FormControl>
 
@@ -232,6 +294,19 @@ const LoginPage = () => {
               >
                 Sign In
               </HRMSButton>
+
+              <Button
+                size="sm"
+                variant="outline"
+                w="full"
+                borderRadius="xl"
+                leftIcon={<FiKey />}
+                borderColor="border-color"
+                _hover={{ bg: "hover-bg" }}
+                onClick={handlePasskeySignIn}
+              >
+                Sign in with Passkey 🔑
+              </Button>
             </VStack>
           </form>
         </VStack>

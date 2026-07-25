@@ -3,10 +3,11 @@
 import React from "react";
 import {
   Text, VStack, Spinner, useDisclosure, useToast,
-  Flex, Box, Badge, HStack, Button,
+  Flex, Box, Badge, HStack, Button, IconButton,
   Modal, ModalOverlay, ModalContent, ModalHeader,
   ModalBody, ModalFooter, Input, Textarea, Checkbox,
 } from "@chakra-ui/react";
+import { FiEdit2, FiTrash2, FiPin } from "react-icons/fi";
 import HRMSCard from "@/components/atomic/molecules/HRMSCard";
 import SectionTitle from "@/components/atomic/atoms/SectionTitle";
 import HRMSButton from "@/components/atomic/atoms/HRMSButton";
@@ -184,34 +185,36 @@ const NoticeBoardCard = () => {
                   </Box>
 
                   {isHR && (
-                    <VStack spacing={1} align="flex-end" flexShrink={0}>
-                      <Button
+                    <HStack spacing={1} align="center" flexShrink={0}>
+                      <IconButton
+                        aria-label={notice.pinned ? "Unpin notice" : "Pin notice"}
+                        icon={<FiPin />}
                         size="xs"
                         variant={notice.pinned ? "solid" : "ghost"}
                         colorScheme={notice.pinned ? "orange" : "gray"}
                         onClick={() => togglePin(notice)}
                         isLoading={saveMutation.isPending}
-                      >
-                        {notice.pinned ? "Unpin" : "Pin"}
-                      </Button>
-                      <Button
+                      />
+                      <IconButton
+                        aria-label="Edit notice"
+                        icon={<FiEdit2 />}
                         size="xs"
                         variant="ghost"
-                        colorScheme="blue"
+                        color="text-secondary"
+                        _hover={{ bg: "hover-bg", color: "accent" }}
                         onClick={() => openEditModal(notice)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
+                      />
+                      <IconButton
+                        aria-label="Delete notice"
+                        icon={<FiTrash2 />}
                         size="xs"
                         variant="ghost"
-                        colorScheme="red"
+                        color="red.400"
+                        _hover={{ bg: "rgba(239, 68, 68, 0.15)" }}
                         onClick={() => handleDelete(notice)}
                         isLoading={deleteMutation.isPending}
-                      >
-                        Delete
-                      </Button>
-                    </VStack>
+                      />
+                    </HStack>
                   )}
                 </Flex>
               </Box>

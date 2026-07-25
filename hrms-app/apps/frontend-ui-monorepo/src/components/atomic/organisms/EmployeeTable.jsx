@@ -1,5 +1,4 @@
-/* eslint-disable no-unused-vars */
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Box,
   Table,
@@ -8,34 +7,23 @@ import {
   Tr,
   Th,
   Td,
-  Avatar,
   Text,
   HStack,
-  Badge,
   IconButton,
   VStack,
   Spinner,
   Button,
+  Input,
+  InputGroup,
+  InputLeftElement,
+  Switch,
+  FormControl,
+  FormLabel,
+  Flex,
 } from "@chakra-ui/react";
-import { FiTrash2, FiEdit2 } from "react-icons/fi";
+import { FiTrash2, FiEdit2, FiSearch } from "react-icons/fi";
 import DeleteEmployeeModal from "@/features/employee/components/DeleteEmployeeModal";
-
-const AVATAR_COLORS = [
-  ["purple.100", "purple.700"],
-  ["blue.100", "blue.700"],
-  ["green.100", "green.700"],
-  ["orange.100", "orange.700"],
-  ["pink.100", "pink.700"],
-  ["teal.100", "teal.700"],
-  ["cyan.100", "cyan.700"],
-  ["red.100", "red.700"],
-  ["yellow.100", "yellow.700"],
-];
-
-const getAvatarColors = (name = "") => {
-  const idx = (name.charCodeAt(0) || 0) % AVATAR_COLORS.length;
-  return AVATAR_COLORS[idx];
-};
+import EmployeeAvatar from "@/components/atomic/atoms/EmployeeAvatar";
 
 const getFormattedEmpId = (emp) => {
   const code = emp.emp_code || emp.id?.slice(0, 8);
@@ -67,6 +55,32 @@ const EmployeeTable = ({
   isReadOnly = false,
 }) => {
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [showAlias, setShowAlias] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [deptFilter, setDeptFilter] = useState("");
+  const [locFilter, setLocFilter] = useState("");
+
+  const filteredEmployees = useMemo(() => {
+    return employees.filter((emp) => {
+      const q = searchTerm.toLowerCase().trim();
+      const matchSearch =
+        !q ||
+        (emp.name && emp.name.toLowerCase().includes(q)) ||
+        (emp.nickname && emp.nickname.toLowerCase().includes(q)) ||
+        (emp.email && emp.email.toLowerCase().includes(q)) ||
+        (emp.emp_code && emp.emp_code.toLowerCase().includes(q));
+
+      const matchDept =
+        !deptFilter ||
+        (emp.department && emp.department.toLowerCase().includes(deptFilter.toLowerCase().trim()));
+
+      const matchLoc =
+        !locFilter ||
+        (emp.work_location && emp.work_location.toLowerCase().includes(locFilter.toLowerCase().trim()));
+
+      return matchSearch && matchDept && matchLoc;
+    });
+  }, [employees, searchTerm, deptFilter, locFilter]);
 
   if (isLoading) {
     return (
@@ -92,13 +106,76 @@ const EmployeeTable = ({
   return (
     <>
       <Box bg="card-bg" borderRadius="2xl" boxShadow="sm" overflow="hidden">
+        {/* Table Filter Controls Header */}
+        <Flex
+          direction={{ base: "column", md: "row" }}
+          justify="space-between"
+          align={{ base: "stretch", md: "center" }}
+          gap={3}
+          p={4}
+          borderBottom="1px solid"
+          borderColor="border-color"
+          bg="app-bg-secondary"
+        >
+          <HStack spacing={3} flex={1} wrap="wrap">
+            <InputGroup size="sm" maxW="240px">
+              <InputLeftElement pointerEvents="none" color="text-muted">
+                <FiSearch size={14} />
+              </InputLeftElement>
+              <Input
+                placeholder="Search name, ID, email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                borderRadius="xl"
+                bg="card-bg"
+                borderColor="border-color"
+              />
+            </InputGroup>
+
+            <Input
+              size="sm"
+              maxW="160px"
+              placeholder="Filter Dept..."
+              value={deptFilter}
+              onChange={(e) => setDeptFilter(e.target.value)}
+              borderRadius="xl"
+              bg="card-bg"
+              borderColor="border-color"
+            />
+
+            <Input
+              size="sm"
+              maxW="160px"
+              placeholder="Filter Location..."
+              value={locFilter}
+              onChange={(e) => setLocFilter(e.target.value)}
+              borderRadius="xl"
+              bg="card-bg"
+              borderColor="border-color"
+            />
+          </HStack>
+
+          {/* Alias Name Toggle Switch */}
+          <FormControl display="flex" alignItems="center" w="auto">
+            <FormLabel htmlFor="alias-toggle" mb="0" fontSize="xs" color="text-secondary" fontWeight="semibold">
+              Show Nickname/Alias
+            </FormLabel>
+            <Switch
+              id="alias-toggle"
+              size="sm"
+              colorScheme="purple"
+              isChecked={showAlias}
+              onChange={(e) => setShowAlias(e.target.checked)}
+            />
+          </FormControl>
+        </Flex>
+
         <Box overflowX="auto">
           <Table variant="simple" size="md">
             <Thead>
               <Tr borderBottom="1px solid" borderColor="border-color">
                 <ColHeader>EMP ID</ColHeader>
-                <ColHeader>Nickname</ColHeader>
-                <ColHeader>Official Identity</ColHeader>
+                <ColHeader>{showAlias ? "Alias / Nickname" : "Official Name"}</ColHeader>
                 <ColHeader>Department</ColHeader>
                 <ColHeader>Location</ColHeader>
                 {!isReadOnly && <ColHeader>Actions</ColHeader>}
@@ -106,22 +183,22 @@ const EmployeeTable = ({
             </Thead>
 
             <Tbody>
-              {employees.length === 0 ? (
+              {filteredEmployees.length === 0 ? (
                 <Tr>
                   <Td
-                    colSpan={isReadOnly ? 5 : 6}
+                    colSpan={isReadOnly ? 4 : 5}
                     py={16}
                     textAlign="center"
                     borderColor="transparent"
                   >
                     <VStack spacing={2} color="text-muted">
-                      <Text fontSize="sm">No employees found</Text>
+                      <Text fontSize="sm">No matching employees found</Text>
                     </VStack>
                   </Td>
                 </Tr>
               ) : (
-                employees.map((emp) => {
-                  const [bgColor, textColor] = getAvatarColors(emp.name);
+                filteredEmployees.map((emp) => {
+                  const displayName = showAlias ? (emp.nickname || emp.name) : emp.name;
 
                   return (
                     <Tr
@@ -145,27 +222,15 @@ const EmployeeTable = ({
                         </Text>
                       </Td>
 
-                      {/* Nickname */}
-                      <Td py={4} borderColor="border-color">
-                        <Text
-                          fontSize="sm"
-                          color="text-secondary"
-                          fontStyle={emp.nickname ? "italic" : "normal"}
-                        >
-                          {emp.nickname || "—"}
-                        </Text>
-                      </Td>
-
-                      {/* Official Identity */}
+                      {/* Name / Alias + Avatar */}
                       <Td py={4} borderColor="border-color" minW="220px">
                         <HStack spacing={3}>
-                          <Avatar
+                          <EmployeeAvatar
                             size="sm"
+                            employee={emp}
                             name={emp.name}
-                            bg={bgColor}
-                            color={textColor}
-                            fontWeight="bold"
-                            fontSize="xs"
+                            src={emp.avatar_url || emp.profile_picture}
+                            birthdate={emp.birthdate}
                           />
                           <VStack spacing={0} align="start">
                             <Text
@@ -174,7 +239,7 @@ const EmployeeTable = ({
                               color="text-primary"
                               noOfLines={1}
                             >
-                              {emp.name}
+                              {displayName}
                             </Text>
                             <Text fontSize="xs" color="text-muted">
                               {emp.email || "—"}

@@ -16,10 +16,12 @@ const DeleteEmployeeModal = ({ isOpen, onClose, employee }) => {
   const [totp, setTotp] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [totpError, setTotpError] = useState(false);
+  const [isPermanent, setIsPermanent] = useState(false);
 
   const handleClose = () => {
     setTotp("");
     setTotpError(false);
+    setIsPermanent(false);
     onClose();
   };
 
@@ -45,20 +47,21 @@ const DeleteEmployeeModal = ({ isOpen, onClose, employee }) => {
 
     setIsLoading(true);
     try {
-      await deleteEmployee(employee.id);
-      // ✅ Invalidate React Query cache → table auto-refreshes
+      await deleteEmployee(employee.id, { permanent: isPermanent });
       queryClient.invalidateQueries({ queryKey: ["employees"] });
       toast({
-        title: "Employee deleted",
-        description: `${employee.name}'s record has been permanently removed.`,
-        status: "success",
+        title: isPermanent ? "Employee Deleted" : "Employee Archived",
+        description: isPermanent
+          ? `${employee.name}'s record has been permanently removed.`
+          : `${employee.name} moved to Compliance Archive (7-day retention).`,
+        status: isPermanent ? "info" : "success",
         duration: 3000,
         isClosable: true,
       });
       handleClose();
     } catch (err) {
       toast({
-        title: "Delete failed",
+        title: "Action failed",
         description: err.message,
         status: "error",
         duration: 5000,

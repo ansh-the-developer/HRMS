@@ -48,10 +48,11 @@ const getDayName = (dateStr) => {
 };
 
 const STATUS_CONFIG = {
-  "Present":  { color: "#34D399", bg: "rgba(16, 185, 129, 0.15)" },
-  "Absent":   { color: "#F87171", bg: "rgba(239, 68, 68, 0.15)" },
-  "On Leave": { color: "#818CF8", bg: "rgba(99, 102, 241, 0.15)" },
-  "Off Day":  { color: "#FBBF24", bg: "rgba(245, 158, 11, 0.15)" },
+  "Present":         { color: "#34D399", bg: "rgba(16, 185, 129, 0.15)" },
+  "Absent":          { color: "#F87171", bg: "rgba(239, 68, 68, 0.15)" },
+  "On Leave":        { color: "#818CF8", bg: "rgba(99, 102, 241, 0.15)" },
+  "Off Day":         { color: "#FBBF24", bg: "rgba(245, 158, 11, 0.15)" },
+  "Not Yet Joined":  { color: "#9CA3AF", bg: "rgba(156, 163, 175, 0.15)" },
 };
 
 const StatusBadge = ({ status }) => {
@@ -64,8 +65,20 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-const StatCard = ({ icon, label, value, color }) => (
-  <Box bg="card-bg" borderRadius="xl" p={5} shadow="sm" border="1px solid" borderColor="border-color">
+const StatCard = ({ icon, label, value, color, isSelected, onClick }) => (
+  <Box
+    bg="card-bg"
+    borderRadius="xl"
+    p={5}
+    shadow="sm"
+    border="1px solid"
+    borderColor={isSelected ? color : "border-color"}
+    boxShadow={isSelected ? `0 0 0 2px ${color}` : "none"}
+    cursor="pointer"
+    _hover={{ transform: "translateY(-1px)", bg: "hover-bg" }}
+    transition="all 0.15s ease"
+    onClick={onClick}
+  >
     <HStack spacing={3} mb={2}>
       <Center w="36px" h="36px" borderRadius="lg" bg={color + "15"}>
         <Box as={icon} fontSize="17px" color={color} />
@@ -87,6 +100,7 @@ export default function EmployeeAttendanceDashboard() {
   const [logs, setLogs]           = useState([]);
   const [loading, setLoading]     = useState(true);
   const [noRecord, setNoRecord]   = useState(false);
+  const [statusFilter, setStatusFilter] = useState(null);
 
   useEffect(() => {
     if (!user?.id && !user?.email) return;
@@ -124,6 +138,7 @@ export default function EmployeeAttendanceDashboard() {
 
   const totalDays = new Date(viewYear, viewMonth + 1, 0).getDate();
   const today = new Date().toISOString().split("T")[0];
+  const joiningDate = empRecord?.joining_date || empRecord?.created_at?.split("T")[0];
 
   const calendarRows = Array.from({ length: totalDays }, (_, i) => {
     const mm = String(viewMonth + 1).padStart(2, "0");
@@ -133,20 +148,34 @@ export default function EmployeeAttendanceDashboard() {
     const dow = new Date(dateStr + "T00:00:00").getDay();
     const isWeekend = dow === 0 || dow === 6;
     const isFuture = dateStr > today;
+    const isBeforeJoining = joiningDate && dateStr < joiningDate;
+
+    let computedStatus = log?.status || (isFuture ? "Future" : isWeekend ? "Off Day" : "Absent");
+    if (isBeforeJoining) computedStatus = "Not Yet Joined";
+
     return {
       date: dateStr,
       isWeekend,
       isFuture,
+      isBeforeJoining,
       in_time: log?.in_time || null,
       out_time: log?.out_time || null,
-      status: log?.status || (isFuture ? "Future" : isWeekend ? "Off Day" : "Absent"),
+      status: computedStatus,
     };
   });
 
+  const displayRows = statusFilter
+    ? calendarRows.filter((r) => r.status === statusFilter)
+    : calendarRows;
+
   const presentCount = logs.filter((l) => l.status === "Present").length;
-  const absentCount  = calendarRows.filter((r) => !r.isFuture && !r.isWeekend && r.status === "Absent").length;
+  const absentCount  = calendarRows.filter((r) => !r.isFuture && !r.isWeekend && !r.isBeforeJoining && r.status === "Absent").length;
   const leaveCount   = logs.filter((l) => l.status === "On Leave").length;
   const offCount     = calendarRows.filter((r) => r.isWeekend).length;
+
+  const toggleFilter = (label) => {
+    setStatusFilter((prev) => (prev === label ? null : label));
+  };
 
   const prevMonth = () => {
     if (viewMonth === 0) { setViewMonth(11); setViewYear(viewYear - 1); }
@@ -188,12 +217,40 @@ export default function EmployeeAttendanceDashboard() {
           </VStack>
         </Flex>
 
-        {/* Stats */}
+        {/* Interactive Filter Stat Cards */}
         <SimpleGrid columns={{ base: 2, md: 4 }} spacing={4} mb={6}>
-          <StatCard icon={FiCheckCircle}        label="Present"  value={presentCount} color="#10B981" />
-          <StatCard icon={FiXCircle}            label="Absent"   value={absentCount}  color="#EF4444" />
-          <StatCard icon={MdOutlineBeachAccess} label="On Leave" value={leaveCount}   color="#6366F1" />
-          <StatCard icon={FiSun}                label="Off Days" value={offCount}     color="#F59E0B" />
+          <StatCard
+            icon={FiCheckCircle}
+            label="Present"
+            value={presentCount}
+            color="#10B981"
+            isSelected={statusFilter === "Present"}
+            onClick={() => toggleFilter("Present")}
+          />
+          <StatCard
+            icon={FiXCircle}
+            label="Absent"
+            value={absentCount}
+            color="#EF4444"
+            isSelected={statusFilter === "Absent"}
+            onClick={() => toggleFilter("Absent")}
+          />
+          <StatCard
+            icon={MdOutlineBeachAccess}
+            label="On Leave"
+            value={leaveCount}
+            color="#6366F1"
+            isSelected={statusFilter === "On Leave"}
+            onClick={() => toggleFilter("On Leave")}
+          />
+          <StatCard
+            icon={FiSun}
+            label="Off Days"
+            value={offCount}
+            color="#F59E0B"
+            isSelected={statusFilter === "Off Day"}
+            onClick={() => toggleFilter("Off Day")}
+          />
         </SimpleGrid>
 
         {/* Log Table - Restyled to Japanese Glass Design System */}
@@ -244,7 +301,7 @@ export default function EmployeeAttendanceDashboard() {
                   </Tr>
                 </Thead>
                 <Tbody>
-                  {calendarRows.map((row) => {
+                  {displayRows.map((row) => {
                     const isToday = row.date === today;
                     const hours = calcHours(row.in_time, row.out_time);
                     return (

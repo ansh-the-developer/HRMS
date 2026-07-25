@@ -9,6 +9,7 @@ import {
   useToast,
   VStack,
   Button,
+  IconButton,
   Modal,
   ModalOverlay,
   ModalContent,
@@ -18,6 +19,7 @@ import {
   Input,
   Select,
 } from "@chakra-ui/react";
+import { FiEdit2, FiTrash2, FiDownload } from "react-icons/fi";
 import HRMSCard from "@/components/atomic/molecules/HRMSCard";
 import SectionTitle from "@/components/atomic/atoms/SectionTitle";
 import InfoRow from "@/components/atomic/molecules/InfoRow";
@@ -213,25 +215,27 @@ const HolidaysCard = () => {
                   />
 
                   {isHR && (
-                    <VStack spacing={1} align="flex-end" flexShrink={0}>
-                      <Button
+                    <HStack spacing={1} flexShrink={0}>
+                      <IconButton
+                        aria-label="Edit Holiday"
+                        icon={<FiEdit2 />}
                         size="xs"
                         variant="ghost"
-                        colorScheme="blue"
+                        color="text-secondary"
+                        _hover={{ bg: "hover-bg", color: "accent" }}
                         onClick={() => openEditModal(holiday)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
+                      />
+                      <IconButton
+                        aria-label="Delete Holiday"
+                        icon={<FiTrash2 />}
                         size="xs"
                         variant="ghost"
-                        colorScheme="red"
+                        color="red.400"
+                        _hover={{ bg: "rgba(239, 68, 68, 0.15)" }}
                         onClick={() => handleDelete(holiday)}
                         isLoading={deleteMutation.isPending}
-                      >
-                        Delete
-                      </Button>
-                    </VStack>
+                      />
+                    </HStack>
                   )}
                 </Flex>
               ))}
@@ -239,11 +243,37 @@ const HolidaysCard = () => {
           )}
         </Box>
 
-        <HStack spacing={4}>
-          <LegendItem label="Public" color="purple.500" />
-          <LegendItem label="Company" color="blue.500" />
-          <LegendItem label="Optional" color="green.500" />
-        </HStack>
+        <Flex justify="space-between" align="center" pt={2} borderTop="1px solid" borderColor="border-color">
+          <HStack spacing={4}>
+            <LegendItem label="Public" color="red.400" />
+            <LegendItem label="Company" color="purple.400" />
+            <LegendItem label="Optional" color="amber.400" />
+          </HStack>
+
+          <HStack spacing={2}>
+            <Button
+              size="xs"
+              variant="outline"
+              leftIcon={<FiDownload />}
+              borderRadius="lg"
+              borderColor="border-color"
+              _hover={{ bg: "hover-bg" }}
+              onClick={() => {
+                const csvHeader = "Date,Name,Type\n";
+                const csvRows = holidays.map((h) => `"${h.date}","${h.name}","${h.type}"`).join("\n");
+                const blob = new Blob([csvHeader + csvRows], { type: "text/csv" });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = "holidays.csv";
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
+            >
+              Export CSV
+            </Button>
+          </HStack>
+        </Flex>
       </HRMSCard>
 
       {isHR && (

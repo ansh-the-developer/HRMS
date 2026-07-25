@@ -29,6 +29,7 @@ import {
   createEmployeeProfile,
   updateEmployeeProfile,
   uploadFile,
+  generateNextEmployeeId,
 } from "@/services/employeeApi";
 import { useRole } from "@/hooks/useRole";
 
@@ -174,22 +175,35 @@ const UploadBox = ({
 
 const INITIAL_FORM = {
   name: "",
+  nickname: "",
   email: "",
   department: "",
   designation: "",
   birthdate: "",
+  gender: "Male",
+  qualification: "",
+  joining_date: new Date().toISOString().split("T")[0],
 };
 
 const INITIAL_UI = {
   marital_status: "Single",
+  country_code: "+91",
   personal_number: "",
   present_address: "",
+  permanent_address: "",
   emp_type: "Permanent",
   location: "",
   emp_id: "",
   monthly_ctc: "",
+  basic_salary: "",
+  hra: "",
+  allowances: "",
+  pf: "",
+  esi: "",
   blood_group: "",
-  emergency_contact: "",
+  emergency_contact_name: "",
+  emergency_contact_phone: "",
+  emergency_contact_relation: "",
   epfo_uan: "",
   pran: "",
   esic_ip: "",
@@ -201,9 +215,8 @@ const INITIAL_UI = {
   secondary_bank_name: "",
   secondary_account_number: "",
   secondary_ifsc: "",
-  portal_password: "",
+  password: "",
   role: "employee",
-  temp_password: "",
 };
 
 const INITIAL_FILES = {
@@ -290,6 +303,9 @@ const EmployeeMasterForm = ({ isOpen, onClose, employee, onSuccess }) => {
       setSignPreview(employee.documents?.signature_url || "");
     } else {
       resetAll();
+      generateNextEmployeeId().then((nextId) => {
+        setUi((prev) => ({ ...prev, emp_id: nextId }));
+      });
     }
   }, [employee, isOpen]);
 

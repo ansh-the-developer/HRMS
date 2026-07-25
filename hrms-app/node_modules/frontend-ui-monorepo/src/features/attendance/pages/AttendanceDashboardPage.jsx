@@ -219,7 +219,7 @@ const AttendanceDashboardPage = () => {
   const isPageLoading = loading || (shouldFetchProfile && loadingProfile);
 
   // Global filters
-  const [selectedDate, setSelectedDate] = useState("2026-07-06");
+  const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [selectedFY, setSelectedFY] = useState("2026-27");
   const [selectedMonth, setSelectedMonth] = useState("Jul");
   const [selectedYear, setSelectedYear] = useState("2026");
@@ -249,6 +249,48 @@ const AttendanceDashboardPage = () => {
   const [editingLogTarget, setEditingLogTarget] = useState(null); // { date, emp_id, in_time, out_time }
   const [editInTime, setEditInTime] = useState(""); // HH:MM 24h
   const [editOutTime, setEditOutTime] = useState(""); // HH:MM 24h
+
+  // Helper to trigger download of CSV (sorted chronologically by date ascending)
+  const triggerCSVDownload = (filename, formattedRows) => {
+    const headers = [
+      "emp_id",
+      "date",
+      "in_time",
+      "out_time",
+      "name",
+      "department",
+      "location",
+      "work_hour",
+      "status",
+    ];
+
+    const sortedRows = [...formattedRows].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const rows = sortedRows.map((row) => {
+      return [
+        row.emp_code,
+        row.date,
+        row.in_time || "",
+        row.out_time || "",
+        `"${row.name || ""}"`,
+        `"${row.department || ""}"`,
+        `"${row.work_location || ""}"`,
+        row.work_hour || "",
+        row.status,
+      ].join(",");
+    });
+
+    const csvContent = [headers.join(","), ...rows].join("\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", filename);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
 
   // Fetch employees and attendance logs from Supabase for main dashboard
   const loadData = async () => {
@@ -417,46 +459,6 @@ const AttendanceDashboardPage = () => {
         });
       }
     }
-  };
-
-  // Helper to trigger download of CSV
-  const triggerCSVDownload = (filename, formattedRows) => {
-    const headers = [
-      "emp_id",
-      "date",
-      "in_time",
-      "out_time",
-      "name",
-      "department",
-      "location",
-      "work_hour",
-      "status",
-    ];
-
-    const rows = formattedRows.map((row) => {
-      return [
-        row.emp_code,
-        row.date,
-        row.in_time || "",
-        row.out_time || "",
-        `"${row.name || ""}"`,
-        `"${row.department || ""}"`,
-        `"${row.work_location || ""}"`,
-        row.work_hour || "",
-        row.status,
-      ].join(",");
-    });
-
-    const csvContent = [headers.join(","), ...rows].join("\n");
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", filename);
-    link.style.visibility = "hidden";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
   };
 
   // Main Dashboard Downloads

@@ -36,6 +36,7 @@ import { useParams, useNavigate, Navigate } from "react-router-dom";
 import { useEmployeeProfile } from "@/hooks/useEmployeeProfile";
 import { useUpdateEmployee } from "@/hooks/useEmployees";
 import DashboardLayout from "@/components/atomic/templates/DashboardLayout";
+import EmployeeMasterForm from "./EmployeeMasterForm";
 import { useRole } from "@/hooks/useRole";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -168,23 +169,13 @@ export default function EmployeeProfilePage() {
     (!!user?.id && !!employee?.auth_user_id && String(user.id) === String(employee.auth_user_id)) ||
     (!!user?.email && !!employee?.email && employee.email.toLowerCase() === user.email.toLowerCase());
 
-  // Friendly Empty State when profile record is missing for the logged-in user after all lookup fallbacks
-  if (!isLoading && !data && (isEmployee || String(targetId) === String(user?.id))) {
+  // If profile data is loading or being resolved for logged-in user
+  if (isLoading || (!data && (isEmployee || String(targetId) === String(user?.id)))) {
     return (
       <DashboardLayout pageTitle="My Profile">
-        <Center minH="400px" flexDir="column" gap={4}>
-          <Center w="72px" h="72px" borderRadius="full" bg="rgba(99, 102, 241, 0.12)">
-            <Icon as={FiUser} boxSize={8} color="accent" />
-          </Center>
-          <VStack spacing={2} textAlign="center">
-            <Text fontSize="lg" fontWeight="700" color="text-primary">
-              This administrator account is not linked to an employee profile.
-            </Text>
-            <Text fontSize="sm" color="text-muted" maxW="460px" lineHeight="relaxed">
-              Employee Mode requires an employee record. Create or link an employee profile to this account to access employee features.
-            </Text>
-          </VStack>
-        </Center>
+        <Flex minH="60vh" align="center" justify="center">
+          <Spinner size="xl" color="purple.500" />
+        </Flex>
       </DashboardLayout>
     );
   }
@@ -294,41 +285,17 @@ export default function EmployeeProfilePage() {
             )}
 
             {/* Edit action buttons under RBAC */}
-            {(isHR || isOwnProfile) && (
-              <HStack spacing={2}>
-                {isEditing ? (
-                  <>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      colorScheme="gray"
-                      onClick={() => setIsEditing(false)}
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      size="sm"
-                      bg="purple.500"
-                      color="white"
-                      _hover={{ bg: "purple.600" }}
-                      onClick={handleSave}
-                      isLoading={updateMutation.isPending}
-                    >
-                      Save Changes
-                    </Button>
-                  </>
-                ) : (
-                  <Button
-                    size="sm"
-                    bg="purple.500"
-                    color="white"
-                    _hover={{ bg: "purple.600" }}
-                    onClick={() => setIsEditing(true)}
-                  >
-                    Edit Profile
-                  </Button>
-                )}
-              </HStack>
+            {isHR && (
+              <Button
+                size="sm"
+                bg="purple.500"
+                color="white"
+                _hover={{ bg: "purple.600" }}
+                onClick={() => setIsEditing(true)}
+                leftIcon={<FiFileText />}
+              >
+                Edit Profile
+              </Button>
             )}
           </HStack>
         </Flex>
@@ -687,6 +654,14 @@ export default function EmployeeProfilePage() {
           </Box>
         </SimpleGrid>
       </Box>
+
+      {isHR && (
+        <EmployeeMasterForm
+          isOpen={isEditing}
+          onClose={() => setIsEditing(false)}
+          employee={data}
+        />
+      )}
     </DashboardLayout>
   );
 }

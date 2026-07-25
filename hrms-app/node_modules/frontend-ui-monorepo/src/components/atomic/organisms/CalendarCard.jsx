@@ -128,6 +128,7 @@ const CalendarCard = ({ minH }) => {
       const dayStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
       const isToday = dayStr === today;
       const badges = getDayBadges(day);
+      const hasEvent = badges.length > 0;
 
       cells.push(
         <Button
@@ -144,24 +145,19 @@ const CalendarCard = ({ minH }) => {
           overflow="hidden"
           _hover={{ bg: isToday ? "purple.500" : "hover-bg" }}
         >
-          <Text>{day}</Text>
+          <Text fontStyle="normal">{day}</Text>
 
-          {badges.length > 0 && (
-            <Box position="absolute" bottom={0} right={0} p={0.5}>
-              <SimpleGrid columns={2} spacing={0}>
-                {badges.map((badge, i) => (
-                  <Badge
-                    key={`${badge}-${i}`}
-                    fontSize="2xs"
-                    colorScheme={badge.includes("🎂") ? "pink" : "purple"}
-                    variant="subtle"
-                    borderRadius="full"
-                  >
-                    {badge}
-                  </Badge>
-                ))}
-              </SimpleGrid>
-            </Box>
+          {hasEvent && (
+            <Box
+              position="absolute"
+              bottom="3px"
+              left="50%"
+              transform="translateX(-50%)"
+              w="4px"
+              h="4px"
+              borderRadius="full"
+              bg={isToday ? "white" : "purple.400"}
+            />
           )}
         </Button>
       );

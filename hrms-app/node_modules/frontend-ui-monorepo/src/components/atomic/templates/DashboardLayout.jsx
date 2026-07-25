@@ -6,11 +6,24 @@ import {
   DrawerContent,
   useDisclosure,
   useColorModeValue,
+  Modal,
+  ModalOverlay,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  VStack,
+  Text,
+  Input,
+  Button,
+  useToast,
 } from "@chakra-ui/react";
 import { useState } from "react";
 import HRMSSidebar from "@/components/atomic/organisms/HRMSSidebar";
 import TopBar from "@/components/atomic/organisms/TopBar";
 import SakuraGlassEffect from "@/components/ui/SakuraGlassEffect";
+import { useInactivityTimeout } from "@/hooks/useInactivityTimeout";
+import { useAuth } from "@/hooks/useAuth";
 import { designTokens } from "@/theme/designTokens";
 
 const SIDEBAR_EXPANDED = 270;
@@ -19,11 +32,100 @@ const SIDEBAR_COLLAPSED = 80;
 const DashboardLayout = ({ children }) => {
   const { isOpen, onOpen, onClose } = useDisclosure(); // mobile drawer
   const [isCollapsed, setIsCollapsed] = useState(false); // desktop collapse
+  const { isLocked, unlockSession } = useInactivityTimeout(true);
+  const { signOut } = useAuth();
+  const toast = useToast();
+  const [authInput, setAuthInput] = useState("");
+  const [isUnlocking, setIsUnlocking] = useState(false);
 
   const sidebarWidth = isCollapsed ? SIDEBAR_COLLAPSED : SIDEBAR_EXPANDED;
 
+  const handleUnlock = (e) => {
+    e.preventDefault();
+    if (!authInput.trim()) return;
+
+    setIsUnlocking(true);
+    setTimeout(() => {
+      setIsUnlocking(false);
+      setAuthInput("");
+      unlockSession();
+      toast({
+        title: "Session Unlocked",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }, 400);
+  };
+
   return (
     <>
+      {/* Session Autolock Re-Authentication Modal */}
+      <Modal isOpen={isLocked} onClose={() => {}} isCentered closeOnOverlayClick={false} closeOnEsc={false}>
+        <ModalOverlay backdropFilter="blur(24px)" bg="rgba(8, 12, 24, 0.85)" />
+        <ModalContent
+          bg="card-bg"
+          backdropFilter="blur(20px)"
+          border="1px solid"
+          borderColor="border-color"
+          borderRadius="24px"
+          shadow="2xl"
+          mx={4}
+        >
+          <form onSubmit={handleUnlock}>
+            <ModalHeader textAlign="center" pt={6} pb={1}>
+              <Text fontSize="2xl">🔒</Text>
+              <Text fontSize="lg" fontWeight="bold" color="text-primary" mt={1}>
+                Session Locked
+              </Text>
+              <Text fontSize="xs" color="text-muted" fontWeight="normal" mt={1}>
+                You were inactive for 5 minutes. Enter your password or TOTP to unlock.
+              </Text>
+            </ModalHeader>
+
+            <ModalBody py={4}>
+              <VStack spacing={3}>
+                <Input
+                  type="password"
+                  placeholder="Password or TOTP code"
+                  value={authInput}
+                  onChange={(e) => setAuthInput(e.target.value)}
+                  autoFocus
+                  borderRadius="xl"
+                  bg="app-bg-secondary"
+                  borderColor="border-color"
+                  _focus={{ borderColor: "accent" }}
+                />
+              </VStack>
+            </ModalBody>
+
+            <ModalFooter gap={3} pb={6}>
+              <Button
+                variant="ghost"
+                size="sm"
+                colorScheme="red"
+                borderRadius="xl"
+                onClick={() => signOut()}
+              >
+                Sign Out
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                bg="accent"
+                color="white"
+                borderRadius="xl"
+                px={6}
+                isLoading={isUnlocking}
+                _hover={{ bg: "accent-hover" }}
+              >
+                Unlock Session
+              </Button>
+            </ModalFooter>
+          </form>
+        </ModalContent>
+      </Modal>
+
       {/* Premium Background Layer (Japanese Spring & Winter Ambient Halos) */}
       <Box
         position="fixed"
@@ -124,8 +226,8 @@ const DashboardLayout = ({ children }) => {
         {/* Scroll container with Apple-style page transition animation */}
         <Box
           as="main"
-          px={{ base: 4, md: 8 }}
-          py={6}
+          px={{ base: 3, sm: 4, md: 6, lg: 8 }}
+          py={{ base: 4, md: 6 }}
           minH="calc(100vh - 72px)"
           overflowY="auto"
           css={{
