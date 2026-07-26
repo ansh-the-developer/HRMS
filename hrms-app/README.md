@@ -6168,6 +6168,260 @@ hrms-app/
 └── turbo.json
 ```
 
+
+## Development Log — July 26, 2026
+
+Implemented stable UI-only perspective switching for HR and Manager, with no change to the underlying database role. Cleaned up the sidebar by restoring the Profile menu and removing HR-only settings from Employee UI. Fixed translation fallback for Profile, Supabase 406 errors on notice/holiday edits, and role-based action visibility in dashboard cards.
+
+Updated the README structure with clearer folder, file, and architecture documentation for `hooks`, `contexts`, `routes`, `services`, `features`, `lib`, `theme`, and key files like `useRole.js`, `HomeRoutes.jsx`, `RoleRoute.jsx`, `HRMSSidebar.jsx`, and `LanguageContext.jsx`.
+
+
+hrms-app
+├── apps/
+│   └── frontend-ui-monorepo/
+│       ├── public/
+│       │   ├── favicon.ico
+│       │   ├── vite.svg
+│       │   ├── employee_import_template.csv
+│       │   └── employee_directory-1.csv
+│       │
+│       ├── src/
+│       │   ├── assets/
+│       │   │   ├── ajLogo.png
+│       │   │   ├── forgetPassword.png
+│       │   │   ├── loginPagePic.jpg
+│       │   │   ├── passSucImg.png
+│       │   │   └── successIcon.png
+│       │   │
+│       │   ├── components/
+│       │   │   ├── atomic/
+│       │   │   │   ├── atoms/
+│       │   │   │   │   ├── EmployeeAvatar.jsx
+│       │   │   │   │   ├── HRMSButton.jsx
+│       │   │   │   │   ├── HRMSInput.jsx
+│       │   │   │   │   ├── Logo.jsx
+│       │   │   │   │   ├── SectionTitle.jsx
+│       │   │   │   │   ├── SidebarToggleButton.jsx
+│       │   │   │   │   ├── StatusDot.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   │
+│       │   │   │   ├── molecules/
+│       │   │   │   │   ├── AttendanceConfigItem.jsx
+│       │   │   │   │   ├── BirthdayListItem.jsx
+│       │   │   │   │   ├── DepartmentListItem.jsx
+│       │   │   │   │   ├── EmployeeConfigItem.jsx
+│       │   │   │   │   ├── EmployeeTableRow.jsx
+│       │   │   │   │   ├── HRMSCard.jsx
+│       │   │   │   │   ├── HRMSTable.jsx
+│       │   │   │   │   ├── InfoRow.jsx
+│       │   │   │   │   ├── LegendItem.jsx
+│       │   │   │   │   ├── LogoutButton.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   │
+│       │   │   │   ├── organisms/
+│       │   │   │   │   ├── AttendanceConfigCard.jsx
+│       │   │   │   │   ├── BirthdayTrackerCard.jsx
+│       │   │   │   │   ├── CalendarCard.jsx
+│       │   │   │   │   ├── CompanyEventsCard.jsx
+│       │   │   │   │   ├── EmployeeConfigCard.jsx
+│       │   │   │   │   ├── EmployeeTable.jsx
+│       │   │   │   │   ├── GlobalSearch.jsx
+│       │   │   │   │   ├── HelpCenterModal.jsx
+│       │   │   │   │   ├── HolidaysCard.jsx
+│       │   │   │   │   ├── HRMSSidebar.jsx                 UPDATED
+│       │   │   │   │   ├── NoticeBoardCard.jsx
+│       │   │   │   │   ├── TopBar.jsx
+│       │   │   │   │   ├── UserProfileMenu.jsx
+│       │   │   │   │   └── index.js
+│       │   │   │   │
+│       │   │   │   └── templates/
+│       │   │   │       ├── DashboardLayout.jsx
+│       │   │   │       └── index.js
+│       │   │   │
+│       │   │   ├── ProtectedRoute.jsx
+│       │   │   ├── README.md
+│       │   │   ├── RainGlassEffect.jsx
+│       │   │   └── SakuraGlassEffect.jsx
+│       │   │
+│       │   ├── contexts/
+│       │   │   ├── AuthContext.js
+│       │   │   ├── AuthProvider.jsx
+│       │   │   ├── CalendarContext.jsx
+│       │   │   ├── LanguageContext.jsx                    UPDATED
+│       │   │   └── useAuthContext.js
+│       │   │
+│       │   ├── hooks/
+│       │   │   ├── index.js
+│       │   │   ├── useAuth.js
+│       │   │   ├── useEmployees.js
+│       │   │   ├── useEmployeeProfile.js
+│       │   │   ├── useHome.js
+│       │   │   ├── useLeaves.js
+│       │   │   ├── usePerformance.js
+│       │   │   └── useRole.js                             UPDATED
+│       │   │
+│       │   ├── lib/
+│       │   │   ├── queryClient.js
+│       │   │   ├── supabaseClient.js
+│       │   │   └── totpUtils.js
+│       │   │
+│       │   ├── routes/
+│       │   │   ├── AppRoutes.jsx
+│       │   │   ├── AuthRoutes.jsx
+│       │   │   └── HomeRoutes.jsx
+│       │   │
+│       │   ├── services/
+│       │   │   ├── attendanceApi.js
+│       │   │   ├── complaintApi.js
+│       │   │   ├── employeeApi.js
+│       │   │   ├── homeApi.js                             UPDATED
+│       │   │   ├── leaveApi.js
+│       │   │   ├── payrollApi.js
+│       │   │   ├── performanceApi.js
+│       │   │   ├── profileApi.js
+│       │   │   └── useProfile.js
+│       │   │
+│       │   ├── features/
+│       │   │   ├── auth/
+│       │   │   │   └── pages/
+│       │   │   │       ├── LoginPage.jsx
+│       │   │   │       ├── ChangePasswordPage.jsx
+│       │   │   │       ├── MFAEnrollPage.jsx
+│       │   │   │       ├── TwoFactorPage.jsx
+│       │   │   │       ├── ForgotPasswordPage.jsx
+│       │   │   │       ├── ResetPasswordPage.jsx
+│       │   │   │       ├── VerifyEmailPage.jsx
+│       │   │   │       └── PasswordChangedPage.jsx
+│       │   │   │
+│       │   │   ├── home/
+│       │   │   │   ├── ComplaintCenterPage.jsx
+│       │   │   │   ├── HomePage.jsx
+│       │   │   │   └── ProFeatureGatePage.jsx
+│       │   │   │
+│       │   │   ├── employee/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── DeleteEmployeeModal.jsx
+│       │   │   │   │   ├── EmployeeBulkImportModal.jsx
+│       │   │   │   │   ├── EmployeeMasterForm.jsx
+│       │   │   │   │   └── EmployeeProfilePage.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── EmployeeBranchesPage.jsx
+│       │   │   │       ├── EmployeeDepartmentsPage.jsx
+│       │   │   │       ├── EmployeeDesignationsPage.jsx
+│       │   │   │       ├── EmployeeExportPage.jsx
+│       │   │   │       ├── EmployeeListPage.jsx
+│       │   │   │       ├── EmployeeStatusesPage.jsx
+│       │   │   │       └── EmployeeTypesPage.jsx
+│       │   │   │
+│       │   │   ├── attendance/
+│       │   │   │   ├── constants/
+│       │   │   │   │   └── attendanceMockData.js
+│       │   │   │   ├── components/
+│       │   │   │   │   └── molecules/
+│       │   │   │   │       ├── AttendanceSearchInput.jsx
+│       │   │   │   │       ├── AttendanceStatusBadge.jsx
+│       │   │   │   │       ├── EmployeeAvatarName.jsx
+│       │   │   │   │       ├── RuleField.jsx
+│       │   │   │   │       ├── RuleListItem.jsx
+│       │   │   │   │       ├── WeekdaySelector.jsx
+│       │   │   │   │       ├── WorkingDayItem.jsx
+│       │   │   │   │       └── WorkingHourItem.jsx
+│       │   │   │   └── pages/
+│       │   │   │       ├── AttendanceDashboardPage.jsx
+│       │   │   │       ├── AttendanceExportPage.jsx
+│       │   │   │       ├── EditAttendancePage.jsx
+│       │   │   │       ├── EditWorkingDaysPage.jsx
+│       │   │   │       ├── EditWorkingRulePage.jsx
+│       │   │   │       ├── WorkingDaysPage.jsx
+│       │   │   │       ├── WorkingHoursPage.jsx
+│       │   │   │       └── WorkingRulesPage.jsx
+│       │   │   │
+│       │   │   ├── leaves/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── LeaveRequestForm.jsx
+│       │   │   │   │   └── LeaveUploadOverlay.jsx
+│       │   │   │   ├── leaveMockData.js
+│       │   │   │   └── pages/
+│       │   │   │       ├── LeaveRequestActionPage.jsx
+│       │   │   │       ├── LeaveRequestListPage.jsx
+│       │   │   │       ├── LeaveRequestUploadPage.jsx
+│       │   │   │       ├── LeaveRequiredFormPage.jsx
+│       │   │   │       ├── LeaveRulesApprovalFlowPage.jsx
+│       │   │   │       ├── LeaveRulesPage.jsx
+│       │   │   │       ├── LeaveSubmitStatusPage.jsx
+│       │   │   │       └── LeavesDashboardPage.jsx
+│       │   │   │
+│       │   │   ├── performance/
+│       │   │   │   └── pages/
+│       │   │   │       ├── PerformanceDashboardPage.jsx
+│       │   │   │       ├── PerformanceHistoryPage.jsx
+│       │   │   │       ├── PerformanceNewReviewPage.jsx
+│       │   │   │       └── PerformanceReviewDetailPage.jsx
+│       │   │   │
+│       │   │   ├── payroll/
+│       │   │   │   ├── components/
+│       │   │   │   │   ├── PaymentTable.jsx
+│       │   │   │   │   ├── ReimbursementForm.jsx
+│       │   │   │   │   └── SalaryStructureForm.jsx
+│       │   │   │   ├── constants/
+│       │   │   │   │   └── payrollMockData.js
+│       │   │   │   └── pages/
+│       │   │   │       ├── PayrollDashboardPage.jsx
+│       │   │   │       ├── PayrollOverviewPage.jsx
+│       │   │   │       ├── PayrollSlipsPage.jsx
+│       │   │   │       ├── PendingPaymentsPage.jsx
+│       │   │   │       ├── RecordPaymentPage.jsx
+│       │   │   │       ├── ReimbursementStatusPage.jsx
+│       │   │   │       └── SalaryStructurePage.jsx
+│       │   │   │
+│       │   │   └── settings/
+│       │   │       └── pages/
+│       │   │           ├── CompanyDetailsPage.jsx
+│       │   │           ├── PermissionsManagerPage.jsx
+│       │   │           ├── SettingsDashboardPage.jsx
+│       │   │           └── UserManagementPage.jsx
+│       │   │
+│       │   ├── theme/
+│       │   │   └── designTokens.js
+│       │   │
+│       │   ├── App.css
+│       │   ├── App.jsx
+│       │   ├── index.css
+│       │   └── main.jsx
+│       │
+│       ├── .env.example
+│       ├── package.json
+│       └── vite.config.js
+│
+├── packages/
+│   └── shared/
+│       └── employeeFilters.js
+│
+├── supabase/
+│   ├── functions/
+│   │   └── create-employee-user/
+│   │       ├── config.toml
+│   │       └── index.ts
+│   └── migrations/
+│       ├── 20260708160102_create_payroll_tables.sql
+│       ├── 20260708172232_expand_leave_and_complaints.sql
+│       ├── 20260708181624_fix_leave_requests_rls.sql
+│       └── 20260708183614_fix_leave_requests_select_rls.sql
+│
+├── .env.local
+├── .gitignore
+├── CONTRIBUTING.md
+├── LICENSE
+├── README.md
+├── netlify.toml
+├── package.json
+└── turbo.json
+
+
+
+
+
+
 ---
 
 ## License & Usage

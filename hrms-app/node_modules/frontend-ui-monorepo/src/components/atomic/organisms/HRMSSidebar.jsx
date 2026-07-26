@@ -1,3 +1,4 @@
+// src/components/atomic/organisms/HRMSSidebar.jsx
 import React, { useState } from "react";
 import {
   Box,
@@ -33,7 +34,7 @@ import {
 } from "react-icons/fi";
 import Logo from "./../atoms/Logo";
 import HelpCenterModal from "./HelpCenterModal";
-import { useRole } from "@/hooks/useRole";
+import { useRole, clearPerspective } from "@/hooks/useRole";
 import { useAuth } from "@/hooks/useAuth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { designTokens } from "@/theme/designTokens";
@@ -45,21 +46,25 @@ const LANG_LABELS = {
   ko: "한국어",
 };
 
-const HRMSSidebar = ({
-  onItemClick,
-  isCollapsed = false,
-  onToggleCollapse,
-}) => {
+const HRMSSidebar = ({ onItemClick, isCollapsed = false, onToggleCollapse }) => {
   const location = useLocation();
-  const { role, originalRole, isSwitched, isLoading } = useRole();
+  const { role, originalRole, isSwitched, isLoading, toggleView } = useRole();
   const { user, signOut } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const [isHelpCenterOpen, setIsHelpCenterOpen] = useState(false);
 
-  // Elevate all useColorModeValue calls to top-level to satisfy Rules of Hooks
-  const sidebarBg = useColorModeValue(designTokens.sidebarGradientLight, designTokens.sidebarGradientDark);
-  const sidebarBorderColor = useColorModeValue("rgba(255, 255, 255, 0.80)", "rgba(255, 255, 255, 0.16)");
-  const sidebarBoxShadow = useColorModeValue(designTokens.sidebarShadowLight, designTokens.sidebarShadowDark);
+  const sidebarBg = useColorModeValue(
+    designTokens.sidebarGradientLight,
+    designTokens.sidebarGradientDark
+  );
+  const sidebarBorderColor = useColorModeValue(
+    "rgba(255, 255, 255, 0.80)",
+    "rgba(255, 255, 255, 0.16)"
+  );
+  const sidebarBoxShadow = useColorModeValue(
+    designTokens.sidebarShadowLight,
+    designTokens.sidebarShadowDark
+  );
 
   const topGlowBg = useColorModeValue(
     "radial(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%)",
@@ -70,17 +75,31 @@ const HRMSSidebar = ({
     "radial(circle, rgba(56, 189, 248, 0.15) 0%, transparent 75%)"
   );
 
-  const activeItemBg = useColorModeValue("rgba(99, 102, 241, 0.16)", "rgba(99, 102, 241, 0.32)");
-  const activeItemBorder = useColorModeValue("1px solid rgba(99, 102, 241, 0.30)", "1px solid rgba(255, 255, 255, 0.30)");
+  const activeItemBg = useColorModeValue(
+    "rgba(99, 102, 241, 0.16)",
+    "rgba(99, 102, 241, 0.32)"
+  );
+  const activeItemBorder = useColorModeValue(
+    "1px solid rgba(99, 102, 241, 0.30)",
+    "1px solid rgba(255, 255, 255, 0.30)"
+  );
   const activeItemShadow = useColorModeValue(
     "0 4px 18px rgba(99, 102, 241, 0.18), inset 0 1px 0 0 rgba(255, 255, 255, 0.80)",
     "0 4px 20px rgba(99, 102, 241, 0.40), inset 0 1px 0 0 rgba(255, 255, 255, 0.40)"
   );
-  const activeItemHoverBg = useColorModeValue("rgba(99, 102, 241, 0.22)", "rgba(99, 102, 241, 0.40)");
+  const activeItemHoverBg = useColorModeValue(
+    "rgba(99, 102, 241, 0.22)",
+    "rgba(99, 102, 241, 0.40)"
+  );
 
   const sidebarWidth = isCollapsed ? "80px" : "270px";
 
   const isEmployee = role === "employee";
+
+  // Profile route reuses the existing /employees/:id route, which is
+  // already RoleRoute-allowed for hr, manager, and employee, and resolves
+  // to the logged-in user's own profile inside EmployeeProfilePage.
+  const profilePath = `/employees/${user?.id ?? ""}`;
 
   const adminNavItems = [
     { label: t("dashboard"), path: "/home", icon: FiHome },
@@ -89,6 +108,7 @@ const HRMSSidebar = ({
     { label: t("leaveManagement"), path: "/leaves", icon: FiClipboard },
     { label: t("payroll"), path: "/payroll", icon: FiDollarSign },
     { label: t("complaints"), path: "/complaints", icon: FiShield },
+    { label: t("profile"), path: profilePath, icon: FiUser },
     { label: t("settings"), path: "/settings", icon: FiUser },
     { label: t("activityLogs"), path: "/activity-logs", icon: FiList },
   ];
@@ -99,7 +119,7 @@ const HRMSSidebar = ({
     { label: t("leaveManagement"), path: "/leaves", icon: FiClipboard },
     { label: t("payroll"), path: "/payroll", icon: FiDollarSign },
     { label: t("complaints"), path: "/complaints", icon: FiShield },
-    { label: t("settings"), path: "/settings", icon: FiUser },
+    { label: t("profile"), path: profilePath, icon: FiUser },
   ];
 
   const navItems = isEmployee ? employeeNavItems : adminNavItems;
@@ -108,12 +128,15 @@ const HRMSSidebar = ({
     if (exact) {
       return location.pathname === itemPath;
     }
-    return location.pathname === itemPath || location.pathname.startsWith(`${itemPath}/`);
+    return (
+      location.pathname === itemPath ||
+      location.pathname.startsWith(`${itemPath}/`)
+    );
   };
 
   const handleSignOutClick = async (e) => {
     e.preventDefault();
-    localStorage.removeItem("userRole");
+    clearPerspective();
     try {
       await signOut();
     } catch (err) {
@@ -122,216 +145,145 @@ const HRMSSidebar = ({
   };
 
   const handleToggleView = () => {
-    if (isSwitched) {
-      localStorage.setItem("userRole", originalRole);
-    } else {
-      localStorage.setItem("userRole", "employee");
-    }
-    window.location.reload();
+    toggleView();
   };
 
   return (
     <>
       <Box
-        h="full"
-        w="full"
+        as="nav"
+        w={sidebarWidth}
+        h="100vh"
         bg={sidebarBg}
-        backdropFilter={`blur(${designTokens.glassBlurSidebar})`}
-        borderRight="1px solid"
-        borderColor={sidebarBorderColor}
+        borderRight={`1px solid ${sidebarBorderColor}`}
         boxShadow={sidebarBoxShadow}
-        px={isCollapsed ? 3 : 4}
-        py={5}
-        display="flex"
-        flexDirection="column"
         position="relative"
         overflow="hidden"
-        css={{ backdropFilter: "blur(18px)" }}
+        transition="width 0.2s ease"
+        display="flex"
+        flexDirection="column"
       >
         <Box
           position="absolute"
           top="-10%"
           left="-10%"
-          w="80%"
-          h="160px"
+          w="60%"
+          h="40%"
           bgGradient={topGlowBg}
-          filter="blur(24px)"
           pointerEvents="none"
-          borderRadius="24px"
         />
-
         <Box
           position="absolute"
-          top="40%"
-          left="5%"
-          w="90%"
-          h="180px"
+          top="30%"
+          left="20%"
+          w="80%"
+          h="60%"
           bgGradient={centerGlowBg}
-          filter="blur(28px)"
           pointerEvents="none"
-          borderRadius="24px"
         />
 
-        <Box
-          display="flex"
-          flexDirection="column"
-          flex="1"
-          overflowY="auto"
-          pr={1}
-          position="relative"
+        <Flex
+          align="center"
+          justify={isCollapsed ? "center" : "space-between"}
+          px={4}
+          py={5}
           zIndex={1}
-          css={{
-            "&::-webkit-scrollbar": { width: "4px" },
-            "&::-webkit-scrollbar-track": { background: "transparent" },
-            "&::-webkit-scrollbar-thumb": { background: "rgba(148, 163, 184, 0.3)", borderRadius: "4px" },
-          }}
         >
+          <Logo collapsed={isCollapsed} />
+          <IconButton
+            aria-label="Toggle sidebar"
+            icon={isCollapsed ? <FiChevronRight /> : <FiChevronLeft />}
+            size="xs"
+            variant="ghost"
+            color="accent"
+            onClick={onToggleCollapse}
+            _hover={{ bg: "transparent" }}
+          />
+        </Flex>
+
+        <VStack align="stretch" spacing={1} px={3} flex="1" zIndex={1} overflowY="auto">
+          {!isLoading &&
+            navItems.map((item) => {
+              const isActive = isItemActive(item.path);
+              return (
+                <Box
+                  as={NavLink}
+                  key={item.label}
+                  to={item.path}
+                  onClick={onItemClick}
+                  display="flex"
+                  alignItems="center"
+                  gap={3}
+                  px={3}
+                  py={2.5}
+                  borderRadius="12px"
+                  bg={isActive ? activeItemBg : "transparent"}
+                  border={isActive ? activeItemBorder : "1px solid transparent"}
+                  boxShadow={isActive ? activeItemShadow : "none"}
+                  _hover={{ bg: isActive ? activeItemHoverBg : "rgba(0,0,0,0.04)" }}
+                  transition="all 0.15s ease"
+                >
+                  <Icon as={item.icon} boxSize={5} color={isActive ? "accent" : "text-secondary"} />
+                  {!isCollapsed && (
+                    <Text fontSize="sm" fontWeight={isActive ? "semibold" : "medium"}>
+                      {item.label}
+                    </Text>
+                  )}
+                </Box>
+              );
+            })}
+        </VStack>
+
+        <VStack align="stretch" spacing={3} px={3} pb={5} zIndex={1}>
           <Box
-            position="relative"
-            mb={6}
+            as="button"
             display="flex"
-            flexDirection={isCollapsed ? "column" : "row"}
             alignItems="center"
-            justifyContent={isCollapsed ? "center" : "space-between"}
-            gap={isCollapsed ? 3 : 0}
-          >
-            <Logo
-              w={
-                isCollapsed
-                  ? { base: "1.25rem", md: "1.5rem" }
-                  : { base: "1.75rem", md: "2rem" }
-              }
-              h="auto"
-              alt="Company sidebar logo"
-            />
-
-            <Box
-              display={{ base: "none", md: "flex" }}
-              alignItems="center"
-              justifyContent="center"
-              bg="app-bg-secondary"
-              backdropFilter="blur(12px)"
-              border="1px solid"
-              borderColor="border-color"
-              borderRadius="full"
-              p={isCollapsed ? 2 : 1}
-            >
-              <IconButton
-                aria-label="Toggle sidebar"
-                icon={isCollapsed ? <FiChevronRight /> : <FiChevronLeft />}
-                size="xs"
-                variant="ghost"
-                color="accent"
-                onClick={onToggleCollapse}
-                _hover={{ bg: "transparent" }}
-              />
-            </Box>
-          </Box>
-
-          <VStack spacing={1.5} align="stretch" w="full">
-            {!isLoading &&
-              navItems.map((item) => {
-                const isActive = location.pathname === item.path;
-                return (
-                  <NavLink
-                    key={item.path}
-                    to={item.path}
-                    onClick={onItemClick}
-                    style={{ textDecoration: "none" }}
-                  >
-                    <Flex
-                      align="center"
-                      gap={isCollapsed ? 0 : 3.5}
-                      justify={isCollapsed ? "center" : "flex-start"}
-                      px={isCollapsed ? 0 : 4}
-                      py={2.5}
-                      borderRadius="16px"
-                      bg={isActive ? activeItemBg : "transparent"}
-                      color={isActive ? "text-primary" : "text-secondary"}
-                      fontWeight={isActive ? "semibold" : "medium"}
-                      _hover={
-                        isActive
-                          ? { bg: activeItemHoverBg }
-                          : { bg: "hover-bg", color: "text-primary", transform: "translateY(-1px)" }
-                      }
-                      transition="all 0.18s ease"
-                    >
-                      <Icon
-                        as={item.icon}
-                        boxSize={4.5}
-                        color={isActive ? "accent" : "text-muted"}
-                      />
-                      {!isCollapsed && <Text fontSize="sm">{item.label}</Text>}
-                    </Flex>
-                  </NavLink>
-                );
-              })}
-          </VStack>
-        </Box>
-
-        <Box mt="auto" pt={3} borderTopWidth="1px" borderColor="border-color">
-          <Flex
-            align="center"
-            gap={isCollapsed ? 0 : 3}
-            justify={isCollapsed ? "center" : "flex-start"}
-            px={isCollapsed ? 0 : 4}
+            gap={3}
+            px={3}
             py={2.5}
-            mb={2}
-            borderRadius="14px"
-            color="text-secondary"
-            fontWeight="medium"
-            cursor="pointer"
-            _hover={{ bg: "rgba(239, 68, 68, 0.15)", color: "red.400" }}
-            transition="all 0.18s ease"
+            borderRadius="12px"
+            _hover={{ bg: "rgba(220, 38, 38, 0.08)" }}
             onClick={handleSignOutClick}
           >
-            <Icon as={FiLogOut} boxSize={4.5} color="red.400" />
-            {!isCollapsed && <Text fontSize="sm" fontWeight="semibold" color="red.400">{t("signOut")}</Text>}
-          </Flex>
+            <Icon as={FiLogOut} boxSize={5} color="red.500" />
+            {!isCollapsed && (
+              <Text fontSize="sm" fontWeight="medium" color="red.500">
+                {t("signOut")}
+              </Text>
+            )}
+          </Box>
 
           {!isCollapsed && (
-            <Flex
-              align="center"
-              justify="space-between"
-              bg="card-bg"
-              backdropFilter="blur(16px)"
-              border="1px solid"
-              borderColor="border-color"
-              borderRadius="16px"
-              p={3}
-              mb={3}
-              cursor="pointer"
-              _hover={{ bg: "hover-bg", transform: "translateY(-1px)" }}
-              transition="all 0.18s ease"
+            <Box
+              as="button"
+              display="flex"
+              flexDirection="column"
+              alignItems="flex-start"
+              gap={1}
+              px={3}
+              py={2.5}
+              borderRadius="12px"
+              _hover={{ bg: "rgba(0,0,0,0.04)" }}
               onClick={() => setIsHelpCenterOpen(true)}
             >
-              <HStack spacing={3}>
-                <Box
-                  p={2}
-                  borderRadius="12px"
-                  bg="rgba(99, 102, 241, 0.15)"
-                  color="accent"
-                >
-                  <FiHeadphones size={16} />
-                </Box>
-                <VStack align="start" spacing={0}>
-                  <Text fontSize="xs" fontWeight="bold" color="text-primary">
-                    {t("needHelp")}
-                  </Text>
-                  <Text fontSize="10px" color="text-muted">
-                    {t("contactSupport")}
-                  </Text>
-                </VStack>
+              <HStack>
+                <Icon as={FiHeadphones} boxSize={4} color="text-secondary" />
+                <Text fontSize="xs" fontWeight="semibold">
+                  {t("needHelp")}
+                </Text>
               </HStack>
-              <FiChevronRight size={14} color="gray" />
-            </Flex>
+              <Text fontSize="xs" color="text-secondary">
+                {t("contactSupport")}
+              </Text>
+            </Box>
           )}
 
           {(originalRole === "hr" || originalRole === "manager") && (
-            <Box mb={isCollapsed ? 0 : 3}>
+            <Box>
               {isCollapsed ? (
                 <IconButton
-                  aria-label="Switch Perspective"
+                  aria-label="Switch perspective"
                   icon={<FiRefreshCw />}
                   size="md"
                   bg="accent"
@@ -343,16 +295,16 @@ const HRMSSidebar = ({
                 />
               ) : (
                 <Button
-                  size="sm"
-                  w="full"
+                  leftIcon={<FiRefreshCw />}
                   bg="accent"
                   color="white"
+                  w="full"
                   borderRadius="14px"
-                  py={4.5}
-                  fontSize="xs"
-                  fontWeight="bold"
-                  leftIcon={<FiRefreshCw />}
-                  _hover={{ bg: "accent-hover", transform: "translateY(-1px)", boxShadow: "0 8px 24px rgba(99, 102, 241, 0.30)" }}
+                  _hover={{
+                    bg: "accent-hover",
+                    transform: "translateY(-1px)",
+                    boxShadow: "0 8px 24px rgba(99, 102, 241, 0.30)",
+                  }}
                   onClick={handleToggleView}
                   shadow="sm"
                 >
@@ -363,26 +315,17 @@ const HRMSSidebar = ({
           )}
 
           {!isCollapsed && (
-            <Flex
-              align="center"
-              justify="space-between"
-              bg="app-bg-secondary"
-              border="1px solid"
-              borderColor="border-color"
-              borderRadius="14px"
-              p={2}
-              px={3}
-            >
-              <HStack spacing={2} color="text-muted">
-                <FiGlobe size={14} />
-                <Text fontSize="10px" fontWeight="bold" letterSpacing="wider" color="text-muted">{t("language")}</Text>
-              </HStack>
-              <Menu placement="top-end">
+            <Menu>
+              <HStack justify="space-between" px={1}>
+                <Text fontSize="xs" fontWeight="semibold" color="text-secondary">
+                  {t("language")}
+                </Text>
                 <MenuButton
                   as={Button}
+                  rightIcon={<Text as="span">▼</Text>}
+                  leftIcon={<FiGlobe />}
                   size="xs"
                   variant="ghost"
-                  rightIcon={<Text fontSize="9px">▼</Text>}
                   fontSize="xs"
                   fontWeight="bold"
                   color="text-secondary"
@@ -391,16 +334,16 @@ const HRMSSidebar = ({
                 >
                   {LANG_LABELS[language] || "English"}
                 </MenuButton>
-                <MenuList fontSize="xs" minW="120px" zIndex={20}>
-                  <MenuItem fontWeight="medium" onClick={() => setLanguage("en")}>English</MenuItem>
-                  <MenuItem fontWeight="medium" onClick={() => setLanguage("hi")}>हिन्दी (Hindi)</MenuItem>
-                  <MenuItem fontWeight="medium" onClick={() => setLanguage("ne")}>नेपाली (Nepali)</MenuItem>
-                  <MenuItem fontWeight="medium" onClick={() => setLanguage("ko")}>한국어 (Korean)</MenuItem>
-                </MenuList>
-              </Menu>
-            </Flex>
+              </HStack>
+              <MenuList>
+                <MenuItem onClick={() => setLanguage("en")}>English</MenuItem>
+                <MenuItem onClick={() => setLanguage("hi")}>हिन्दी (Hindi)</MenuItem>
+                <MenuItem onClick={() => setLanguage("ne")}>नेपाली (Nepali)</MenuItem>
+                <MenuItem onClick={() => setLanguage("ko")}>한국어 (Korean)</MenuItem>
+              </MenuList>
+            </Menu>
           )}
-        </Box>
+        </VStack>
       </Box>
 
       <HelpCenterModal

@@ -1,3 +1,4 @@
+// src/contexts/LanguageContext.jsx
 import React, { createContext, useContext, useState, useEffect } from "react";
 
 const LanguageContext = createContext();
@@ -20,7 +21,8 @@ export const TRANSLATIONS = {
     signOut: "Sign out",
     searchPlaceholder: "Search employees, attendance, leaves...",
     language: "LANGUAGE",
-    
+    profile: "Profile",
+
     // Dashboard Stats
     totalEmployees: "Total Employees",
     presentToday: "Present Today",
@@ -31,7 +33,7 @@ export const TRANSLATIONS = {
     recentAnnouncements: "Recent Announcements",
     noAnnouncements: "No announcements currently posted.",
     noBirthdays: "No upcoming birthdays this week.",
-    
+
     // Buttons & Actions
     applyLeave: "Apply Leave",
     generatePayslip: "Generate Payslip",
@@ -59,7 +61,8 @@ export const TRANSLATIONS = {
     signOut: "साइन आउट",
     searchPlaceholder: "कर्मचारी, उपस्थिति, अवकाश खोजें...",
     language: "भाषा",
-    
+    profile: "प्रोफ़ाइल",
+
     // Dashboard Stats
     totalEmployees: "कुल कर्मचारी",
     presentToday: "आज उपस्थित",
@@ -70,7 +73,7 @@ export const TRANSLATIONS = {
     recentAnnouncements: "हाल की घोषणाएं",
     noAnnouncements: "वर्तमान में कोई घोषणा पोस्ट नहीं की गई है।",
     noBirthdays: "इस सप्ताह कोई आगामी जन्मदिन नहीं है।",
-    
+
     // Buttons & Actions
     applyLeave: "अवकाश लागू करें",
     generatePayslip: "पेस्लिप बनाएं",
@@ -98,7 +101,8 @@ export const TRANSLATIONS = {
     signOut: "साइन आउट",
     searchPlaceholder: "कर्मचारी, उपस्थिति, बिदा खोज्नुहोस्...",
     language: "भाषा",
-    
+    profile: "प्रोफाइल",
+
     // Dashboard Stats
     totalEmployees: "जम्मा कर्मचारी",
     presentToday: "आज उपस्थित",
@@ -109,7 +113,7 @@ export const TRANSLATIONS = {
     recentAnnouncements: "भर्खरका सूचनाहरू",
     noAnnouncements: "हाल कुनै सूचना पोस्ट गरिएको छैन।",
     noBirthdays: "यो हप्ता कुनै आगामी जन्मदिन छैन।",
-    
+
     // Buttons & Actions
     applyLeave: "बिदा आवेदन दिनुहोस्",
     generatePayslip: "पेस्लिप बनाउनुहोस्",
@@ -137,7 +141,8 @@ export const TRANSLATIONS = {
     signOut: "로그아웃",
     searchPlaceholder: "직원, 근태, 휴가 검색...",
     language: "언어",
-    
+    profile: "프로필",
+
     // Dashboard Stats
     totalEmployees: "총 직원 수",
     presentToday: "오늘 출근",
@@ -148,7 +153,7 @@ export const TRANSLATIONS = {
     recentAnnouncements: "최신 공지사항",
     noAnnouncements: "현재 등록된 공지사항이 없습니다.",
     noBirthdays: "이번 주 다가오는 생일이 없습니다.",
-    
+
     // Buttons & Actions
     applyLeave: "휴가 신청",
     generatePayslip: "급여 명세서 생성",
